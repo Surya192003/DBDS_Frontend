@@ -1,0 +1,23 @@
+/* You can add global styles to this file, and also import other style files */
+/* Add any custom styles here */
+.card {
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  margin-bottom: 20px;
+}
+
+.table-responsive {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.badge {
+  font-size: 0.8em;
+}
+
+.progress {
+  background-color: #e9ecef;
+}
+
+.progress-bar {
+  transition: width 0.6s ease;
+}
