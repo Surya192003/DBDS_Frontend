@@ -10,7 +10,7 @@ import { AuthService } from './auth.service';
 export class ApiService {
   private apiUrl = 'http://localhost:5010/api';
 
-  constructor(private http: HttpClient, private authService: AuthService) {}
+  constructor(private http: HttpClient, private authService: AuthService) { }
 
   // ✅ Get headers method
   private getHeaders(): HttpHeaders {
@@ -18,18 +18,18 @@ export class ApiService {
     let headers = new HttpHeaders({
       'Content-Type': 'application/json'
     });
-    
+
     if (token) {
       headers = headers.set('Authorization', `Bearer ${token}`);
     }
-    
+
     return headers;
   }
 
   // ✅ Error handler method
   private handleHttpError(error: HttpErrorResponse): Observable<never> {
     let errorMessage = 'An error occurred';
-    
+
     if (error.error instanceof ErrorEvent) {
       // Client-side error
       errorMessage = error.error.message;
@@ -62,19 +62,19 @@ export class ApiService {
           errorMessage = error.error?.message || `Error: ${error.status}`;
       }
     }
-    
+
     console.error('HTTP Error:', {
       status: error.status,
       message: errorMessage,
       url: error.url,
       error: error.error
     });
-    
+
     return throwError(() => new Error(errorMessage));
   }
 
   // ============ CLASS MANAGEMENT ============
-  
+
   getClasses(): Observable<any> {
     return this.http.get(`${this.apiUrl}/classes`, { headers: this.getHeaders() })
       .pipe(catchError(this.handleHttpError.bind(this)));
@@ -86,25 +86,25 @@ export class ApiService {
   }
 
   // Students
-getActiveStudents(): Observable<any> {
-  return this.http.get(`${this.apiUrl}/attendance/students/active`, { headers: this.getHeaders() })
-    .pipe(catchError(this.handleHttpError.bind(this)));
-}
+  getActiveStudents(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/attendance/students/active`, { headers: this.getHeaders() })
+      .pipe(catchError(this.handleHttpError.bind(this)));
+  }
 
-getClassStudents(classId: number): Observable<any> {
-  return this.http.get(`${this.apiUrl}/classes/${classId}/students`, { headers: this.getHeaders() })
-    .pipe(catchError(this.handleHttpError.bind(this)));
-}
+  getClassStudents(classId: number): Observable<any> {
+    return this.http.get(`${this.apiUrl}/classes/${classId}/students`, { headers: this.getHeaders() })
+      .pipe(catchError(this.handleHttpError.bind(this)));
+  }
 
-assignStudentToClass(classId: number, studentId: number): Observable<any> {
-  return this.http.post(`${this.apiUrl}/classes/${classId}/assign-student/${studentId}`, {}, { headers: this.getHeaders() })
-    .pipe(catchError(this.handleHttpError.bind(this)));
-}
+  assignStudentToClass(classId: number, studentId: number): Observable<any> {
+    return this.http.post(`${this.apiUrl}/classes/${classId}/assign-student/${studentId}`, {}, { headers: this.getHeaders() })
+      .pipe(catchError(this.handleHttpError.bind(this)));
+  }
 
-markBulkAttendance(data: any): Observable<any> {
-  return this.http.post(`${this.apiUrl}/attendance/bulk`, data, { headers: this.getHeaders() })
-    .pipe(catchError(this.handleHttpError.bind(this)));
-}
+  markBulkAttendance(data: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/attendance/bulk`, data, { headers: this.getHeaders() })
+      .pipe(catchError(this.handleHttpError.bind(this)));
+  }
 
   // ✅ Delete class method
   deleteClass(classId: number): Observable<any> {
@@ -113,7 +113,7 @@ markBulkAttendance(data: any): Observable<any> {
   }
 
   updateSongLink(classId: number, songLink: string): Observable<any> {
-    return this.http.put(`${this.apiUrl}/classes/${classId}/song-link`, 
+    return this.http.put(`${this.apiUrl}/classes/${classId}/song-link`,
       { song_link: songLink }, { headers: this.getHeaders() })
       .pipe(catchError(this.handleHttpError.bind(this)));
   }
@@ -136,7 +136,7 @@ markBulkAttendance(data: any): Observable<any> {
   }
 
   // ============ USER MANAGEMENT ============
-  
+
   getUsers(): Observable<any> {
     return this.http.get(`${this.apiUrl}/users`, { headers: this.getHeaders() })
       .pipe(catchError(this.handleHttpError.bind(this)));
@@ -148,7 +148,7 @@ markBulkAttendance(data: any): Observable<any> {
   }
 
   updatePayRate(instructorId: number, payRate: number): Observable<any> {
-    return this.http.put(`${this.apiUrl}/users/instructor/${instructorId}/pay-rate`, 
+    return this.http.put(`${this.apiUrl}/users/instructor/${instructorId}/pay-rate`,
       { pay_per_class: payRate }, { headers: this.getHeaders() })
       .pipe(catchError(this.handleHttpError.bind(this)));
   }
@@ -159,7 +159,7 @@ markBulkAttendance(data: any): Observable<any> {
   }
 
   // ============ ATTENDANCE MANAGEMENT ============
-  
+
   markAttendance(data: any): Observable<any> {
     return this.http.post(`${this.apiUrl}/attendance`, data, { headers: this.getHeaders() })
       .pipe(catchError(this.handleHttpError.bind(this)));
@@ -176,9 +176,9 @@ markBulkAttendance(data: any): Observable<any> {
   }
 
   // ============ PAYMENT MANAGEMENT ============
-  
+
   calculateMonthlyPayments(monthYear: string): Observable<any> {
-    return this.http.post(`${this.apiUrl}/payments/calculate-monthly`, 
+    return this.http.post(`${this.apiUrl}/payments/calculate-monthly`,
       { month_year: monthYear }, { headers: this.getHeaders() })
       .pipe(catchError(this.handleHttpError.bind(this)));
   }
@@ -194,7 +194,7 @@ markBulkAttendance(data: any): Observable<any> {
   }
 
   // ============ REPORTS ============
-  
+
   getStudentStats(): Observable<any> {
     return this.http.get(`${this.apiUrl}/reports/student-stats`, { headers: this.getHeaders() })
       .pipe(catchError(this.handleHttpError.bind(this)));
@@ -211,7 +211,7 @@ markBulkAttendance(data: any): Observable<any> {
   }
 
   // ============ UTILITY METHODS ============
-  
+
   testConnection(): Observable<any> {
     return this.http.get(`${this.apiUrl}/health`)
       .pipe(catchError(this.handleHttpError.bind(this)));
@@ -254,6 +254,41 @@ markBulkAttendance(data: any): Observable<any> {
       ...options
     };
     return this.http.delete(`${this.apiUrl}/${url}`, defaultOptions)
+      .pipe(catchError(this.handleHttpError.bind(this)));
+  }
+  // Groups
+  getGroups(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/groups`, { headers: this.getHeaders() })
+      .pipe(catchError(this.handleHttpError.bind(this)));
+  }
+
+  getGroupDetails(groupId: number): Observable<any> {
+    return this.http.get(`${this.apiUrl}/groups/${groupId}`, { headers: this.getHeaders() })
+      .pipe(catchError(this.handleHttpError.bind(this)));
+  }
+
+  createGroup(groupData: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/groups`, groupData, { headers: this.getHeaders() })
+      .pipe(catchError(this.handleHttpError.bind(this)));
+  }
+
+  addStudentToGroup(groupId: number, studentId: number): Observable<any> {
+    return this.http.post(`${this.apiUrl}/groups/${groupId}/add-student/${studentId}`, {}, { headers: this.getHeaders() })
+      .pipe(catchError(this.handleHttpError.bind(this)));
+  }
+
+  removeStudentFromGroup(groupId: number, studentId: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/groups/${groupId}/remove-student/${studentId}`, { headers: this.getHeaders() })
+      .pipe(catchError(this.handleHttpError.bind(this)));
+  }
+
+  updateGroup(groupId: number, groupData: any): Observable<any> {
+    return this.http.put(`${this.apiUrl}/groups/${groupId}`, groupData, { headers: this.getHeaders() })
+      .pipe(catchError(this.handleHttpError.bind(this)));
+  }
+
+  deleteGroup(groupId: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/groups/${groupId}`, { headers: this.getHeaders() })
       .pipe(catchError(this.handleHttpError.bind(this)));
   }
 }

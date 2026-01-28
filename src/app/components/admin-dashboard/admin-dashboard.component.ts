@@ -17,6 +17,8 @@ export class AdminDashboardComponent implements OnInit {
   filteredUsers: any[] = [];
   filteredStudentStats: any[] = [];
   instructorStats: any[] = [];
+  groups: any[] = [];
+  loadingGroups: boolean = false;
 
   selectedMonth: string = new Date().toISOString().slice(0, 7);
   selectedInstructor: any = null;
@@ -35,7 +37,7 @@ export class AdminDashboardComponent implements OnInit {
   assigningStudent: boolean = false;
   selectedStudent: any = null;
   selectedClass: any = null;
-loadingStudents: boolean = false;
+  loadingStudents: boolean = false;
 
 
   today: string = new Date().toISOString().split('T')[0];
@@ -50,9 +52,11 @@ loadingStudents: boolean = false;
   ) {
     // Initialize forms
     this.classForm = this.fb.group({
+      class_name: ['', Validators.required],
       class_date: ['', Validators.required],
       class_time: ['', Validators.required],
-      instructor_id: ['']
+      instructor_id: [''],
+      group_id: ['', Validators.required]
     });
 
     this.payRateForm = this.fb.group({
@@ -60,10 +64,26 @@ loadingStudents: boolean = false;
     });
   }
 
- ngOnInit() {
-  this.loadAllData();
-  this.loadActiveStudents(); // Add this
-}
+  ngOnInit() {
+    this.loadAllData();
+    this.loadActiveStudents();
+    this.loadGroups(); // Add this
+  }
+
+  loadGroups() {
+    this.loadingGroups = true;
+    this.apiService.getGroups().subscribe({
+      next: (data: any) => {
+        this.groups = data;
+        this.loadingGroups = false;
+      },
+      error: (error) => {
+        console.error('Error loading groups:', error);
+        this.loadingGroups = false;
+      }
+    });
+  }
+
 
   loadAllData() {
     this.loadUsers();
@@ -398,28 +418,28 @@ loadingStudents: boolean = false;
   clearSuccess() {
     this.successMessage = '';
   }
-    loadActiveStudents() {
-  this.loadingStudents = true;
-  this.apiService.getActiveStudents().subscribe({
-    next: (data: any) => {
-      console.log('Active students data:', data); // Debug log
-      
-      if (data && data.length > 0) {
-        this.activeStudents = data;
-      } else {
-        // If no students from API, try to get from users list
+  loadActiveStudents() {
+    this.loadingStudents = true;
+    this.apiService.getActiveStudents().subscribe({
+      next: (data: any) => {
+        console.log('Active students data:', data); // Debug log
+
+        if (data && data.length > 0) {
+          this.activeStudents = data;
+        } else {
+          // If no students from API, try to get from users list
+          this.loadStudentsFromUsersList();
+        }
+        this.loadingStudents = false;
+      },
+      error: (error) => {
+        console.error('Error loading active students:', error);
+        // Fallback to users list
         this.loadStudentsFromUsersList();
+        this.loadingStudents = false;
       }
-      this.loadingStudents = false;
-    },
-    error: (error) => {
-      console.error('Error loading active students:', error);
-      // Fallback to users list
-      this.loadStudentsFromUsersList();
-      this.loadingStudents = false;
-    }
-  });
-}
+    });
+  }
 
   openAssignStudentModal(classItem: any) {
     this.selectedClass = classItem;
@@ -448,28 +468,28 @@ loadingStudents: boolean = false;
   }
 
 
-// Fallback method to load students from users list
-loadStudentsFromUsersList() {
-  this.apiService.getUsers().subscribe({
-    next: (data: any) => {
-      // Filter active students from users
-      const studentUsers = data.filter((user: any) => 
-        user.role === 'STUDENT' && user.is_active && user.student_id
-      );
-      
-      this.activeStudents = studentUsers.map((student: any) => ({
-        student_id: student.student_id,
-        user_id: student.id,
-        name: student.name,
-        email: student.email
-      }));
-      
-      console.log('Students from users list:', this.activeStudents);
-    },
-    error: (error) => {
-      console.error('Error loading students from users:', error);
-      this.activeStudents = [];
-    }
-  });
-}
+  // Fallback method to load students from users list
+  loadStudentsFromUsersList() {
+    this.apiService.getUsers().subscribe({
+      next: (data: any) => {
+        // Filter active students from users
+        const studentUsers = data.filter((user: any) =>
+          user.role === 'STUDENT' && user.is_active && user.student_id
+        );
+
+        this.activeStudents = studentUsers.map((student: any) => ({
+          student_id: student.student_id,
+          user_id: student.id,
+          name: student.name,
+          email: student.email
+        }));
+
+        console.log('Students from users list:', this.activeStudents);
+      },
+      error: (error) => {
+        console.error('Error loading students from users:', error);
+        this.activeStudents = [];
+      }
+    });
+  }
 }

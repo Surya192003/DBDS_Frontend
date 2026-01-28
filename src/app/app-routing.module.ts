@@ -8,11 +8,18 @@ import { InstructorDashboardComponent } from './components/instructor-dashboard/
 import { StudentDashboardComponent } from './components/student-dashboard/student-dashboard.component';
 import { AuthGuard } from './guards/auth.guard';
 import { RoleGuard } from './guards/role.guard';
+import { GroupsManagementComponent } from './components/groups-management/groups-management.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
+   { 
+    path: 'admin/groups', 
+    component: GroupsManagementComponent,
+    canActivate: [AuthGuard, RoleGuard],
+    data: { role: 'ADMIN' }
+  },
   { 
     path: 'dashboard', 
     component: DashboardComponent,
@@ -36,7 +43,7 @@ const routes: Routes = [
     canActivate: [AuthGuard, RoleGuard],
     data: { role: 'STUDENT' }
   },
-  { path: '**', redirectTo: '/dashboard' }
+  { path: '**', redirectTo: '/dashboard' },
 ];
 
 @NgModule({
