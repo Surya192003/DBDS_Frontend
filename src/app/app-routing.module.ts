@@ -9,6 +9,7 @@ import { StudentDashboardComponent } from './components/student-dashboard/studen
 import { AuthGuard } from './guards/auth.guard';
 import { RoleGuard } from './guards/role.guard';
 import { GroupsManagementComponent } from './components/groups-management/groups-management.component';
+import { ProfileComponent } from './components/profile/profile.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
@@ -44,6 +45,11 @@ const routes: Routes = [
     data: { role: 'STUDENT' }
   },
   { path: '**', redirectTo: '/dashboard' },
+  { 
+    path: 'profile', 
+    component: ProfileComponent,
+    canActivate: [AuthGuard]
+  },
 ];
 
 @NgModule({

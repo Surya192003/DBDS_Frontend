@@ -14,6 +14,7 @@ import { StudentDashboardComponent } from './components/student-dashboard/studen
 import { AuthInterceptor } from './interceptors/auth.interceptor';
 import { ReactiveFormsModule } from '@angular/forms';
 import { GroupsManagementComponent } from './components/groups-management/groups-management.component';
+import { ProfileComponent } from './components/profile/profile.component';
 @NgModule({
   declarations: [
     AppComponent,
@@ -23,7 +24,8 @@ import { GroupsManagementComponent } from './components/groups-management/groups
     AdminDashboardComponent,
     InstructorDashboardComponent,
     StudentDashboardComponent,
-    GroupsManagementComponent
+    GroupsManagementComponent,
+    ProfileComponent
   ],
   imports: [
     BrowserModule,

@@ -266,18 +266,24 @@
                   </td>
                   <td>
                     <div class="btn-group btn-group-sm" role="group">
-                      <button class="btn btn-outline-primary" (click)="toggleUserStatus(user.id)"
+                      <button class="btn btn-outline-primary me-1" (click)="toggleUserStatus(user.id)"
                         [disabled]="user.role === 'ADMIN'"
                         [title]="user.is_active ? 'Deactivate User' : 'Activate User'">
                         <i class="bi" [ngClass]="user.is_active ? 'bi-person-x' : 'bi-person-check'"></i>
                       </button>
-                      <button *ngIf="user.role === 'INSTRUCTOR' && user.instructor_id" class="btn btn-outline-info"
+
+                      <button *ngIf="user.role === 'INSTRUCTOR' && user.instructor_id" class="btn btn-outline-info me-1"
                         (click)="openPayRateModal(user)" title="Set Pay Rate">
                         <i class="bi bi-cash-coin"></i>
                       </button>
+
+                      <!-- Delete User Button -->
+                      <button class="btn btn-outline-danger" (click)="deleteUser(user.id)"
+                        [disabled]="user.role === 'ADMIN' || user.id === currentUser?.id" title="Delete User">
+                        <i class="bi bi-trash"></i>
+                      </button>
                     </div>
-                  </td>
-                </tr>
+                     </tr>
                 <tr *ngIf="filteredUsers.length === 0">
                   <td colspan="4" class="text-center py-4">
                     <i class="bi bi-people text-muted fs-1 mb-2"></i>

@@ -291,4 +291,34 @@ export class ApiService {
     return this.http.delete(`${this.apiUrl}/groups/${groupId}`, { headers: this.getHeaders() })
       .pipe(catchError(this.handleHttpError.bind(this)));
   }
+  // User profile
+updateUserProfile(profileData: any): Observable<any> {
+  return this.http.put(`${this.apiUrl}/users/profile`, profileData, { headers: this.getHeaders() })
+    .pipe(catchError(this.handleHttpError.bind(this)));
+}
+
+// Delete user
+deleteUser(userId: number): Observable<any> {
+  return this.http.delete(`${this.apiUrl}/users/${userId}`, { headers: this.getHeaders() })
+    .pipe(catchError(this.handleHttpError.bind(this)));
+}
+
+// Upload profile photo
+uploadProfilePhoto(file: File): Observable<any> {
+  const formData = new FormData();
+  formData.append('photo', file);
+  
+  return this.http.post(`${this.apiUrl}/upload/profile-photo`, formData, {
+    headers: {
+      'Authorization': `Bearer ${this.authService.token}`
+      // Note: Don't set Content-Type, let browser set it with boundary
+    }
+  }).pipe(catchError(this.handleHttpError.bind(this)));
+}
+
+// Delete profile photo
+deleteProfilePhoto(): Observable<any> {
+  return this.http.delete(`${this.apiUrl}/upload/profile-photo`, { headers: this.getHeaders() })
+    .pipe(catchError(this.handleHttpError.bind(this)));
+}
 }

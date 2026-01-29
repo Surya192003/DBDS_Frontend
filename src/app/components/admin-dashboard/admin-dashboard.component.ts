@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../../services/api.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ModalService } from '../../services/modal.service';
+import { AuthService } from 'src/app/services/auth.service';
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -19,6 +20,8 @@ export class AdminDashboardComponent implements OnInit {
   instructorStats: any[] = [];
   groups: any[] = [];
   loadingGroups: boolean = false;
+  currentUser: any = null;
+
 
   selectedMonth: string = new Date().toISOString().slice(0, 7);
   selectedInstructor: any = null;
@@ -47,6 +50,7 @@ export class AdminDashboardComponent implements OnInit {
 
   constructor(
     private apiService: ApiService,
+    private authService: AuthService,
     private fb: FormBuilder,
     public modalService: ModalService
   ) {
@@ -58,7 +62,7 @@ export class AdminDashboardComponent implements OnInit {
       instructor_id: [''],
       group_id: ['', Validators.required]
     });
-
+    this.currentUser = this.authService.currentUser;
     this.payRateForm = this.fb.group({
       payRate: [0, [Validators.required, Validators.min(0)]]
     });
@@ -492,4 +496,20 @@ export class AdminDashboardComponent implements OnInit {
       }
     });
   }
+  deleteUser(userId: number) {
+  if (confirm(`Are you sure you want to delete this user? This action cannot be undone and will delete all associated data.`)) {
+    this.apiService.deleteUser(userId).subscribe({
+      next: (response: any) => {
+        this.successMessage = `User "${response.deletedUser.name}" deleted successfully`;
+        setTimeout(() => this.successMessage = '', 5000);
+        this.loadUsers();
+      },
+      error: (error) => {
+        console.error('Error deleting user:', error);
+        this.errorMessage = 'Failed to delete user: ' + error.message;
+        setTimeout(() => this.errorMessage = '', 5000);
+      }
+    });
+  }
+}
 }
