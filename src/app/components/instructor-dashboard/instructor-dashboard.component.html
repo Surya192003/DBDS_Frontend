@@ -1,297 +1,110 @@
-<div class="container-fluid">
-  <!-- Statistics Cards -->
-  <div class="row mb-4">
-    <div class="col-md-3 col-sm-6 mb-3">
-      <div class="card bg-primary text-white shadow-sm">
-        <div class="card-body">
-          <div class="d-flex justify-content-between align-items-center">
-            <div>
-              <h6 class="card-title mb-1">Total Classes</h6>
-              <h2 class="mb-0">{{totalClasses}}</h2>
-            </div>
-            <i class="bi bi-calendar-week fs-1 opacity-50"></i>
-          </div>
-        </div>
+<div class="dashboard-wrapper fade-in">
+  <header class="dashboard-header mb-5">
+    <div class="d-flex justify-content-between align-items-end">
+      <div>
+        <h1 class="title-text">INSTRUCTOR_PORTAL</h1>
+        <p class="tagline">DBDS_IRELAND // ACCESS_LEVEL: {{currentUser?.role}}</p>
+      </div>
+      <button class="btn-sharp-outline mobile-icon-only" (click)="loadDashboardData()">
+        <span class="d-none d-md-inline">REFRESH_SYSTEM</span> 🔄
+      </button>
+    </div>
+  </header>
+
+  <section class="summary-grid mb-5">
+    <div class="summary-card color-blue">
+      <label>TOTAL_CLASSES</label>
+      <div class="value">{{totalClasses}}</div>
+    </div>
+    <div class="summary-card color-green">
+      <label>COMPLETED</label>
+      <div class="value">{{completedClasses}}</div>
+    </div>
+    <div class="summary-card color-yellow">
+      <label>UPCOMING</label>
+      <div class="value">{{upcomingClasses}}</div>
+    </div>
+    <div class="summary-card color-red">
+      <label>TOTAL_STUDENTS</label>
+      <div class="value">{{totalStudents}}</div>
+    </div>
+  </section>
+
+  <section class="mb-5">
+    <label class="section-label">ASSIGNED_CLASSES_MANIFEST</label>
+    <div class="sharp-card">
+      <div *ngIf="loading" class="center-content py-5">
+        <div class="spinner-square"></div>
+        <p class="fw-bold mt-3">SYNCING_DATA...</p>
+      </div>
+
+      <div class="table-container" *ngIf="!loading && classes.length > 0">
+        <table class="sharp-table">
+          <thead>
+            <tr>
+              <th>CLASS_NAME</th>
+              <th>DATE_&_TIME</th>
+              <th>GROUP</th>
+              <th>STATUS</th>
+              <th>ACTIONS</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let classItem of classes">
+              <td>
+                <div class="fw-bold">{{classItem.class_name}}</div>
+                <div class="muted-id">ID: #{{classItem.id}}</div>
+              </td>
+              <td>
+                <div>{{classItem.class_date | date:'dd.MM.yy'}}</div>
+                <div class="muted-id">{{classItem.class_time}}</div>
+              </td>
+              <td><span class="badge-sharp">{{classItem.group_name || 'NONE'}}</span></td>
+              <td>
+                <span class="status-pill" 
+                      [ngClass]="getStatusClass(classItem.class_date)">
+                  {{getStatusText(classItem.class_date)}}
+                </span>
+              </td>
+              <td>
+                <div class="action-stack">
+                  <button class="btn-sharp-sm" (click)="openAttendanceModal(classItem)" 
+                          [disabled]="getStatusClass(classItem.class_date) === 'pill-green'">
+                    ATTENDANCE
+                  </button>
+                  <button class="btn-sharp-sm outline" (click)="openSongModal(classItem)">SONG</button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
+  </section>
 
-    <div class="col-md-3 col-sm-6 mb-3">
-      <div class="card bg-success text-white shadow-sm">
-        <div class="card-body">
-          <div class="d-flex justify-content-between align-items-center">
-            <div>
-              <h6 class="card-title mb-1">Completed Classes</h6>
-              <h2 class="mb-0">{{completedClasses}}</h2>
-            </div>
-            <i class="bi bi-check-circle fs-1 opacity-50"></i>
-          </div>
-        </div>
+  <section class="mb-5">
+    <label class="section-label">MONTHLY_PERFORMANCE_METRICS</label>
+    <div class="sharp-card">
+      <div class="table-container">
+        <table class="sharp-table">
+          <thead>
+            <tr>
+              <th>MONTH</th>
+              <th class="text-center">CLASSES</th>
+              <th class="text-center">STUDENTS</th>
+              <th class="text-end">EARNINGS</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let perf of monthlyPerformance">
+              <td class="fw-bold">{{perf.month_year}}</td>
+              <td class="text-center">{{perf.total_classes}}</td>
+              <td class="text-center">{{perf.total_students}}</td>
+              <td class="text-end fw-bold text-success">€{{perf.earnings}}</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
-
-    <div class="col-md-3 col-sm-6 mb-3">
-      <div class="card bg-info text-white shadow-sm">
-        <div class="card-body">
-          <div class="d-flex justify-content-between align-items-center">
-            <div>
-              <h6 class="card-title mb-1">Upcoming Classes</h6>
-              <h2 class="mb-0">{{upcomingClasses}}</h2>
-            </div>
-            <i class="bi bi-clock-history fs-1 opacity-50"></i>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="col-md-3 col-sm-6 mb-3">
-      <div class="card bg-warning text-white shadow-sm">
-        <div class="card-body">
-          <div class="d-flex justify-content-between align-items-center">
-            <div>
-              <h6 class="card-title mb-1">Total Students</h6>
-              <h2 class="mb-0">{{totalStudents}}</h2>
-            </div>
-            <i class="bi bi-people fs-1 opacity-50"></i>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Page Header -->
-  <div class="row mb-4">
-    <div class="col-12">
-      <div class="d-flex justify-content-between align-items-center">
-        <h3 class="mb-0">
-          <i class="bi bi-person-badge text-primary me-2"></i>
-          Welcome, {{currentUser?.name}}
-        </h3>
-        <button class="btn btn-outline-primary" (click)="loadDashboardData()">
-          <i class="bi bi-arrow-clockwise"></i> Refresh
-        </button>
-      </div>
-      <hr>
-    </div>
-  </div>
-
-  <!-- My Classes Section -->
-  <div class="row mb-4">
-    <div class="col-12">
-      <div class="card shadow-sm">
-        <div class="card-header bg-white">
-          <h5 class="card-title mb-0">
-            <i class="bi bi-calendar-check text-primary me-2"></i>
-            My Classes
-          </h5>
-        </div>
-        <div class="card-body">
-          <div *ngIf="loading" class="text-center py-5">
-            <div class="spinner-border text-primary" role="status">
-              <span class="visually-hidden">Loading...</span>
-            </div>
-            <p class="mt-2 text-muted">Loading your classes...</p>
-          </div>
-
-          <div *ngIf="!loading && classes.length === 0" class="text-center py-5">
-            <i class="bi bi-calendar-x fs-1 text-muted mb-3"></i>
-            <h5 class="text-muted">No Classes Assigned</h5>
-            <p class="text-muted">You haven't been assigned to any classes yet.</p>
-          </div>
-
-          <div *ngIf="!loading && classes.length > 0" class="table-responsive">
-            <table class="table table-hover">
-              <thead class="table-light">
-                <tr>
-                  <th>Class Name</th>
-                  <th>Date</th>
-                  <th>Time</th>
-                  <th>Group</th>
-                  <th>Status</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let classItem of classes">
-                  <td>
-                    <strong>{{classItem.class_name}}</strong>
-                    <br>
-                    <small class="text-muted">ID: #{{classItem.id}}</small>
-                  </td>
-                  <td>{{classItem.class_date | date:'fullDate'}}</td>
-                  <td>{{classItem.class_time}}</td>
-                  <td>
-                    <span class="badge bg-secondary">{{classItem.group_name || 'No Group'}}</span>
-                  </td>
-                  <td>
-                    <span [class]="getStatusClass(classItem.class_date) === 'completed' ? 'badge bg-success' : 
-                                   getStatusClass(classItem.class_date) === 'today' ? 'badge bg-warning' : 
-                                   'badge bg-info'">
-                      {{getStatusClass(classItem.class_date) === 'completed' ? 'Completed' : 
-                        getStatusClass(classItem.class_date) === 'today' ? 'Today' : 'Upcoming'}}
-                    </span>
-                  </td>
-                  <td>
-                    <div class="btn-group btn-group-sm">
-                      <button class="btn btn-outline-primary" 
-                              (click)="openAttendanceModal(classItem)"
-                              [disabled]="getStatusClass(classItem.class_date) === 'completed'">
-                        <i class="bi bi-check-square"></i> Attendance
-                      </button>
-                      <button class="btn btn-outline-secondary" 
-                              (click)="openSongModal(classItem)">
-                        <i class="bi bi-music-note"></i> Song
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Monthly Performance Section -->
-  <div class="row">
-    <div class="col-12">
-      <div class="card shadow-sm">
-        <div class="card-header bg-white">
-          <h5 class="card-title mb-0">
-            <i class="bi bi-graph-up text-info me-2"></i>
-            Monthly Performance
-          </h5>
-        </div>
-        <div class="card-body">
-          <div *ngIf="monthlyPerformance.length === 0" class="text-center py-4">
-            <i class="bi bi-bar-chart-line fs-1 text-muted mb-3"></i>
-            <p class="text-muted mb-0">No performance data available yet</p>
-          </div>
-          <div *ngIf="monthlyPerformance.length > 0" class="table-responsive">
-            <table class="table table-sm">
-              <thead class="table-light">
-                <tr>
-                  <th>Month</th>
-                  <th class="text-center">Classes</th>
-                  <th class="text-center">Students</th>
-                  <th class="text-end">Earnings</th>
-                  <th class="text-center">Rating</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let perf of monthlyPerformance">
-                  <td>{{perf.month_year || perf.month}}</td>
-                  <td class="text-center">{{perf.total_classes || 0}}</td>
-                  <td class="text-center">{{perf.total_students || 0}}</td>
-                  <td class="text-end text-success">${{perf.earnings || 0}}</td>
-                  <td class="text-center">
-                    <span class="badge bg-warning">
-                      {{perf.rating || 0}} ★
-                    </span>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Attendance Modal -->
-<!-- Attendance Modal -->
-<div class="modal fade" id="attendanceModal" tabindex="-1">
-  <div class="modal-dialog modal-lg modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header bg-primary text-white">
-        <h5 class="modal-title">
-          <i class="bi bi-check-square me-2"></i>
-          Mark Attendance - {{selectedClass?.class_name}}
-        </h5>
-        <button type="button" class="btn-close btn-close-white" (click)="closeAttendanceModal()"></button>
-      </div>
-      <div class="modal-body">
-        <div class="alert alert-info">
-          <i class="bi bi-info-circle me-2"></i>
-          Mark attendance for students in this class. All students are from the assigned group.
-        </div>
-        
-        <div *ngIf="classStudents.length === 0" class="text-center py-4">
-          <p class="text-muted">No students found in this class.</p>
-        </div>
-        
-        <div *ngIf="classStudents.length > 0" class="table-responsive">
-          <table class="table table-hover">
-            <thead class="table-light">
-              <tr>
-                <th>Student Name</th>
-                <th>Email</th>
-                <th class="text-center">Present</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let student of classStudents">
-                <td><strong>{{student.name}}</strong></td>
-                <td>{{student.email}}</td>
-                <td class="text-center">
-                  <div class="form-check form-switch d-flex justify-content-center">
-                    <input class="form-check-input" type="checkbox" 
-                           [formControl]="getAttendanceControl(student.student_id)"
-                           id="student_{{student.student_id}}">
-                    <label class="form-check-label ms-2" 
-                           [for]="'student_' + student.student_id">
-                      {{getAttendanceControl(student.student_id)?.value ? 'Present' : 'Absent'}}
-                    </label>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" (click)="closeAttendanceModal()">Cancel</button>
-        <button type="button" class="btn btn-primary" 
-                (click)="submitAttendance()" 
-                [disabled]="markingAttendance || classStudents.length === 0">
-          <span *ngIf="markingAttendance" class="spinner-border spinner-border-sm me-2"></span>
-          Save Attendance
-        </button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Song Link Modal -->
-<div class="modal fade" id="songModal" tabindex="-1">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header bg-secondary text-white">
-        <h5 class="modal-title">
-          <i class="bi bi-music-note-beamed me-2"></i>
-          Update Song Link - {{selectedClass?.class_name}}
-        </h5>
-        <button type="button" class="btn-close btn-close-white" (click)="closeSongModal()"></button>
-      </div>
-      <div class="modal-body">
-        <div class="mb-3">
-          <label class="form-label">YouTube/Spotify Link</label>
-          <input type="url" class="form-control" [(ngModel)]="songLink" 
-                 placeholder="https://www.youtube.com/watch?v=...">
-          <div class="form-text">Paste the link to the song for this class</div>
-        </div>
-        <div *ngIf="songLink" class="mt-3">
-          <label class="form-label">Preview:</label>
-          <div class="ratio ratio-16x9" *ngIf="songLink.includes('youtube.com') || songLink.includes('youtu.be')">
-            <iframe [src]="songLink" frameborder="0" allowfullscreen></iframe>
-          </div>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" (click)="closeSongModal()">Cancel</button>
-        <button type="button" class="btn btn-primary" (click)="updateSongLink()">Update Link</button>
-      </div>
-    </div>
-  </div>
+  </section>
 </div>

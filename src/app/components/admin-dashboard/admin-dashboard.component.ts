@@ -3,14 +3,12 @@ import { ApiService } from '../../services/api.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ModalService } from '../../services/modal.service';
 import { AuthService } from 'src/app/services/auth.service';
-import { HostListener } from '@angular/core';
 
 @Component({
   selector: 'app-admin-dashboard',
   templateUrl: './admin-dashboard.component.html',
   styleUrls: ['./admin-dashboard.component.css']
 })
-
 export class AdminDashboardComponent implements OnInit {
   users: any[] = [];
   classes: any[] = [];
@@ -248,6 +246,8 @@ export class AdminDashboardComponent implements OnInit {
 
   // Class Management
   createClass() {
+     console.log('createClass called, form valid?', this.classForm.valid);
+  console.log('Form value:', this.classForm.value);
     if (this.classForm.valid) {
       this.creatingClass = true;
       this.setFormDisabled(true);

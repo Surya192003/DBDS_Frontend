@@ -1,1 +1,129 @@
-<p>dashboard works!</p>
+<div class="dashboard-wrapper">
+  <!-- Loading state -->
+  <div class="sharp-card center-text" *ngIf="!user">
+    <div class="spinner-square"></div>
+    <h2 class="title-text">INITIALIZING_SYSTEM...</h2>
+  </div>
+
+  <!-- Main Dashboard -->
+  <div class="sharp-card main-dashboard-card" *ngIf="user">
+    <!-- Video Header (optional, remove if no video) -->
+    <div class="video-header">
+      <video autoplay muted loop playsinline class="header-video">
+        <source src="assets/videos/dance-background.jpg">
+      </video>
+      <div class="video-overlay">
+        <h1 class="school-name">DHARMENDRA BOLLYWOOD DANCE SCHOOL</h1>
+        <p class="tagline">WHERE YOUR DREAMS BEGIN // IRELAND</p>
+      </div>
+    </div>
+
+    <!-- Profile Summary -->
+    <div class="profile-summary">
+      <div class="profile-photo">
+        <img *ngIf="user?.photo_url" [src]="user.photo_url" class="profile-img">
+        <div *ngIf="!user?.photo_url" class="profile-placeholder">{{user?.name?.charAt(0)}}</div>
+      </div>
+      <div class="profile-info">
+        <div class="info-line"><span class="label">ID:</span> 00{{user?.id}}</div>
+        <div class="info-line"><span class="label">NAME:</span> {{user?.name | uppercase}}</div>
+        <div class="info-line"><span class="label">ROLE:</span> {{user?.role}}</div>
+      </div>
+      <button class="btn-sharp-small" (click)="openEditProfileModal()">EDIT_PROFILE</button>
+    </div>
+
+    <!-- Role Portals -->
+    <div class="actions-section">
+      <label class="section-label">ACCESS_PROTOCOLS</label>
+      <div class="button-grid">
+        <a *ngIf="user?.role === 'ADMIN'" routerLink="/admin" class="btn-sharp">ADMIN_PORTAL</a>
+        <a *ngIf="user?.role === 'INSTRUCTOR'" routerLink="/instructor" class="btn-sharp">INSTRUCTOR_PORTAL</a>
+        <a *ngIf="user?.role === 'STUDENT'" routerLink="/student" class="btn-sharp">LEARNING_PORTAL</a>
+      </div>
+    </div>
+
+    <!-- Dance Classes Grid -->
+    <div class="classes-section">
+      <label class="section-label">OUR_CLASSES</label>
+      <div class="classes-grid">
+        <div class="class-card" *ngFor="let danceClass of danceClasses">
+          <div class="class-icon">{{danceClass.icon}}</div>
+          <h4>{{danceClass.name}}</h4>
+          <p>{{danceClass.description}}</p>
+          <button class="btn-sharp-small w-100 mt-2" (click)="navigateToClass(danceClass)">VIEW_COURSE</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Info Cards (Coming Soon) -->
+    <div class="info-grid">
+      <div class="info-card" (click)="comingSoon('Events')">
+        <span>📅</span> EVENTS
+      </div>
+      <div class="info-card" (click)="comingSoon('DBDS Store')">
+        <span>🛒</span> DBDS STORE
+      </div>
+      <div class="info-card" (click)="comingSoon('Refer Friends')">
+        <span>🤝</span> REFER FRIENDS
+      </div>
+      <div class="info-card" (click)="comingSoon('Gallery')">
+        <span>🖼️</span> GALLERY
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer-contact">
+      <p>+353 89 468 5565 // INFO@DBDS.IE // DUBLIN, IRELAND</p>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Profile Modal -->
+<div class="modal-overlay" *ngIf="showEditModal" (click)="closeModalOnOverlay($event)">
+  <div class="sharp-modal">
+    <div class="modal-header-sharp">
+      <h3>EDIT_PROFILE // {{user?.name | uppercase}}</h3>
+      <button class="modal-close" (click)="closeEditModal()">✕</button>
+    </div>
+    <form [formGroup]="profileForm" (ngSubmit)="updateProfile()" class="modal-body-sharp">
+      <!-- Photo Upload -->
+      <div class="photo-upload-section">
+        <div class="current-photo">
+          <img *ngIf="previewUrl || user?.photo_url" [src]="previewUrl || user?.photo_url" alt="Profile">
+          <div *ngIf="!previewUrl && !user?.photo_url" class="photo-placeholder">{{user?.name?.charAt(0)}}</div>
+        </div>
+        <div class="photo-actions">
+          <input type="file" #fileInput accept="image/*" (change)="onFileSelected($event)" style="display:none">
+          <button type="button" class="btn-sharp-small" (click)="fileInput.click()">UPLOAD_NEW</button>
+          <button type="button" class="btn-sharp-small danger" (click)="deletePhoto()" *ngIf="user?.photo_url">REMOVE</button>
+        </div>
+        <div *ngIf="uploadMessage" class="upload-message">{{uploadMessage}}</div>
+      </div>
+
+      <!-- Editable Fields -->
+      <div class="form-row-sharp">
+        <label>FULL_NAME</label>
+        <input type="text" formControlName="name" class="sharp-input">
+      </div>
+      <div class="form-row-sharp">
+        <label>EMAIL</label>
+        <input type="email" formControlName="email" class="sharp-input">
+      </div>
+      <div class="form-row-sharp">
+        <label>PHONE</label>
+        <input type="text" formControlName="phone" class="sharp-input">
+      </div>
+      <div class="form-row-sharp">
+        <label>ADDRESS</label>
+        <textarea formControlName="address" class="sharp-input" rows="2"></textarea>
+      </div>
+
+      <div class="modal-footer-sharp">
+        <button type="button" class="btn-sharp-small" (click)="closeEditModal()">CANCEL</button>
+        <button type="submit" class="btn-sharp-small primary" [disabled]="isSubmitting">
+          {{isSubmitting ? 'SAVING...' : 'SAVE_CHANGES'}}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

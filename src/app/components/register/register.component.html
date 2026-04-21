@@ -1,1 +1,72 @@
-<p>register works!</p>
+<div class="auth-container">
+  <div class="sharp-card auth-card">
+    <div class="auth-header">
+      <h2 class="title-text">NEW_USER_REGISTRATION</h2>
+      <p class="tagline">DBDS_IRELAND // SECURE_PORTAL</p>
+    </div>
+
+    <div *ngIf="errorMessage" class="msg-box error" (click)="errorMessage = ''">{{errorMessage}}</div>
+    <div *ngIf="successMessage" class="msg-box success" (click)="successMessage = ''">{{successMessage}}</div>
+
+    <form (ngSubmit)="onSubmit()" class="auth-form">
+      <div class="input-stack">
+        <div class="field">
+          <label>FULL_NAME</label>
+          <input type="text" [(ngModel)]="name" name="name" class="sharp-input" required>
+        </div>
+
+        <div class="field">
+          <label>EMAIL_ADDRESS</label>
+          <input type="email" [(ngModel)]="email" name="email" class="sharp-input" required>
+        </div>
+
+        <div class="field">
+          <label>ACCESS_PASSWORD</label>
+          <input type="password" [(ngModel)]="password" name="password" class="sharp-input" required>
+        </div>
+
+        <div class="field">
+          <label>SYSTEM_ROLE</label>
+          <select [(ngModel)]="role" name="role" class="sharp-input" required>
+            <option value="">SELECT_ROLE</option>
+            <option value="STUDENT">STUDENT</option>
+            <option value="INSTRUCTOR">INSTRUCTOR</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>PROFILE_PHOTO (OPTIONAL)</label>
+          <input type="file" (change)="onFileSelected($event)" class="sharp-input" accept="image/*">
+        </div>
+      </div>
+
+      <div class="terms-section">
+        <label class="section-label">CHILD_PROTECTION_&_TERMS</label>
+        <div class="terms-box">
+          <h6>1. IRELAND_CHILD_PROTECTION</h6>
+          <p>DBDS Ireland strictly adheres to the <strong>Children First Act 2015</strong>. All instructors are Garda Vetted.</p>
+          
+          <h6>2. MEDIA_CONSENT</h6>
+          <p>DBDS reserves the right to use video clips/photos of students for promotional purposes on our website and social platforms.</p>
+          
+          <h6>3. COMPETITIONS</h6>
+          <p>Selection for competitions will be communicated to parents. Specific information and concern-based consent will be required for every event.</p>
+        </div>
+        
+        <div class="checkbox-container mt-3">
+          <input type="checkbox" id="terms" [(ngModel)]="acceptedTerms" name="acceptedTerms">
+          <label for="terms">I_ACCEPT_ALL_SYSTEM_PROTOCOLS</label>
+        </div>
+      </div>
+
+      <div class="form-actions mt-4">
+        <button type="submit" class="btn-sharp w-100" [disabled]="loading || !acceptedTerms">
+          {{loading ? 'SYNCING...' : 'INITIALIZE_ACCOUNT'}}
+        </button>
+        <div class="text-center mt-3">
+          <a routerLink="/login" class="link-text">ALREADY_HAVE_ACCESS?_LOGIN</a>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>

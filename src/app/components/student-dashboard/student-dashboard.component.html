@@ -1,1 +1,100 @@
-<p>student-dashboard works!</p>
+<div class="dashboard-wrapper">
+  <div *ngIf="loading" class="center-content py-5">
+    <div class="spinner-square"></div>
+    <h3 class="title-text mt-4">INITIALIZING_SECURE_SESSION...</h3>
+  </div>
+
+  <div *ngIf="!loading" class="fade-in">
+    <header class="dashboard-header mb-5">
+      <h1 class="title-text">STUDENT_PORTAL</h1>
+      <div class="d-flex justify-content-between align-items-center">
+        <p class="tagline">DBDS_IRELAND // USER_SESSION_ACTIVE</p>
+        <span class="system-date">{{ today | date:'dd.MM.yyyy' }}</span>
+      </div>
+    </header>
+
+    <section class="mb-5">
+      <label class="section-label">ATTENDANCE_SNAPSHOT</label>
+      <div class="summary-grid">
+        <div class="summary-card color-blue">
+          <label>TOTAL_SESSIONS</label>
+          <div class="value">{{attendanceSummary.totalClasses}}</div>
+        </div>
+        <div class="summary-card color-green">
+          <label>PRESENT</label>
+          <div class="value">{{attendanceSummary.present}}</div>
+        </div>
+        <div class="summary-card color-red">
+          <label>ABSENT</label>
+          <div class="value">{{attendanceSummary.absent}}</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="mb-5">
+      <label class="section-label">UPCOMING_SCHEDULE</label>
+      <div class="sharp-card">
+        <div class="table-container">
+          <table class="sharp-table">
+            <thead>
+              <tr>
+                <th>CLASS_DETAILS</th>
+                <th>DATE_&_TIME</th>
+                <th>INSTRUCTOR</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let classItem of upcomingClasses">
+                <td class="fw-bold">{{classItem.class_name}}</td>
+                <td>{{classItem.class_date | date:'EEE, MMM d'}} @ {{formatTime(classItem.class_time)}}</td>
+                <td>{{classItem.instructor_name}}</td>
+              </tr>
+            </tbody>
+          </table>
+          <div *ngIf="upcomingClasses.length === 0" class="empty-state">
+            [NO_CLASSES_SCHEDULED]
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="mb-5">
+      <label class="section-label">HISTORY_LOG</label>
+      <div class="sharp-card">
+        <div class="table-container">
+          <table class="sharp-table">
+            <thead>
+              <tr>
+                <th>CLASS</th>
+                <th>DATE</th>
+                <th>STATUS</th>
+                <th>RESOURCES</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let record of attendanceHistory">
+                <td>{{getClassName(record.class_id)}}</td>
+                <td>{{record.class_date | date:'dd/MM/yy'}}</td>
+                <td>
+                  <span class="status-pill" [ngClass]="record.is_present ? 'pill-green' : 'pill-red'">
+                    {{record.is_present ? 'PRESENT' : 'ABSENT'}}
+                  </span>
+                </td>
+                <td>
+                  <a *ngIf="record.song_link && record.is_present" [href]="record.song_link" target="_blank" class="link-sharp">
+                    LISTEN_TRACK
+                  </a>
+                  <span *ngIf="!record.song_link || !record.is_present" class="muted-text">--</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <footer class="footer-note">
+      <p>SAFEGUARDING_COMPLIANT // GARD_VETTED_STAFF</p>
+    </footer>
+  </div>
+</div>

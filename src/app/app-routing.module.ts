@@ -15,41 +15,33 @@ const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
-   { 
+  { path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuard] },
+  { path: 'profile', component: ProfileComponent, canActivate: [AuthGuard] },  // Add comma here
+  { 
     path: 'admin/groups', 
     component: GroupsManagementComponent,
     canActivate: [AuthGuard, RoleGuard],
     data: { role: 'ADMIN' }
-  },
-  { 
-    path: 'dashboard', 
-    component: DashboardComponent,
-    canActivate: [AuthGuard]
-  },
+  },  // Add comma after closing brace
   { 
     path: 'admin', 
     component: AdminDashboardComponent,
     canActivate: [AuthGuard, RoleGuard],
     data: { role: 'ADMIN' }
-  },
+  },  // Add comma
   { 
     path: 'instructor', 
     component: InstructorDashboardComponent,
     canActivate: [AuthGuard, RoleGuard],
     data: { role: 'INSTRUCTOR' }
-  },
+  },  // Add comma
   { 
     path: 'student', 
     component: StudentDashboardComponent,
     canActivate: [AuthGuard, RoleGuard],
     data: { role: 'STUDENT' }
-  },
-  { path: '**', redirectTo: '/dashboard' },
-  { 
-    path: 'profile', 
-    component: ProfileComponent,
-    canActivate: [AuthGuard]
-  },
+  },  // Add comma
+  { path: '**', redirectTo: '/dashboard' }
 ];
 
 @NgModule({

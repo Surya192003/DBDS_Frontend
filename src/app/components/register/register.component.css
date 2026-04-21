@@ -1,0 +1,113 @@
+:host { --black: #000; --white: #fff; }
+
+.auth-container {
+  min-height: 100vh;
+  background: var(--white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.sharp-card {
+  width: 100%;
+  max-width: 500px;
+  border: 4px solid var(--black);
+  padding: 40px;
+  box-shadow: 15px 15px 0px var(--black);
+  background: var(--white);
+}
+
+.auth-header { border-bottom: 4px solid var(--black); margin-bottom: 30px; padding-bottom: 10px; }
+.title-text { font-weight: 900; letter-spacing: -1px; margin: 0; }
+.tagline { font-family: monospace; font-size: 0.75rem; color: #666; }
+
+.field { margin-bottom: 20px; }
+.field label { display: block; font-weight: 900; font-size: 0.7rem; margin-bottom: 5px; }
+
+.sharp-input {
+  width: 100%;
+  border: 2px solid var(--black);
+  padding: 12px;
+  font-weight: 700;
+  border-radius: 0;
+  font-family: monospace;
+}
+
+/* TERMS BOX STYLES */
+.terms-section { margin-top: 30px; border-top: 1px solid #ddd; padding-top: 20px; }
+.section-label { font-weight: 900; font-size: 0.7rem; letter-spacing: 1px; display: block; margin-bottom: 10px; }
+
+.terms-box {
+  height: 150px;
+  border: 2px solid var(--black);
+  background: #f9f9f9;
+  overflow-y: scroll;
+  padding: 15px;
+  font-family: monospace;
+  font-size: 0.75rem;
+  line-height: 1.4;
+}
+
+.terms-box h6 { font-weight: 900; margin-top: 10px; font-size: 0.8rem; text-decoration: underline; }
+
+.checkbox-container { display: flex; align-items: center; gap: 10px; font-weight: 900; font-size: 0.75rem; }
+
+/* BUTTONS & FEEDBACK */
+.btn-sharp {
+  background: var(--black);
+  color: var(--white);
+  border: none;
+  padding: 15px;
+  font-weight: 900;
+  cursor: pointer;
+  transition: 0.1s;
+}
+
+.auth-container {
+  padding: 10px; /* Less padding so card has more room */
+}
+
+.auth-card {
+  width: 100%;
+  padding: 20px; /* Compact padding for small screens */
+  box-shadow: 8px 8px 0px var(--black);
+}
+
+/* Make inputs large enough for fingers */
+.sharp-input {
+  font-size: 16px; /* Prevents iOS from auto-zooming on focus */
+  padding: 14px;
+}
+
+/* Responsive Terms Box */
+.terms-box {
+  height: 200px; /* Taller on mobile for easier reading */
+  -webkit-overflow-scrolling: touch; /* Smooth scroll for iPhones */
+}
+
+.checkbox-container {
+  padding: 10px 0;
+  align-items: flex-start; /* Better if text wraps */
+}
+
+.checkbox-container input {
+  width: 20px;
+  height: 20px;
+  margin-top: 2px;
+}
+
+/* Desktop refinements */
+@media (min-width: 768px) {
+  .auth-card { padding: 40px; box-shadow: 15px 15px 0px var(--black); }
+}
+
+.btn-sharp:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn-sharp:hover:not(:disabled) { transform: translate(-4px, -4px); box-shadow: 4px 4px 0px #333; }
+
+.msg-box { padding: 15px; border: 3px solid var(--black); margin-bottom: 20px; font-weight: 900; font-size: 0.8rem; }
+.msg-box.error { background: #ff0000; color: #fff; }
+.msg-box.success { background: #00ff00; color: #000; }
+
+.link-text { text-decoration: none; color: var(--black); font-weight: 900; font-size: 0.75rem; }
+.link-text:hover { text-decoration: underline; }

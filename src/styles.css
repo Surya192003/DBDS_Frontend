@@ -21,3 +21,26 @@
 .progress-bar {
   transition: width 0.6s ease;
 }
+/* Add smooth font rendering */
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 1030; /* Bootstrap's default for fixed/sticky navbars */
+}
+
+
+/* Card loading shimmer effect (optional) */
+@keyframes shimmer {
+  0% { background-position: -1000px 0; }
+  100% { background-position: 1000px 0; }
+}
+
+.loading-shimmer {
+  animation: shimmer 2s infinite linear;
+  background: linear-gradient(to right, #f6f7f8 8%, #edeef1 18%, #f6f7f8 33%);
+  background-size: 1000px 100%;
+}

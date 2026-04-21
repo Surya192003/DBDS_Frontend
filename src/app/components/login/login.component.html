@@ -1,1 +1,37 @@
-<p>login works!</p>
+<div class="auth-wrapper">
+  <div class="sharp-card login-card">
+    <div class="auth-header">
+      <h2 class="title-text">USER_AUTHENTICATION</h2>
+      <p class="tagline">DBDS_IRELAND // SECURE_ACCESS_v1.0</p>
+    </div>
+
+    <div *ngIf="errorMessage" class="msg-box error" (click)="errorMessage = ''">
+      {{errorMessage}} // CLICK_TO_DISMISS
+    </div>
+    
+    <form (ngSubmit)="onSubmit()" class="auth-form">
+      <div class="input-stack">
+        <div class="field">
+          <label>ACCESS_IDENTIFIER (EMAIL)</label>
+          <input type="email" class="sharp-input" [(ngModel)]="email" name="email" required placeholder="USER@DOMAIN.COM">
+        </div>
+        
+        <div class="field">
+          <label>ENCRYPTION_KEY (PASSWORD)</label>
+          <input type="password" class="sharp-input" [(ngModel)]="password" name="password" required placeholder="••••••••">
+        </div>
+      </div>
+      
+      <div class="form-actions mt-4">
+        <button type="submit" class="btn-sharp w-100" [disabled]="loading">
+          <span *ngIf="loading" class="spinner-square-sm me-2"></span>
+          {{loading ? 'AUTHENTICATING...' : 'ESTABLISH_CONNECTION'}}
+        </button>
+        
+        <div class="text-center mt-4">
+          <a routerLink="/register" class="link-text">UNREGISTERED_USER?_CREATE_IDENTITY</a>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>

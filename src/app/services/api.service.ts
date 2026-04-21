@@ -8,8 +8,8 @@ import { AuthService } from './auth.service';
   providedIn: 'root'
 })
 export class ApiService {
-  // private apiUrl = 'https://backend-instructor-attendance.onrender.com/api';
-  private apiUrl = 'http://localhost:5010/api';
+  private apiUrl = 'https://dbds-backend.onrender.com/api';
+  // private apiUrl = 'http://localhost:5010/api';
 
   constructor(private http: HttpClient, private authService: AuthService) { }
 
@@ -322,4 +322,5 @@ deleteProfilePhoto(): Observable<any> {
   return this.http.delete(`${this.apiUrl}/upload/profile-photo`, { headers: this.getHeaders() })
     .pipe(catchError(this.handleHttpError.bind(this)));
 }
+
 }

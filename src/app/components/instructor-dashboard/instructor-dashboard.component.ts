@@ -230,4 +230,11 @@ export class InstructorDashboardComponent implements OnInit {
     const control = this.getAttendanceControl(studentId);
     return control ? control.value : false;
   }
+  getStatusText(date: any) {
+  const status = this.getStatusClass(date);
+  if (status === 'completed') return 'COMPLETED';
+  if (status === 'today') return 'ACTIVE_TODAY';
+  return 'UPCOMING';
+}
+
 }

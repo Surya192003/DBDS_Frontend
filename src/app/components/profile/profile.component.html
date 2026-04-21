@@ -1,241 +1,132 @@
-<div class="container-fluid">
-  <!-- Loading State -->
-  <div *ngIf="loading" class="text-center py-5">
-    <div class="spinner-border text-primary"></div>
-    <p class="mt-2">Loading profile...</p>
+<div class="dashboard-wrapper">
+  <div *ngIf="loading" class="sharp-card center-content">
+    <div class="spinner-square"></div>
+    <p class="mt-3 fw-bold">INITIALIZING_PROFILE...</p>
   </div>
 
-  <!-- Profile Content -->
-  <div *ngIf="!loading && user" class="row justify-content-center">
-    <div class="col-lg-8">
-      <!-- Alerts -->
-      <div *ngIf="errorMessage" class="alert alert-danger alert-dismissible fade show">
-        {{errorMessage}}
-        <button type="button" class="btn-close" (click)="clearMessages()"></button>
+  <div *ngIf="!loading && user" class="dashboard-grid">
+    
+    <div class="full-width">
+      <div *ngIf="errorMessage" class="msg-box error" (click)="clearMessages()">
+        {{errorMessage}} // CLICK_TO_DISMISS
       </div>
-
-      <div *ngIf="successMessage" class="alert alert-success alert-dismissible fade show">
-        {{successMessage}}
-        <button type="button" class="btn-close" (click)="clearMessages()"></button>
-      </div>
-
-      <div class="card shadow-sm">
-        <div class="card-header bg-white">
-          <h4 class="mb-0">
-            <i class="bi bi-person-circle text-primary me-2"></i>My Profile
-          </h4>
-        </div>
-        <div class="card-body">
-          <div class="row">
-            <!-- Profile Photo Section -->
-            <div class="col-md-4 text-center mb-4 mb-md-0">
-              <div class="profile-photo-container">
-                <!-- Current Photo -->
-                <div *ngIf="user.photo_url" class="mb-3">
-                  <img [src]="user.photo_url" 
-                       class="rounded-circle profile-photo" 
-                       alt="Profile Photo"
-                       style="width: 200px; height: 200px; object-fit: cover;">
-                </div>
-                
-                <!-- Default Avatar -->
-                <div *ngIf="!user.photo_url" class="mb-3">
-                  <div class="rounded-circle bg-light d-flex align-items-center justify-content-center mx-auto"
-                       style="width: 200px; height: 200px; border: 2px dashed #dee2e6;">
-                    <i class="bi bi-person text-muted" style="font-size: 80px;"></i>
-                  </div>
-                </div>
-
-                <!-- Upload Controls -->
-                <div class="mb-3">
-                  <input type="file" 
-                         id="photoInput" 
-                         accept="image/*" 
-                         (change)="onFileSelected($event)"
-                         class="form-control d-none">
-                  
-                  <div class="d-grid gap-2">
-                    <button class="btn btn-outline-primary" onclick="document.getElementById('photoInput').click()">
-                      <i class="bi bi-camera me-1"></i> Choose Photo
-                    </button>
-                    
-                    <button *ngIf="user.photo_url" 
-                            class="btn btn-outline-danger" 
-                            (click)="deletePhoto()">
-                      <i class="bi bi-trash me-1"></i> Remove Photo
-                    </button>
-                  </div>
-                </div>
-
-                <!-- File Preview -->
-                <div *ngIf="previewUrl" class="mt-3">
-                  <h6>Preview:</h6>
-                  <img [src]="previewUrl" 
-                       class="img-thumbnail" 
-                       style="max-width: 150px; max-height: 150px;">
-                  <div class="mt-2">
-                    <button class="btn btn-success btn-sm me-2" 
-                            (click)="uploadPhoto()"
-                            [disabled]="uploading">
-                      <span *ngIf="uploading" class="spinner-border spinner-border-sm me-2"></span>
-                      {{uploading ? 'Uploading...' : 'Upload'}}
-                    </button>
-                    <button class="btn btn-secondary btn-sm" 
-                            (click)="selectedFile = null; previewUrl = null">
-                      Cancel
-                    </button>
-                  </div>
-                </div>
-
-                <!-- Upload Guidelines -->
-                <div class="text-muted mt-3">
-                  <small>
-                    <i class="bi bi-info-circle me-1"></i>
-                    Max size: 5MB. JPG, PNG, GIF allowed.
-                  </small>
-                </div>
-              </div>
-            </div>
-
-            <!-- Profile Info Section -->
-            <div class="col-md-8">
-              <!-- Role Badge -->
-              <div class="mb-4">
-                <span class="badge" [ngClass]="getRoleBadgeClass()" style="font-size: 1rem;">
-                  {{getRoleName()}}
-                </span>
-                <span *ngIf="user.is_active" class="badge bg-success ms-2">Active</span>
-                <span *ngIf="!user.is_active" class="badge bg-warning ms-2">Inactive</span>
-              </div>
-
-              <!-- Profile Form -->
-              <form [formGroup]="profileForm" (ngSubmit)="updateProfile()">
-                <div class="row">
-                  <div class="col-md-6 mb-3">
-                    <label class="form-label">Full Name</label>
-                    <input type="text" 
-                           class="form-control" 
-                           formControlName="name"
-                           [class.is-invalid]="profileForm.get('name')?.invalid && profileForm.get('name')?.touched">
-                    <div *ngIf="profileForm.get('name')?.invalid && profileForm.get('name')?.touched" 
-                         class="invalid-feedback">
-                      Name is required
-                    </div>
-                  </div>
-
-                  <div class="col-md-6 mb-3">
-                    <label class="form-label">Email Address</label>
-                    <input type="email" 
-                           class="form-control" 
-                           formControlName="email"
-                           [class.is-invalid]="profileForm.get('email')?.invalid && profileForm.get('email')?.touched">
-                    <div *ngIf="profileForm.get('email')?.invalid && profileForm.get('email')?.touched" 
-                         class="invalid-feedback">
-                      Valid email is required
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Read-only Info -->
-                <div class="row mb-4">
-                  <div class="col-md-6 mb-3">
-                    <label class="form-label">User ID</label>
-                    <input type="text" class="form-control" [value]="user.id" readonly>
-                  </div>
-
-                  <div class="col-md-6 mb-3">
-                    <label class="form-label">Account Created</label>
-                    <input type="text" 
-                           class="form-control" 
-                           [value]="user.created_at | date:'mediumDate'" 
-                           readonly>
-                  </div>
-                </div>
-
-                <!-- Role-specific Info -->
-                <div *ngIf="user.role === 'INSTRUCTOR' && user.instructor_id" class="card bg-light mb-4">
-                  <div class="card-body">
-                    <h6 class="card-title">
-                      <i class="bi bi-cash-coin text-primary me-2"></i>Instructor Information
-                    </h6>
-                    <div class="row">
-                      <div class="col-md-6">
-                        <small class="text-muted">Pay Rate:</small>
-                        <div class="fw-bold">${{user.pay_per_class || 0}} per class</div>
-                      </div>
-                      <div class="col-md-6">
-                        <small class="text-muted">Instructor ID:</small>
-                        <div class="fw-bold">#{{user.instructor_id}}</div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div *ngIf="user.role === 'STUDENT' && user.student_id" class="card bg-light mb-4">
-                  <div class="card-body">
-                    <h6 class="card-title">
-                      <i class="bi bi-mortarboard text-primary me-2"></i>Student Information
-                    </h6>
-                    <div class="row">
-                      <div class="col-md-6">
-                        <small class="text-muted">Student ID:</small>
-                        <div class="fw-bold">#{{user.student_id}}</div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Update Button -->
-                <div class="d-flex justify-content-between">
-                  <button type="submit" 
-                          class="btn btn-primary"
-                          [disabled]="profileForm.invalid || updating">
-                    <span *ngIf="updating" class="spinner-border spinner-border-sm me-2"></span>
-                    <i *ngIf="!updating" class="bi bi-check-circle me-1"></i>
-                    {{updating ? 'Updating...' : 'Update Profile'}}
-                  </button>
-
-                  <button type="button" 
-                          class="btn btn-outline-secondary"
-                          (click)="loadUserProfile()">
-                    <i class="bi bi-arrow-clockwise me-1"></i> Refresh
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Account Info Card -->
-      <div class="card shadow-sm mt-4">
-        <div class="card-header bg-white">
-          <h6 class="mb-0">
-            <i class="bi bi-shield-check text-primary me-2"></i>Account Information
-          </h6>
-        </div>
-        <div class="card-body">
-          <div class="row">
-            <div class="col-md-6">
-              <div class="mb-3">
-                <small class="text-muted">Last Updated:</small>
-                <div class="fw-medium">{{user.updated_at | date:'medium'}}</div>
-              </div>
-            </div>
-            <div class="col-md-6">
-              <div class="mb-3">
-                <small class="text-muted">Member Since:</small>
-                <div class="fw-medium">{{user.created_at | date:'mediumDate'}}</div>
-              </div>
-            </div>
-          </div>
-          
-          <div class="alert alert-info">
-            <i class="bi bi-info-circle me-2"></i>
-            <small>For security reasons, password changes must be requested from the administrator.</small>
-          </div>
-        </div>
+      <div *ngIf="successMessage" class="msg-box success" (click)="clearMessages()">
+        {{successMessage}} // SYSTEM_SYNC_OK
       </div>
     </div>
+
+    <div class="side-panel">
+      <div class="sharp-card mb-4 text-center">
+        <div class="profile-photo-container">
+          <div class="photo-frame">
+            <img *ngIf="user.photo_url && !previewUrl" [src]="user.photo_url" alt="Profile">
+            <img *ngIf="previewUrl" [src]="previewUrl" alt="Preview" class="preview-img">
+            <div *ngIf="!user.photo_url && !previewUrl" class="placeholder-icon">
+              {{user.name?.charAt(0)}}
+            </div>
+          </div>
+
+          <div class="upload-controls mt-3">
+            <input type="file" id="photoInput" accept="image/*" (change)="onFileSelected($event)" hidden>
+            
+            <div class="d-grid gap-2">
+              <button class="btn-sharp-outline" onclick="document.getElementById('photoInput').click()">
+                SELECT_IMAGE
+              </button>
+              
+              <button *ngIf="user.photo_url && !previewUrl" class="btn-danger-outline" (click)="deletePhoto()">
+                DELETE_CURRENT
+              </button>
+            </div>
+          </div>
+
+          <div *ngIf="previewUrl" class="preview-actions mt-3">
+            <p class="small-label">CONFIRM_UPLOAD?</p>
+            <div class="d-flex gap-2">
+              <button class="btn-sharp w-100" (click)="uploadPhoto()" [disabled]="uploading">
+                {{uploading ? 'SYNCING...' : 'UPLOAD'}}
+              </button>
+              <button class="btn-sharp-outline" (click)="selectedFile = null; previewUrl = null">✕</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sharp-card">
+        <label class="section-label">ACCESS_LEVEL</label>
+        <div class="role-display" [attr.data-role]="user.role">
+          {{getRoleName() | uppercase}}
+        </div>
+        <div class="status-tag mt-2" *ngIf="user.is_active">ACCOUNT_ACTIVE</div>
+      </div>
+    </div>
+
+    <div class="main-panel">
+      <div class="sharp-card">
+        <div class="card-header-sharp">
+          <h2 class="title-text">PROFILE_DATA // {{user.id}}</h2>
+        </div>
+
+        <form [formGroup]="profileForm" (ngSubmit)="updateProfile()" class="profile-form">
+          <div class="input-stack">
+            <div class="field">
+              <label>LEGAL_NAME</label>
+              <input type="text" formControlName="name" class="sharp-input" 
+                     [class.is-invalid]="profileForm.get('name')?.invalid && profileForm.get('name')?.touched">
+            </div>
+
+            <div class="field">
+              <label>EMAIL_ADDRESS</label>
+              <input type="email" formControlName="email" class="sharp-input"
+                     [class.is-invalid]="profileForm.get('email')?.invalid && profileForm.get('email')?.touched">
+            </div>
+          </div>
+
+          <div class="metadata-row mt-4">
+            <div class="meta-item">
+              <label>MEMBER_SINCE</label>
+              <div class="static-val">{{user.created_at | date:'mediumDate' | uppercase}}</div>
+            </div>
+            <div class="meta-item">
+              <label>LAST_SYNC</label>
+              <div class="static-val">{{user.updated_at | date:'short' | uppercase}}</div>
+            </div>
+          </div>
+
+          <div *ngIf="user.role === 'INSTRUCTOR' || user.role === 'STUDENT'" class="role-module mt-4">
+            <label class="section-label">CORE_PROTOCOL_INFO</label>
+            <div class="info-grid">
+              <div *ngIf="user.instructor_id">
+                <small>INSTRUCTOR_ID</small>
+                <div class="fw-bold">#{{user.instructor_id}}</div>
+              </div>
+              <div *ngIf="user.pay_per_class">
+                <small>PAY_RATE</small>
+                <div class="fw-bold">${{user.pay_per_class}} / CLASS</div>
+              </div>
+              <div *ngIf="user.student_id">
+                <small>STUDENT_ID</small>
+                <div class="fw-bold">#{{user.student_id}}</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-actions mt-4">
+            <button type="submit" class="btn-sharp" [disabled]="profileForm.invalid || updating">
+              {{updating ? 'WRITING_TO_DISK...' : 'UPDATE_PROFILE_DATA'}}
+            </button>
+            <button type="button" class="btn-sharp-outline" (click)="loadUserProfile()">
+              REFRESH
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <div class="sharp-card mt-4 security-notice">
+        <label class="section-label"><i class="bi bi-shield-lock me-2"></i>SECURITY_PROTOCOL</label>
+        <p class="mb-0">PASSWORD_ENCRYPTION_MANAGED_BY_ADMIN. CONTACT_SUPPORT_FOR_CREDENTIAL_RESET.</p>
+      </div>
+    </div>
+
   </div>
 </div>
