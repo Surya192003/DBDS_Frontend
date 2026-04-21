@@ -46,6 +46,18 @@ import { AuthService } from '../../services/auth.service';
                   <option value="INSTRUCTOR">Instructor</option>
                 </select>
               </div>
+
+              <!-- Add this section to registration form -->
+<div class="mb-3">
+  <label class="form-label">Profile Photo (Optional)</label>
+  <input type="file" class="form-control" (change)="onFileSelected($event)" accept="image/*">
+  <div class="form-text">
+    You can upload a profile photo later from your profile settings
+  </div>
+  <div *ngIf="selectedFile" class="mt-2">
+    <small>Selected: {{selectedFile.name}}</small>
+  </div>
+</div>
               
               <button type="submit" class="btn btn-primary w-100" [disabled]="loading">
                 <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
@@ -63,6 +75,7 @@ import { AuthService } from '../../services/auth.service';
   `
 })
 export class RegisterComponent {
+  selectedFile: File | null = null;
   name: string = '';
   email: string = '';
   password: string = '';
@@ -71,7 +84,7 @@ export class RegisterComponent {
   errorMessage: string = '';
   successMessage: string = '';
 
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(private authService: AuthService, private router: Router) { }
 
   onSubmit() {
     if (!this.name || !this.email || !this.password || !this.role) {
@@ -102,5 +115,34 @@ export class RegisterComponent {
         this.errorMessage = error.error?.message || 'Registration failed. Please try again.';
       }
     });
+  }
+  onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+
+    if (!input.files || input.files.length === 0) {
+      this.selectedFile = null;
+      return;
+    }
+
+    const file = input.files[0];
+
+    // Optional: validate file type
+    if (!file.type.startsWith('image/')) {
+      alert('Please select a valid image file');
+      input.value = '';
+      this.selectedFile = null;
+      return;
+    }
+
+    // Optional: validate file size (2MB example)
+    const maxSize = 2 * 1024 * 1024;
+    if (file.size > maxSize) {
+      alert('Image size should be less than 2MB');
+      input.value = '';
+      this.selectedFile = null;
+      return;
+    }
+
+    this.selectedFile = file;
   }
 }

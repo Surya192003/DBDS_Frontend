@@ -17,6 +17,7 @@ export interface User {
   providedIn: 'root'
 })
 export class AuthService {
+    // private apiUrl = 'https://backend-instructor-attendance.onrender.com/api';
   private apiUrl = 'http://localhost:5010/api';
   private currentUserSubject = new BehaviorSubject<User | null>(null);
   currentUser$ = this.currentUserSubject.asObservable();

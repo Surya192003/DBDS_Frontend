@@ -1,191 +1,296 @@
 <div class="container-fluid">
-  <!-- Quick Stats -->
+  <!-- Statistics Cards -->
   <div class="row mb-4">
-    <div class="col-md-4 mb-3">
-      <div class="card bg-primary text-white">
+    <div class="col-md-3 col-sm-6 mb-3">
+      <div class="card bg-primary text-white shadow-sm">
         <div class="card-body">
-          <h6 class="card-title">Total Classes</h6>
-          <h3 class="mb-0">{{classes.length}}</h3>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-4 mb-3">
-      <div class="card bg-success text-white">
-        <div class="card-body">
-          <h6 class="card-title">Active Students</h6>
-          <h3 class="mb-0">{{activeStudents.length}}</h3>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-4 mb-3">
-      <div class="card bg-info text-white">
-        <div class="card-body">
-          <h6 class="card-title">Monthly Performance</h6>
-          <h3 class="mb-0">{{monthlyPerformance[0]?.total_classes || 0}}</h3>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <h3>Instructor Dashboard</h3>
-  <hr>
-
-  <!-- My Classes -->
-  <div class="card mb-4">
-    <div class="card-header">
-      <h5 class="mb-0">My Classes</h5>
-    </div>
-    <div class="card-body">
-      <div class="table-responsive">
-        <table class="table table-hover">
-          <thead>
-            <tr>
-              <th>Date</th>
-              <th>Time</th>
-              <th>Song Link</th>
-              <th>Attendance</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let classItem of classes">
-              <td>{{classItem.class_date | date:'mediumDate'}}</td>
-              <td>{{classItem.class_time}}</td>
-              <td>
-                <a *ngIf="classItem.song_link" [href]="classItem.song_link" target="_blank" class="btn btn-sm btn-outline-info">
-                  Listen
-                </a>
-                <button *ngIf="!classItem.song_link" class="btn btn-sm btn-outline-secondary" (click)="openSongModal(classItem)">
-                  Set Song
-                </button>
-              </td>
-              <td>{{classItem.attendance_count || 0}} students</td>
-              <td>
-                <button class="btn btn-sm btn-primary me-2" (click)="openAttendanceModal(classItem)">
-                  Mark Attendance
-                </button>
-                <button class="btn btn-sm btn-info" (click)="openSongModal(classItem)">
-                  Update Song
-                </button>
-              </td>
-            </tr>
-            <tr *ngIf="classes.length === 0">
-              <td colspan="5" class="text-center text-muted">No classes assigned</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-
-  <!-- Monthly Performance -->
-  <div class="card">
-    <div class="card-header">
-      <h5 class="mb-0">Monthly Performance</h5>
-    </div>
-    <div class="card-body">
-      <div class="table-responsive">
-        <table class="table table-hover">
-          <thead>
-            <tr>
-              <th>Month</th>
-              <th>Total Classes</th>
-              <th>Total Students</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let perf of monthlyPerformance">
-              <td>{{perf.month_year}}</td>
-              <td>{{perf.total_classes}}</td>
-              <td>{{perf.total_students}}</td>
-            </tr>
-            <tr *ngIf="monthlyPerformance.length === 0">
-              <td colspan="3" class="text-center text-muted">No performance data available</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-
-  <!-- Song Link Modal -->
-  <div class="modal fade" id="songModal" tabindex="-1">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Set Song Link</h5>
-          <button type="button" class="btn-close" (click)="closeSongModal()"></button>
-        </div>
-        <div class="modal-body">
-          <div class="mb-3">
-            <label class="form-label">Song Link (YouTube, Spotify, etc.)</label>
-            <input type="url" class="form-control" [(ngModel)]="songLink" placeholder="https://...">
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" (click)="closeSongModal()">Cancel</button>
-          <button type="button" class="btn btn-primary" (click)="updateSongLink()">Save</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Attendance Modal -->
-  <div class="modal fade" id="attendanceModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Mark Attendance - {{selectedClass?.class_date | date:'mediumDate'}} {{selectedClass?.class_time}}</h5>
-          <button type="button" class="btn-close" (click)="closeAttendanceModal()" [disabled]="markingAttendance"></button>
-        </div>
-        <div class="modal-body">
-          <div *ngIf="classStudents.length === 0" class="text-center py-4">
-            <p class="text-muted">No students registered for this class</p>
-          </div>
-          
-          <form [formGroup]="attendanceForm" *ngIf="classStudents.length > 0">
-            <div class="table-responsive">
-              <table class="table table-hover">
-                <thead>
-                  <tr>
-                    <th>Student Name</th>
-                    <th>Email</th>
-                    <th>Attendance</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr *ngFor="let student of classStudents">
-                    <td>{{student.name}}</td>
-                    <td>{{student.email}}</td>
-                    <td>
-                      <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" 
-                               [id]="'present_' + student.student_id" 
-                               [value]="true" 
-                               formControlName="student_{{student.student_id}}">
-                        <label class="form-check-label" [for]="'present_' + student.student_id">Present</label>
-                      </div>
-                      <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" 
-                               [id]="'absent_' + student.student_id" 
-                               [value]="false" 
-                               formControlName="student_{{student.student_id}}">
-                        <label class="form-check-label" [for]="'absent_' + student.student_id">Absent</label>
-                      </div>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h6 class="card-title mb-1">Total Classes</h6>
+              <h2 class="mb-0">{{totalClasses}}</h2>
             </div>
-          </form>
+            <i class="bi bi-calendar-week fs-1 opacity-50"></i>
+          </div>
         </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" (click)="closeAttendanceModal()" [disabled]="markingAttendance">Cancel</button>
-          <button type="button" class="btn btn-primary" (click)="submitAttendance()" [disabled]="markingAttendance || classStudents.length === 0">
-            <span *ngIf="markingAttendance" class="spinner-border spinner-border-sm me-2"></span>
-            {{markingAttendance ? 'Saving...' : 'Save Attendance'}}
-          </button>
+      </div>
+    </div>
+
+    <div class="col-md-3 col-sm-6 mb-3">
+      <div class="card bg-success text-white shadow-sm">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h6 class="card-title mb-1">Completed Classes</h6>
+              <h2 class="mb-0">{{completedClasses}}</h2>
+            </div>
+            <i class="bi bi-check-circle fs-1 opacity-50"></i>
+          </div>
         </div>
+      </div>
+    </div>
+
+    <div class="col-md-3 col-sm-6 mb-3">
+      <div class="card bg-info text-white shadow-sm">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h6 class="card-title mb-1">Upcoming Classes</h6>
+              <h2 class="mb-0">{{upcomingClasses}}</h2>
+            </div>
+            <i class="bi bi-clock-history fs-1 opacity-50"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-3 col-sm-6 mb-3">
+      <div class="card bg-warning text-white shadow-sm">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h6 class="card-title mb-1">Total Students</h6>
+              <h2 class="mb-0">{{totalStudents}}</h2>
+            </div>
+            <i class="bi bi-people fs-1 opacity-50"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Page Header -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="d-flex justify-content-between align-items-center">
+        <h3 class="mb-0">
+          <i class="bi bi-person-badge text-primary me-2"></i>
+          Welcome, {{currentUser?.name}}
+        </h3>
+        <button class="btn btn-outline-primary" (click)="loadDashboardData()">
+          <i class="bi bi-arrow-clockwise"></i> Refresh
+        </button>
+      </div>
+      <hr>
+    </div>
+  </div>
+
+  <!-- My Classes Section -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card shadow-sm">
+        <div class="card-header bg-white">
+          <h5 class="card-title mb-0">
+            <i class="bi bi-calendar-check text-primary me-2"></i>
+            My Classes
+          </h5>
+        </div>
+        <div class="card-body">
+          <div *ngIf="loading" class="text-center py-5">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-2 text-muted">Loading your classes...</p>
+          </div>
+
+          <div *ngIf="!loading && classes.length === 0" class="text-center py-5">
+            <i class="bi bi-calendar-x fs-1 text-muted mb-3"></i>
+            <h5 class="text-muted">No Classes Assigned</h5>
+            <p class="text-muted">You haven't been assigned to any classes yet.</p>
+          </div>
+
+          <div *ngIf="!loading && classes.length > 0" class="table-responsive">
+            <table class="table table-hover">
+              <thead class="table-light">
+                <tr>
+                  <th>Class Name</th>
+                  <th>Date</th>
+                  <th>Time</th>
+                  <th>Group</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let classItem of classes">
+                  <td>
+                    <strong>{{classItem.class_name}}</strong>
+                    <br>
+                    <small class="text-muted">ID: #{{classItem.id}}</small>
+                  </td>
+                  <td>{{classItem.class_date | date:'fullDate'}}</td>
+                  <td>{{classItem.class_time}}</td>
+                  <td>
+                    <span class="badge bg-secondary">{{classItem.group_name || 'No Group'}}</span>
+                  </td>
+                  <td>
+                    <span [class]="getStatusClass(classItem.class_date) === 'completed' ? 'badge bg-success' : 
+                                   getStatusClass(classItem.class_date) === 'today' ? 'badge bg-warning' : 
+                                   'badge bg-info'">
+                      {{getStatusClass(classItem.class_date) === 'completed' ? 'Completed' : 
+                        getStatusClass(classItem.class_date) === 'today' ? 'Today' : 'Upcoming'}}
+                    </span>
+                  </td>
+                  <td>
+                    <div class="btn-group btn-group-sm">
+                      <button class="btn btn-outline-primary" 
+                              (click)="openAttendanceModal(classItem)"
+                              [disabled]="getStatusClass(classItem.class_date) === 'completed'">
+                        <i class="bi bi-check-square"></i> Attendance
+                      </button>
+                      <button class="btn btn-outline-secondary" 
+                              (click)="openSongModal(classItem)">
+                        <i class="bi bi-music-note"></i> Song
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Monthly Performance Section -->
+  <div class="row">
+    <div class="col-12">
+      <div class="card shadow-sm">
+        <div class="card-header bg-white">
+          <h5 class="card-title mb-0">
+            <i class="bi bi-graph-up text-info me-2"></i>
+            Monthly Performance
+          </h5>
+        </div>
+        <div class="card-body">
+          <div *ngIf="monthlyPerformance.length === 0" class="text-center py-4">
+            <i class="bi bi-bar-chart-line fs-1 text-muted mb-3"></i>
+            <p class="text-muted mb-0">No performance data available yet</p>
+          </div>
+          <div *ngIf="monthlyPerformance.length > 0" class="table-responsive">
+            <table class="table table-sm">
+              <thead class="table-light">
+                <tr>
+                  <th>Month</th>
+                  <th class="text-center">Classes</th>
+                  <th class="text-center">Students</th>
+                  <th class="text-end">Earnings</th>
+                  <th class="text-center">Rating</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let perf of monthlyPerformance">
+                  <td>{{perf.month_year || perf.month}}</td>
+                  <td class="text-center">{{perf.total_classes || 0}}</td>
+                  <td class="text-center">{{perf.total_students || 0}}</td>
+                  <td class="text-end text-success">${{perf.earnings || 0}}</td>
+                  <td class="text-center">
+                    <span class="badge bg-warning">
+                      {{perf.rating || 0}} ★
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Attendance Modal -->
+<!-- Attendance Modal -->
+<div class="modal fade" id="attendanceModal" tabindex="-1">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title">
+          <i class="bi bi-check-square me-2"></i>
+          Mark Attendance - {{selectedClass?.class_name}}
+        </h5>
+        <button type="button" class="btn-close btn-close-white" (click)="closeAttendanceModal()"></button>
+      </div>
+      <div class="modal-body">
+        <div class="alert alert-info">
+          <i class="bi bi-info-circle me-2"></i>
+          Mark attendance for students in this class. All students are from the assigned group.
+        </div>
+        
+        <div *ngIf="classStudents.length === 0" class="text-center py-4">
+          <p class="text-muted">No students found in this class.</p>
+        </div>
+        
+        <div *ngIf="classStudents.length > 0" class="table-responsive">
+          <table class="table table-hover">
+            <thead class="table-light">
+              <tr>
+                <th>Student Name</th>
+                <th>Email</th>
+                <th class="text-center">Present</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let student of classStudents">
+                <td><strong>{{student.name}}</strong></td>
+                <td>{{student.email}}</td>
+                <td class="text-center">
+                  <div class="form-check form-switch d-flex justify-content-center">
+                    <input class="form-check-input" type="checkbox" 
+                           [formControl]="getAttendanceControl(student.student_id)"
+                           id="student_{{student.student_id}}">
+                    <label class="form-check-label ms-2" 
+                           [for]="'student_' + student.student_id">
+                      {{getAttendanceControl(student.student_id)?.value ? 'Present' : 'Absent'}}
+                    </label>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeAttendanceModal()">Cancel</button>
+        <button type="button" class="btn btn-primary" 
+                (click)="submitAttendance()" 
+                [disabled]="markingAttendance || classStudents.length === 0">
+          <span *ngIf="markingAttendance" class="spinner-border spinner-border-sm me-2"></span>
+          Save Attendance
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Song Link Modal -->
+<div class="modal fade" id="songModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-secondary text-white">
+        <h5 class="modal-title">
+          <i class="bi bi-music-note-beamed me-2"></i>
+          Update Song Link - {{selectedClass?.class_name}}
+        </h5>
+        <button type="button" class="btn-close btn-close-white" (click)="closeSongModal()"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label class="form-label">YouTube/Spotify Link</label>
+          <input type="url" class="form-control" [(ngModel)]="songLink" 
+                 placeholder="https://www.youtube.com/watch?v=...">
+          <div class="form-text">Paste the link to the song for this class</div>
+        </div>
+        <div *ngIf="songLink" class="mt-3">
+          <label class="form-label">Preview:</label>
+          <div class="ratio ratio-16x9" *ngIf="songLink.includes('youtube.com') || songLink.includes('youtu.be')">
+            <iframe [src]="songLink" frameborder="0" allowfullscreen></iframe>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeSongModal()">Cancel</button>
+        <button type="button" class="btn btn-primary" (click)="updateSongLink()">Update Link</button>
       </div>
     </div>
   </div>

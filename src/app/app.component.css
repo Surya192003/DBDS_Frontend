@@ -1,0 +1,12 @@
+.navbar-brand {
+  font-size: 1.2rem;
+  letter-spacing: 0.5px;
+}
+
+.nav-link {
+  cursor: pointer;
+}
+
+.navbar {
+  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+}
