@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../../services/api.service';
 import { AuthService } from '../../services/auth.service';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-student-dashboard',
@@ -9,127 +10,78 @@ import { AuthService } from '../../services/auth.service';
 })
 export class StudentDashboardComponent implements OnInit {
   upcomingClasses: any[] = [];
-  loading: boolean = false;
-  allClasses: any[] = []; 
+  allClasses: any[] = [];
   attendanceHistory: any[] = [];
-  attendanceSummary: any = {
-    totalClasses: 0,
-    present: 0,
-    absent: 0
-  };
+  attendanceSummary = { totalClasses: 0, present: 0, absent: 0 };
+  loading = false;
   currentUser: any;
-today: string | number | Date | undefined;
+today: string|number|Date|null = new Date();
 
-  constructor(private apiService: ApiService, private authService: AuthService) {
+  constructor(
+    private apiService: ApiService,
+    private authService: AuthService
+  ) {
     this.currentUser = this.authService.currentUser;
   }
 
   ngOnInit() {
-    this.loadUpcomingClasses();
-    if (this.currentUser?.roleId) {
-      this.loadAttendanceHistory();
-    }
-  }
-
-  
-
-  loadUpcomingClasses() {
-    this.apiService.getUpcomingClasses().subscribe(
-      (data: any) => {
-        this.upcomingClasses = data;
-      },
-      error => console.error('Error loading upcoming classes:', error)
-    );
-  }
-
-  loadAttendanceHistory() {
-    this.apiService.getStudentAttendance(this.currentUser.roleId).subscribe(
-      (data: any) => {
-        this.attendanceHistory = data;
-        this.calculateSummary();
-      },
-      error => console.error('Error loading attendance history:', error)
-    );
+    this.loadStudentData(); // ✅ Load everything at once
+    console.log('currentUser:', this.authService.currentUser);
   }
 
   loadStudentData() {
     this.loading = true;
-    
-    // Load all classes (this should only return student's classes)
+
+    // 1. Load all classes the student is enrolled in
     this.apiService.getClasses().subscribe({
       next: (data: any) => {
         this.allClasses = data;
-        console.log('Student classes loaded:', this.allClasses.length); // Debug log
+        console.log('Student classes loaded:', this.allClasses.length);
       },
-      error: (error) => {
-        console.error('Error loading student classes:', error);
-      }
+      error: (err) => console.error('Error loading classes:', err)
     });
 
-    // Load upcoming classes
+    // 2. Load upcoming classes
     this.apiService.getUpcomingClasses().subscribe({
       next: (data: any) => {
         this.upcomingClasses = data;
-        console.log('Upcoming classes:', this.upcomingClasses.length); // Debug log
+        console.log('Upcoming classes:', this.upcomingClasses.length);
       },
-      error: (error) => {
-        console.error('Error loading upcoming classes:', error);
-      }
+      error: (err) => console.error('Error loading upcoming:', err)
     });
 
-    // Load attendance history
-    if (this.currentUser?.roleId) {
-      this.apiService.getStudentAttendance(this.currentUser.roleId).subscribe({
+    // 3. Load attendance history – use correct student_id
+    const studentId = this.currentUser?.student_data?.student_id; // ✅ Must be students.id
+    if (studentId) {
+      this.apiService.getStudentAttendance(studentId).subscribe({
         next: (data: any) => {
           this.attendanceHistory = data;
           this.calculateSummary();
           this.loading = false;
-          
-          // Debug: Check if attendance history matches classes
-          console.log('Attendance history count:', this.attendanceHistory.length);
-          console.log('All classes count:', this.allClasses.length);
-          
-          // Filter classes to only show those with attendance records
-          this.filterClassesWithAttendance();
         },
-        error: (error) => {
-          console.error('Error loading attendance history:', error);
+        error: (err) => {
+          console.error('Error loading attendance:', err);
           this.loading = false;
         }
       });
-    }
-  }
-
-  // Filter classes to show only those the student has attended or is enrolled in
-  filterClassesWithAttendance() {
-    if (this.attendanceHistory.length > 0 && this.allClasses.length > 0) {
-      // Get class IDs from attendance history
-      const attendedClassIds = this.attendanceHistory.map(record => record.class_id);
-      
-      // Filter classes to only include those in attendance history
-      this.allClasses = this.allClasses.filter(classItem => 
-        attendedClassIds.includes(classItem.id)
-      );
-      
-      console.log('Filtered classes count:', this.allClasses.length);
+    } else {
+      console.error('No student_id found in currentUser');
+      this.loading = false;
     }
   }
 
   calculateSummary() {
-    this.attendanceSummary.totalClasses = this.attendanceHistory.length;
-    this.attendanceSummary.present = this.attendanceHistory.filter(r => r.is_present).length;
-    this.attendanceSummary.absent = this.attendanceHistory.filter(r => !r.is_present).length;
+  this.attendanceSummary.totalClasses = this.allClasses.length;          // from enrolled classes, not attendanceHistory
+  this.attendanceSummary.present = this.attendanceHistory.filter(r => r.is_present).length;
+  this.attendanceSummary.absent = this.attendanceSummary.totalClasses - this.attendanceSummary.present;
+}
+
+  getClassName(classId: number): string {
+    const classItem = this.allClasses.find(c => c.id === classId);
+    return classItem?.class_name || `Class #${classId}`;
   }
 
   formatTime(time: string): string {
-    if (!time) return '';
-    return time.substring(0, 5); // Format HH:MM
+    return time ? time.substring(0, 5) : '';
   }
-// Helper method to get class name from class ID
-getClassName(classId: number): string {
-  const classItem = this.allClasses.find(c => c.id === classId);
-  return classItem?.class_name || 'Class #' + classId;
-}
-
-
 }

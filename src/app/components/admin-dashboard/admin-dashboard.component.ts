@@ -41,6 +41,7 @@ export class AdminDashboardComponent implements OnInit {
   selectedStudent: any = null;
   selectedClass: any = null;
   loadingStudents: boolean = false;
+  
 
 
   today: string = new Date().toISOString().split('T')[0];
@@ -112,20 +113,19 @@ export class AdminDashboardComponent implements OnInit {
   }
 
   loadClasses() {
-    this.loadingClasses = true;
-    // Use regular getClasses instead of getAllClassesForAdmin if route doesn't exist
-    this.apiService.getClasses().subscribe({
-      next: (data: any) => {
-        this.classes = data;
-        this.loadingClasses = false;
-      },
-      error: (error) => {
-        console.error('Error loading classes:', error);
-        this.errorMessage = 'Failed to load classes: ' + error.message;
-        this.loadingClasses = false;
-      }
-    });
-  }
+  this.loadingClasses = true;
+  this.apiService.getAllClassesForAdmin().subscribe({
+    next: (data: any) => {
+      this.classes = data;
+      this.loadingClasses = false;
+    },
+    error: (error) => {
+      console.error('Error loading classes:', error);
+      this.errorMessage = 'Failed to load classes: ' + error.message;
+      this.loadingClasses = false;
+    }
+  });
+}
 
   // Update the loadActiveInstructors method
   loadActiveInstructors() {
@@ -162,12 +162,8 @@ export class AdminDashboardComponent implements OnInit {
             user_id: instructor.id,
             name: instructor.name,
             email: instructor.email,
-            pay_per_class: instructor.pay_per_class || 50
+            pay_per_class: instructor.pay_per_class || 30
           }));
-
-        console.log('Active instructors ready for dropdown:', this.activeInstructors);
-
-        // If still empty, show warning
         if (this.activeInstructors.length === 0 && instructors.length > 0) {
           this.errorMessage = 'Instructors found but missing instructor records. Please fix database.';
         }
@@ -205,15 +201,16 @@ export class AdminDashboardComponent implements OnInit {
   }
 
   loadInstructorStats() {
-    this.apiService.getInstructorStats().subscribe({
-      next: (data: any) => {
-        this.instructorStats = data;
-      },
-      error: (error) => {
-        console.error('Error loading instructor stats:', error);
-      }
-    });
-  }
+  this.apiService.getInstructorTagSummary().subscribe({
+    next: (data: any) => {
+      this.instructorStats = data;
+    },
+    error: (error) => {
+      console.error('Error loading instructor tag summary:', error);
+      this.instructorStats = [];
+    }
+  });
+}
 
   // Modal Methods
   openCreateClassModal() {
@@ -227,7 +224,7 @@ export class AdminDashboardComponent implements OnInit {
 
   openPayRateModal(user: any) {
     this.selectedInstructor = user;
-    this.payRateForm.patchValue({ payRate: user.pay_per_class || 50 });
+    this.payRateForm.patchValue({ payRate: user.pay_per_class || 30 });
     this.modalService.openModal('payRateModal');
   }
 
@@ -408,8 +405,13 @@ export class AdminDashboardComponent implements OnInit {
   }
 
   getTotalMissed(): number {
-    return this.filteredStudentStats.reduce((total, stat) => total + (stat.missed_classes || 0), 0);
-  }
+  return this.filteredStudentStats.reduce((total, stat) => total + (stat.total_classes - stat.attended_classes), 0);
+}
+  getMissedClasses(stat: any): number {
+  return (stat.total_classes || 0) - (stat.attended_classes || 0);
+}
+  
+  
 
   getOverallAttendancePercentage(): number {
     const total = this.getTotalClasses();

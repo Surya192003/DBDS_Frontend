@@ -455,8 +455,8 @@
                     <span class="badge bg-success">{{stat.attended_classes || 0}}</span>
                   </td>
                   <td class="text-center">
-                    <span class="badge bg-danger">{{stat.missed_classes || 0}}</span>
-                  </td>
+  <span class="badge bg-danger">{{ getMissedClasses(stat) }}</span>
+</td>
                   <td>
                     <div class="d-flex align-items-center">
                       <div class="progress flex-grow-1 me-3" style="height: 8px;">
@@ -515,46 +515,52 @@
           <div class="table-responsive">
             <table class="table table-hover">
               <thead class="table-light">
-                <tr>
-                  <th>Instructor</th>
-                  <th class="text-center">Pay Rate</th>
-                  <th class="text-center">Total Classes</th>
-                  <th class="text-center">Completed</th>
-                  <th class="text-end">Potential Earnings</th>
-                  <th class="text-center">Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let instructor of instructorStats">
-                  <td>
-                    <div class="fw-medium">{{instructor.instructor_name}}</div>
-                    <small class="text-muted">{{instructor.email}}</small>
-                  </td>
-                  <td class="text-center">
-                    <span class="badge bg-light text-dark">${{instructor.pay_per_class || 0}}/class</span>
-                  </td>
-                  <td class="text-center">
-                    {{instructor.total_classes_assigned || 0}}
-                  </td>
-                  <td class="text-center">
-                    <span class="badge bg-info">{{instructor.completed_classes || 0}}</span>
-                  </td>
-                  <td class="text-end fw-bold text-success">
-                    ${{instructor.potential_earnings || 0}}
-                  </td>
-                  <td class="text-center">
-                    <span [class]="instructor.is_active ? 'badge bg-success' : 'badge bg-secondary'">
-                      {{instructor.is_active ? 'Active' : 'Inactive'}}
-                    </span>
-                  </td>
-                </tr>
-                <tr *ngIf="instructorStats.length === 0">
-                  <td colspan="6" class="text-center py-4">
-                    <i class="bi bi-person-badge text-muted fs-1 mb-3"></i>
-                    <p class="text-muted mb-0">No instructor statistics found</p>
-                  </td>
-                </tr>
-              </tbody>
+  <tr>
+    <th>Instructor</th>
+    <th class="text-center">Pay Rate</th>
+    <th class="text-center">Total Classes</th>
+    <th class="text-center">Completed</th>
+    <th class="text-center">Tagged In</th>
+    <th>Last Tag In</th>
+    <th class="text-end">Potential Earnings</th>
+    <th class="text-center">Status</th>
+  </tr>
+</thead>
+<tbody>
+  <tr *ngFor="let instructor of instructorStats">
+    <td>
+      <div class="fw-medium">{{instructor.instructor_name}}</div>
+      <small class="text-muted">{{instructor.email}}</small>
+    </td>
+    <td class="text-center">
+      <span class="badge bg-light text-dark">${{instructor.pay_per_class || 0}}/class</span>
+    </td>
+    <td class="text-center">{{instructor.total_classes_assigned || 0}}</td>
+    <td class="text-center">
+      <span class="badge bg-info">{{instructor.completed_classes || 0}}</span>
+    </td>
+    <td class="text-center">
+      <span class="badge bg-primary">{{instructor.classes_tagged_in || 0}}</span>
+    </td>
+    <td>
+      {{instructor.last_tag_in ? (instructor.last_tag_in | date:'dd.MM.yy HH:mm') : '—'}}
+    </td>
+    <td class="text-end fw-bold text-success">
+      ${{instructor.potential_earnings || 0}}
+    </td>
+    <td class="text-center">
+      <span [class]="instructor.is_active ? 'badge bg-success' : 'badge bg-secondary'">
+        {{instructor.is_active ? 'Active' : 'Inactive'}}
+      </span>
+    </td>
+  </tr>
+  <tr *ngIf="instructorStats.length === 0">
+    <td colspan="8" class="text-center py-4">
+      <i class="bi bi-person-badge text-muted fs-1 mb-3"></i>
+      <p class="text-muted mb-0">No instructor statistics found</p>
+    </td>
+  </tr>
+</tbody>
             </table>
           </div>
         </div>

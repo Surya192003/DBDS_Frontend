@@ -1,15 +1,15 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { catchError, map } from 'rxjs/operators';
 import { AuthService } from './auth.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ApiService {
-  private apiUrl = 'https://dbds-backend.onrender.com/api';
-  // private apiUrl = 'http://localhost:5010/api';
+  // private apiUrl = 'https://dbds-backend.onrender.com/api';
+  private apiUrl = 'http://localhost:5010/api';
 
   constructor(private http: HttpClient, private authService: AuthService) { }
 
@@ -154,10 +154,17 @@ export class ApiService {
       .pipe(catchError(this.handleHttpError.bind(this)));
   }
 
-  getUserProfile(): Observable<any> {
-    return this.http.get(`${this.apiUrl}/users/profile`, { headers: this.getHeaders() })
-      .pipe(catchError(this.handleHttpError.bind(this)));
-  }
+  // In AuthService
+getUserProfile() {
+  return this.http.get(`${this.apiUrl}/users/profile`).pipe(
+    map((user: any) => {
+      if (user.role === 'STUDENT') {
+        user.student_id = user.student?.id; // adjust based on your backend response
+      }
+      return user;
+    })
+  );
+}
 
   // ============ ATTENDANCE MANAGEMENT ============
 
@@ -207,9 +214,15 @@ export class ApiService {
   }
 
   getInstructorMonthlyPerformance(instructorId: number): Observable<any> {
-    return this.http.get(`${this.apiUrl}/reports/instructor-monthly/${instructorId}`, { headers: this.getHeaders() })
-      .pipe(catchError(this.handleHttpError.bind(this)));
-  }
+  return this.http.get(`${this.apiUrl}/reports/monthly-performance/${instructorId}`, { headers: this.getHeaders() })
+    .pipe(catchError(this.handleHttpError.bind(this)));
+}
+
+getInstructorTagSummary(): Observable<any> {
+  return this.http.get(`${this.apiUrl}/reports/instructor-tag-summary`, { headers: this.getHeaders() });
+}
+
+  
 
   // ============ UTILITY METHODS ============
 
@@ -321,6 +334,16 @@ uploadProfilePhoto(file: File): Observable<any> {
 deleteProfilePhoto(): Observable<any> {
   return this.http.delete(`${this.apiUrl}/upload/profile-photo`, { headers: this.getHeaders() })
     .pipe(catchError(this.handleHttpError.bind(this)));
+}
+
+tagIn(classId: number): Observable<any> {
+  return this.http.post(`${this.apiUrl}/instructor/tag-in`, { class_id: classId }, { headers: this.getHeaders() });
+}
+tagOut(classId: number): Observable<any> {
+  return this.http.post(`${this.apiUrl}/instructor/tag-out`, { class_id: classId }, { headers: this.getHeaders() });
+}
+getTagStatus(classId: number): Observable<any> {
+  return this.http.get(`${this.apiUrl}/instructor/tag-status/${classId}`, { headers: this.getHeaders() });
 }
 
 }

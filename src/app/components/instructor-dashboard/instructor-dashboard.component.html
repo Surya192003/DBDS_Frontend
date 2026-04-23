@@ -11,6 +11,7 @@
     </div>
   </header>
 
+  <!-- Summary Cards -->
   <section class="summary-grid mb-5">
     <div class="summary-card color-blue">
       <label>TOTAL_CLASSES</label>
@@ -30,6 +31,7 @@
     </div>
   </section>
 
+  <!-- Assigned Classes Table -->
   <section class="mb-5">
     <label class="section-label">ASSIGNED_CLASSES_MANIFEST</label>
     <div class="sharp-card">
@@ -59,29 +61,45 @@
                 <div>{{classItem.class_date | date:'dd.MM.yy'}}</div>
                 <div class="muted-id">{{classItem.class_time}}</div>
               </td>
-              <td><span class="badge-sharp">{{classItem.group_name || 'NONE'}}</span></td>
+              <!-- In the GROUP column -->
+              <td><span class="badge-sharp">{{ classItem.group_name || classItem.class_name || 'NONE' }}</span></td>
               <td>
-                <span class="status-pill" 
-                      [ngClass]="getStatusClass(classItem.class_date)">
+                <span class="status-pill" [ngClass]="getStatusClass(classItem.class_date)">
                   {{getStatusText(classItem.class_date)}}
                 </span>
               </td>
               <td>
-                <div class="action-stack">
-                  <button class="btn-sharp-sm" (click)="openAttendanceModal(classItem)" 
-                          [disabled]="getStatusClass(classItem.class_date) === 'pill-green'">
-                    ATTENDANCE
-                  </button>
-                  <button class="btn-sharp-sm outline" (click)="openSongModal(classItem)">SONG</button>
-                </div>
-              </td>
+  <div class="action-stack">
+    <button class="btn-sharp-sm" (click)="openAttendanceModal(classItem)">ATTENDANCE</button>
+    <button class="btn-sharp-sm outline" (click)="openSongModal(classItem)">SONG</button>
+    <!-- New tag in/out buttons -->
+    <div class="d-flex gap-2 mt-2">
+      <button class="btn-sharp-sm" 
+              *ngIf="!tagStatusMap[classItem.id]?.tagged_in" 
+              (click)="tagIn(classItem.id)">
+        TAG IN
+      </button>
+      <button class="btn-sharp-sm" 
+              *ngIf="tagStatusMap[classItem.id]?.tagged_in && !tagStatusMap[classItem.id]?.tagged_out"
+              (click)="tagOut(classItem.id)">
+        TAG OUT
+      </button>
+      <span *ngIf="tagStatusMap[classItem.id]?.tagged_out" class="text-success">✓ COMPLETED</span>
+    </div>
+  </div>
+</td>
+              
             </tr>
           </tbody>
         </table>
       </div>
+      <div *ngIf="!loading && classes.length === 0" class="text-center py-5">
+        <p>No classes assigned yet.</p>
+      </div>
     </div>
   </section>
 
+  <!-- Monthly Performance Table -->
   <section class="mb-5">
     <label class="section-label">MONTHLY_PERFORMANCE_METRICS</label>
     <div class="sharp-card">
@@ -102,9 +120,119 @@
               <td class="text-center">{{perf.total_students}}</td>
               <td class="text-end fw-bold text-success">€{{perf.earnings}}</td>
             </tr>
+            <tr *ngIf="monthlyPerformance.length === 0">
+              <td colspan="4" class="text-center py-4">No performance data available.</td>
+            </tr>
           </tbody>
         </table>
       </div>
     </div>
   </section>
+
+  <!-- ======================== -->
+  <!-- SONG LINK MODAL          -->
+  <!-- ======================== -->
+  <div class="modal fade" id="songModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content sharp-card p-0">
+        <div class="modal-header border-bottom-0 p-4 pb-0">
+          <h5 class="modal-title fw-bold">UPDATE_SONG_LINK</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-4">
+          <div class="mb-3">
+            <label class="form-label fw-bold">Class: {{selectedClass?.class_name}}</label>
+            <input type="url" class="form-control sharp-input" placeholder="https://soundcloud.com/..."
+              [(ngModel)]="songLink">
+            <small class="text-muted">Paste a link to the song (YouTube, SoundCloud, etc.)</small>
+          </div>
+        </div>
+        <div class="modal-footer border-0 p-4 pt-0">
+          <button type="button" class="btn-sharp-sm outline" data-bs-dismiss="modal">CANCEL</button>
+          <button type="button" class="btn-sharp-sm" [disabled]="loading" (click)="updateSongLink()">
+            <span *ngIf="loading">UPDATING...</span>
+            <span *ngIf="!loading">UPDATE_SONG</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================== -->
+  <!-- ATTENDANCE MODAL         -->
+  <!-- ======================== -->
+  <div class="modal fade" id="attendanceModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content sharp-card p-0">
+        <div class="modal-header border-bottom-0 p-4 pb-0">
+          <h5 class="modal-title fw-bold">MARK_ATTENDANCE</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-4">
+          <div class="mb-3">
+            <p><strong>Class:</strong> {{selectedClass?.class_name}} ({{selectedClass?.class_date | date:'dd.MM.yy'}})
+            </p>
+          </div>
+
+          <!-- Loading state -->
+          <div *ngIf="loadingStudents" class="text-center py-4">
+            <div class="spinner-square"></div>
+            <p class="mt-3">LOADING_STUDENT_ROSTER...</p>
+          </div>
+
+          <!-- No students -->
+          <div *ngIf="!loadingStudents && classStudents.length === 0" class="text-center py-4">
+            <p>⚠️ No students enrolled in this class.</p>
+          </div>
+
+          <!-- Attendance table -->
+          <div *ngIf="!loadingStudents && classStudents.length > 0" class="table-container">
+            <form [formGroup]="attendanceForm">
+              <table class="sharp-table">
+                <thead>
+                  <tr>
+                    <th>STUDENT_NAME</th>
+                    <th>EMAIL</th>
+                    <th class="text-center">ATTENDANCE_STATUS</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let student of classStudents">
+                    <td>
+                      <div class="fw-bold">{{student.student_name || student.name}}</div>
+                      <div class="muted-id">ID: #{{student.student_id}}</div>
+                    </td>
+                    <td>{{student.email}}</td>
+                    <td class="text-center">
+                      <!-- <div class="form-check form-switch d-inline-block">
+                        <input class="form-check-input" type="checkbox" 
+       [formControl]="getAttendanceControl(student.student_id)"
+       [id]="'present_'+student.student_id"> -->
+                      <div class="form-check form-switch d-inline-block">
+                        <input class="form-check-input" type="checkbox"
+                          [formControl]="getAttendanceControl(student.student_id)" [id]="'present_'+student.student_id">
+                        <label class="form-check-label" [for]="'present_'+student.student_id">
+                          {{ getAttendanceControl(student.student_id)?.value ? 'PRESENT' : 'ABSENT' }}
+                        </label>
+                      </div>
+                      <!-- </div> -->
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </form>
+          </div>
+        </div>
+        <div class="modal-footer border-0 p-4 pt-0">
+          <button type="button" class="btn-sharp-sm outline" data-bs-dismiss="modal">CANCEL</button>
+          <button type="button" class="btn-sharp-sm"
+            [disabled]="markingAttendance || loadingStudents || classStudents.length === 0"
+            (click)="submitAttendance()">
+            <span *ngIf="markingAttendance">SAVING...</span>
+            <span *ngIf="!markingAttendance">SUBMIT_ATTENDANCE</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
