@@ -17,8 +17,8 @@ export interface User {
   providedIn: 'root'
 })
 export class AuthService {
-    private apiUrl = 'https://dbds-backend.onrender.com/api';
-  // private apiUrl = 'http://localhost:5010/api';
+    // private apiUrl = 'https://dbds-backend.onrender.com/api';
+  private apiUrl = 'http://localhost:5010/api';
   private currentUserSubject = new BehaviorSubject<User | null>(null);
   currentUser$ = this.currentUserSubject.asObservable();
 
@@ -174,16 +174,17 @@ export class AuthService {
 
   // ✅ Refresh user data from API
   refreshUserData(): Observable<any> {
-    return this.http.get(`${this.apiUrl}/users/profile`, {
-      headers: this.getAuthHeaders()
-    }).pipe(
-      tap((user: any) => {
-        localStorage.setItem('user', JSON.stringify(user));
-        this.currentUserSubject.next(user);
-      }),
-      catchError(this.handleError.bind(this))
-    );
-  }
+  return this.http.get(`${this.apiUrl}/auth/profile`, {
+    headers: this.getAuthHeaders()
+  }).pipe(
+    tap((res: any) => {
+      const user = res.profile;   // 👈 note: res.profile, not res directly
+      localStorage.setItem('user', JSON.stringify(user));
+      this.currentUserSubject.next(user);
+    }),
+    catchError(this.handleError.bind(this))
+  );
+}
 
   // ✅ Check if user is admin
   get isAdmin(): boolean {

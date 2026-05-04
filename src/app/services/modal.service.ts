@@ -6,6 +6,7 @@ import { Injectable } from '@angular/core';
 })
 export class ModalService {
   openModal(modalId: string) {
+    const backdrop = document.getElementById('modal-backdrop');
     const modalElement = document.getElementById(modalId);
     if (modalElement) {
       // Remove any existing backdrop
@@ -24,6 +25,9 @@ export class ModalService {
       document.body.appendChild(backdrop);
       document.body.classList.add('modal-open');
     }
+    if (backdrop) {
+    backdrop.addEventListener('click', () => this.closeModal(modalId));
+  }
   }
 
   closeModal(modalId: string) {

@@ -93,6 +93,72 @@
       </div>
     </section>
 
+    <!-- ANNOUNCEMENTS -->
+<section class="mb-5">
+  <label class="section-label">LATEST_ANNOUNCEMENTS</label>
+  <div class="announcement-grid">
+    <div *ngFor="let ann of announcements" class="announcement-card">
+      <div class="announcement-media">
+        <img *ngIf="ann.media_type === 'IMAGE'" [src]="ann.image_storage || ann.media_url" style="max-width:100%">
+        <iframe *ngIf="ann.media_type === 'VIDEO'" [src]="sanitizeUrl(ann.media_url)" frameborder="0" allowfullscreen></iframe>
+      </div>
+      <div class="announcement-content">
+        <span class="badge-sharp">{{ann.category}}</span>
+        <h4>{{ann.title}}</h4>
+        <p>{{ann.description}}</p>
+        <div *ngIf="ann.registration_enabled" class="register-area">
+          <button *ngIf="!ann.user_registered" class="btn-sharp-sm" (click)="registerForAnnouncement(ann.id)">REGISTER</button>
+          <span *ngIf="ann.user_registered" class="text-success">✓ REGISTERED</span>
+          <span *ngIf="ann.registration_type === 'PAID'" class="price">€{{ann.price}}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- POSTS FEED -->
+<section class="mb-5">
+  <label class="section-label">DANCE_VIDEOS_FEED</label>
+  <div class="posts-feed">
+    <div *ngFor="let post of posts" class="post-card">
+      <div class="video-container">
+        <iframe [src]="sanitizeUrl(post.video_url)" frameborder="0" allowfullscreen></iframe>
+      </div>
+      <h4>{{post.title}}</h4>
+      <p>{{post.description}}</p>
+      <div class="post-meta">
+        <span>{{post.created_at | date}}</span> • <span>{{post.author_name}}</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MY REGISTERED ANNOUNCEMENTS -->
+<section class="mb-5" *ngIf="announcements.length > 0">
+  <label class="section-label">MY_REGISTERED_EVENTS</label>
+  <div class="announcement-grid">
+    <div *ngFor="let ann of announcements" class="announcement-card">
+      <div class="announcement-media">
+        <img *ngIf="ann.media_type === 'IMAGE'" [src]="ann.image_storage || ann.media_url" style="max-width:100%">
+        <iframe *ngIf="ann.media_type === 'VIDEO'" [src]="sanitizeUrl(ann.media_url)" frameborder="0" allowfullscreen></iframe>
+      </div>
+      <div class="announcement-content">
+        <span class="badge-sharp">{{ann.category}}</span>
+        <h4>{{ann.title}}</h4>
+        <p>{{ann.description}}</p>
+        <div *ngIf="ann.registration_type === 'PAID'" class="price-badge">€{{ann.price}}</div>
+        <span class="registered-badge">✓ REGISTERED</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- POSTS FEED (same as before) -->
+<section class="mb-5">
+  <label class="section-label">DANCE_VIDEOS_FEED</label>
+  <div class="posts-feed">...</div>
+</section>
+
     <footer class="footer-note">
       <p>SAFEGUARDING_COMPLIANT // GARD_VETTED_STAFF</p>
     </footer>

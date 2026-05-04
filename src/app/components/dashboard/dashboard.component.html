@@ -1,125 +1,470 @@
-<div class="dashboard-wrapper">
-  <!-- Loading state -->
-  <div class="sharp-card center-text" *ngIf="!user">
-    <div class="spinner-square"></div>
-    <h2 class="title-text">INITIALIZING_SYSTEM...</h2>
+<div class="dashboard-wrapper" data-testid="dashboard-wrapper">
+  <!-- Loading state (only while fetching initial data) - static, no animation -->
+  <div class="loading-overlay" *ngIf="loadingInitial" data-testid="dashboard-loading-overlay">
+    <div class="loader-placeholder" data-testid="dashboard-loader"></div>
+    <p data-testid="dashboard-loading-text">LOADING_DASHBOARD...</p>
   </div>
 
-  <!-- Main Dashboard -->
-  <div class="sharp-card main-dashboard-card" *ngIf="user">
-    <!-- Video Header (optional, remove if no video) -->
-    <div class="video-header">
-      <img autoplay muted loop playsinline class="header-video" src="assets/videos/dance-background.jpg">
-      <div class="video-overlay">
-        <h1 class="school-name">DHARMENDRA BOLLYWOOD DANCE SCHOOL</h1>
-        <p class="tagline">WHERE YOUR DREAMS BEGIN // IRELAND</p>
+  <div class="dashboard-shell" *ngIf="!loadingInitial" data-testid="dashboard-shell">
+    <!-- PROFILE & PORTALS -->
+    <div class="user-area glass-panel" *ngIf="user" data-testid="user-area">
+      <div class="profile-summary" data-testid="profile-summary">
+        <div
+          class="profile-photo"
+          (click)="openEditProfileModal()"
+          role="button"
+          tabindex="0"
+          aria-label="Edit profile photo"
+          data-testid="profile-photo-button"
+        >
+          <img
+            *ngIf="user?.photo_url"
+            [src]="getFullImageUrl(user.photo_url)"
+            class="profile-img"
+            alt="Profile photo"
+            data-testid="profile-image"
+          >
+
+          <div
+            *ngIf="!user?.photo_url"
+            class="profile-placeholder"
+            data-testid="profile-placeholder"
+          >
+            {{ user?.name?.charAt(0) }}
+          </div>
+        </div>
+
+        <div class="profile-info" data-testid="profile-info">
+          <div class="info-line" data-testid="profile-id">ID: 00{{ user?.id }}</div>
+          <div class="info-line profile-name" data-testid="profile-name">
+            {{ user?.name | uppercase }}
+          </div>
+          <div class="info-line role-badge" data-testid="profile-role">
+            {{ user?.role }}
+          </div>
+        </div>
+
+        <button
+          class="btn-sharp-small"
+          (click)="openEditProfileModal()"
+          data-testid="edit-profile-button"
+        >
+          EDIT_PROFILE
+        </button>
+      </div>
+
+      <!-- FIXED: removed incorrect role exclusion, now shows for any logged-in user -->
+      <div class="portal-buttons" *ngIf="user" data-testid="portal-buttons">
+        <a
+          *ngIf="user?.role === 'ADMIN'"
+          routerLink="/admin"
+          class="btn-sharp"
+          data-testid="admin-portal-link"
+        >
+          ADMIN_PORTAL
+        </a>
+
+        <a
+          *ngIf="user?.role === 'INSTRUCTOR'"
+          routerLink="/instructor"
+          class="btn-sharp"
+          data-testid="instructor-portal-link"
+        >
+          INSTRUCTOR_PORTAL
+        </a>
+
+        <a
+          *ngIf="user?.role === 'STUDENT'"
+          routerLink="/student"
+          class="btn-sharp"
+          data-testid="student-portal-link"
+        >
+          LEARNING_PORTAL
+        </a>
       </div>
     </div>
 
-    <!-- Profile Summary -->
-    <div class="profile-summary">
-      <div class="profile-photo">
-        <img *ngIf="user?.photo_url" [src]="user.photo_url" class="profile-img">
-        <div *ngIf="!user?.photo_url" class="profile-placeholder">{{user?.name?.charAt(0)}}</div>
-      </div>
-      <div class="profile-info">
-        <div class="info-line"><span class="label">ID:</span> 00{{user?.id}}</div>
-        <div class="info-line"><span class="label">NAME:</span> {{user?.name | uppercase}}</div>
-        <div class="info-line"><span class="label">ROLE:</span> {{user?.role}}</div>
-      </div>
-      <button class="btn-sharp-small" (click)="openEditProfileModal()">EDIT_PROFILE</button>
-    </div>
+    <!-- HERO SECTION -->
+    <div
+      class="hero-section glass-panel"
+      [class.logged-in-hero]="user"
+      data-testid="hero-section"
+    >
+      <div class="hero-glow hero-glow-one"></div>
+      <div class="hero-glow hero-glow-two"></div>
 
-    <!-- Role Portals -->
-    <div class="actions-section">
-      <label class="section-label">ACCESS_PROTOCOLS</label>
-      <div class="button-grid">
-        <a *ngIf="user?.role === 'ADMIN'" routerLink="/admin" class="btn-sharp">ADMIN_PORTAL</a>
-        <a *ngIf="user?.role === 'INSTRUCTOR'" routerLink="/instructor" class="btn-sharp">INSTRUCTOR_PORTAL</a>
-        <a *ngIf="user?.role === 'STUDENT'" routerLink="/student" class="btn-sharp">LEARNING_PORTAL</a>
-      </div>
-    </div>
+      <div class="hero-content" data-testid="hero-content">
+        <span class="eyebrow" data-testid="hero-eyebrow" style="color: black;">Premium Dance Academy</span>
 
-    <!-- Dance Classes Grid -->
-    <div class="classes-section">
-      <label class="section-label">OUR_CLASSES</label>
-      <div class="classes-grid">
-        <div class="class-card" *ngFor="let danceClass of danceClasses">
-          <div class="class-icon">{{danceClass.icon}}</div>
-          <h4>{{danceClass.name}}</h4>
-          <p>{{danceClass.description}}</p>
-          <button class="btn-sharp-small w-100 mt-2" (click)="navigateToClass(danceClass)">VIEW_COURSE</button>
+        <h1 class="school-name" data-testid="school-name">
+          DHARMENDRA BOLLYWOOD DANCE SCHOOL
+        </h1>
+
+        <p class="hero-tagline" data-testid="hero-tagline">
+          DANCE • FITNESS • CULTURE • IRELAND
+        </p>
+
+        <div class="hero-buttons" *ngIf="!user" data-testid="hero-buttons">
+          <a
+            routerLink="/register"
+            class="btn-sharp-large"
+            data-testid="join-now-link"
+          >
+            JOIN NOW
+          </a>
+
+          <a
+            routerLink="/login"
+            class="btn-sharp-large outline"
+            data-testid="login-link"
+          >
+            LOGIN
+          </a>
+        </div>
+
+        <div class="hero-greeting" *ngIf="user" data-testid="hero-greeting">
+          <p>
+            Welcome back,
+            <strong>{{ user.name }}</strong>!
+          </p>
+        </div>
+      </div>
+
+      <!-- 3D floating visual -->
+      <div class="hero-visual" aria-hidden="true" data-testid="hero-visual">
+        <div class="visual-backplate"></div>
+
+        <!-- Replace this src with your transparent PNG/WebeP dancer image -->
+        <img
+          src="/src/assets/images/dance-background.jpg"
+          alt=""
+          class="floating-dancer"
+          data-testid="hero-floating-dancer-image"
+        >
+
+        <div class="floating-card floating-card-top" data-testid="hero-floating-card-top">
+          BOLLYWOOD
+        </div>
+
+        <div class="floating-card floating-card-bottom" data-testid="hero-floating-card-bottom">
+          DUBLIN
         </div>
       </div>
     </div>
 
-    <!-- Info Cards (Coming Soon) -->
-    <div class="info-grid">
-      <div class="info-card" (click)="comingSoon('Events')">
-        <span>📅</span> EVENTS
+    <!-- ANNOUNCEMENTS -->
+    <div class="announcements-section glass-panel" data-testid="announcements-section">
+      <div class="section-header" data-testid="announcements-header">
+        <div>
+          <span class="section-kicker" data-testid="announcements-kicker">Latest updates</span>
+          <label class="section-label" data-testid="announcements-title">
+            LATEST_ANNOUNCEMENTS
+          </label>
+        </div>
+
+        <div class="category-filters" data-testid="category-filters">
+          <button
+            *ngFor="let cat of categories"
+            (click)="filterAnnouncements(cat)"
+            [class.active]="selectedCategory === cat"
+            class="filter-chip"
+            [attr.data-testid]="'category-filter-' + cat"
+          >
+            {{ cat }}
+          </button>
+        </div>
       </div>
-      <div class="info-card" (click)="comingSoon('DBDS Store')">
-        <span>🛒</span> DBDS STORE
-      </div>
-      <div class="info-card" (click)="comingSoon('Refer Friends')">
-        <span>🤝</span> REFER FRIENDS
-      </div>
-      <div class="info-card" (click)="comingSoon('Gallery')">
-        <span>🖼️</span> GALLERY
+
+      <div class="announcement-grid" data-testid="announcement-grid">
+        <div
+          *ngFor="let ann of filteredAnnouncements"
+          class="announcement-card glass-card"
+          [attr.data-testid]="'announcement-card-' + ann.id"
+        >
+          <div class="media-preview" data-testid="announcement-media">
+            <img
+              *ngIf="ann.media_type === 'IMAGE'"
+              [src]="ann.image_storage || ann.media_url"
+              [alt]="ann.title"
+              data-testid="announcement-image"
+            >
+
+            <iframe
+              *ngIf="ann.media_type === 'VIDEO'"
+              [src]="sanitizeUrl(ann.media_url)"
+              frameborder="0"
+              allowfullscreen
+              title="Announcement video"
+              data-testid="announcement-video"
+            ></iframe>
+          </div>
+
+          <div class="announcement-content" data-testid="announcement-content">
+            <span class="category-badge" data-testid="announcement-category">
+              {{ ann.category }}
+            </span>
+
+            <h4 data-testid="announcement-title">{{ ann.title }}</h4>
+
+            <p data-testid="announcement-description">{{ ann.description }}</p>
+
+            <div
+              *ngIf="ann.registration_enabled"
+              class="register-area"
+              data-testid="announcement-register-area"
+            >
+              <button
+                *ngIf="!ann.user_registered && user"
+                class="btn-sharp-small"
+                (click)="registerForAnnouncement(ann.id)"
+                [attr.data-testid]="'announcement-register-button-' + ann.id"
+              >
+                REGISTER
+              </button>
+
+              <span
+                *ngIf="ann.user_registered"
+                class="registered-badge"
+                data-testid="announcement-registered-badge"
+              >
+                REGISTERED
+              </span>
+
+              <span
+                *ngIf="ann.registration_type === 'PAID'"
+                class="price-badge"
+                data-testid="announcement-price"
+              >
+                €{{ ann.price }}
+              </span>
+
+              <a
+                *ngIf="!user"
+                routerLink="/login"
+                class="login-link"
+                data-testid="announcement-login-to-register-link"
+              >
+                Login to register
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div
+          *ngIf="filteredAnnouncements.length === 0"
+          class="empty-state"
+          data-testid="announcements-empty-state"
+        >
+          No announcements in this category.
+        </div>
       </div>
     </div>
 
-    <!-- Footer -->
-    <div class="footer-contact">
-      <p>+353 89 468 5565 // INFO@DBDS.IE // DUBLIN, IRELAND</p>
+    <!-- POSTS FEED -->
+    <div class="posts-section glass-panel" data-testid="posts-section">
+      <div class="section-header compact" data-testid="posts-header">
+        <div>
+          <span class="section-kicker" data-testid="posts-kicker">Community feed</span>
+          <label class="section-label" data-testid="posts-title">
+            DANCE_VIDEOS // COMMUNITY_FEED
+          </label>
+        </div>
+      </div>
+
+      <div class="posts-feed" data-testid="posts-feed">
+        <div
+          *ngFor="let post of posts"
+          class="post-card glass-card"
+          data-testid="post-card"
+        >
+          <div class="video-wrapper" data-testid="post-video-wrapper">
+            <iframe
+              [src]="sanitizeUrl(post.video_url)"
+              frameborder="0"
+              allowfullscreen
+              title="Dance video"
+              data-testid="post-video"
+            ></iframe>
+          </div>
+
+          <h4 data-testid="post-title">{{ post.title }}</h4>
+
+          <p data-testid="post-description">{{ post.description }}</p>
+
+          <div class="post-meta" data-testid="post-meta">
+            <span data-testid="post-date">{{ post.created_at | date:'dd.MM.yy' }}</span>
+            <span data-testid="post-author">{{ post.author_name }}</span>
+          </div>
+        </div>
+
+        <div
+          *ngIf="posts.length === 0"
+          class="empty-state"
+          data-testid="posts-empty-state"
+        >
+          No videos yet. Check back soon!
+        </div>
+      </div>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="footer-contact glass-panel" data-testid="footer-contact">
+      <p data-testid="footer-contact-text">
+        +353 89 468 5565 // INFO@DBDS.IE // DUBLIN, IRELAND
+      </p>
     </div>
   </div>
 </div>
 
-<!-- Edit Profile Modal -->
-<div class="modal-overlay" *ngIf="showEditModal" (click)="closeModalOnOverlay($event)">
-  <div class="sharp-modal">
-    <div class="modal-header-sharp">
-      <h3>EDIT_PROFILE // {{user?.name | uppercase}}</h3>
-      <button class="modal-close" (click)="closeEditModal()">✕</button>
+<!-- EDIT PROFILE MODAL -->
+<div
+  class="modal-overlay"
+  *ngIf="showEditModal"
+  (click)="closeModalOnOverlay($event)"
+  data-testid="edit-profile-modal-overlay"
+>
+  <div class="sharp-modal glass-panel" data-testid="edit-profile-modal">
+    <div class="modal-header-sharp" data-testid="edit-profile-modal-header">
+      <h3 data-testid="edit-profile-modal-title">
+        EDIT_PROFILE // {{ user?.name | uppercase }}
+      </h3>
+
+      <button
+        class="modal-close"
+        (click)="closeEditModal()"
+        aria-label="Close edit profile modal"
+        data-testid="edit-profile-modal-close-button"
+      >
+        ×
+      </button>
     </div>
-    <form [formGroup]="profileForm" (ngSubmit)="updateProfile()" class="modal-body-sharp">
+
+    <form
+      [formGroup]="profileForm"
+      (ngSubmit)="updateProfile()"
+      class="modal-body-sharp"
+      data-testid="edit-profile-form"
+    >
       <!-- Photo Upload -->
-      <div class="photo-upload-section">
-        <div class="current-photo">
-          <img *ngIf="previewUrl || user?.photo_url" [src]="previewUrl || user?.photo_url" alt="Profile">
-          <div *ngIf="!previewUrl && !user?.photo_url" class="photo-placeholder">{{user?.name?.charAt(0)}}</div>
+      <div class="photo-upload-section" data-testid="photo-upload-section">
+        <div class="current-photo" data-testid="current-photo">
+          <img
+            *ngIf="previewUrl || user?.photo_url"
+            [src]="previewUrl || getFullImageUrl(user?.photo_url)"
+            alt="Profile"
+            data-testid="current-profile-image"
+          >
+
+          <div
+            *ngIf="!previewUrl && !user?.photo_url"
+            class="photo-placeholder"
+            data-testid="current-profile-placeholder"
+          >
+            {{ user?.name?.charAt(0) }}
+          </div>
         </div>
-        <div class="photo-actions">
-          <input type="file" #fileInput accept="image/*" (change)="onFileSelected($event)" style="display:none">
-          <button type="button" class="btn-sharp-small" (click)="fileInput.click()">UPLOAD_NEW</button>
-          <button type="button" class="btn-sharp-small danger" (click)="deletePhoto()" *ngIf="user?.photo_url">REMOVE</button>
+
+        <div class="photo-actions" data-testid="photo-actions">
+          <input
+            type="file"
+            #fileInput
+            accept="image/*"
+            (change)="onFileSelected($event)"
+            style="display:none"
+            data-testid="profile-photo-file-input"
+          >
+
+          <button
+            type="button"
+            class="btn-sharp-small"
+            (click)="fileInput.click()"
+            data-testid="upload-new-photo-button"
+          >
+            UPLOAD_NEW
+          </button>
+
+          <button
+            type="button"
+            class="btn-sharp-small danger"
+            (click)="deletePhoto()"
+            *ngIf="user?.photo_url"
+            data-testid="remove-photo-button"
+          >
+            REMOVE
+          </button>
         </div>
-        <div *ngIf="uploadMessage" class="upload-message">{{uploadMessage}}</div>
+
+        <div
+          *ngIf="uploadMessage"
+          class="upload-message"
+          data-testid="upload-message"
+        >
+          {{ uploadMessage }}
+        </div>
       </div>
 
       <!-- Editable Fields -->
-      <div class="form-row-sharp">
-        <label>FULL_NAME</label>
-        <input type="text" formControlName="name" class="sharp-input">
-      </div>
-      <div class="form-row-sharp">
-        <label>EMAIL</label>
-        <input type="email" formControlName="email" class="sharp-input">
-      </div>
-      <div class="form-row-sharp">
-        <label>PHONE</label>
-        <input type="text" formControlName="phone" class="sharp-input">
-      </div>
-      <div class="form-row-sharp">
-        <label>ADDRESS</label>
-        <textarea formControlName="address" class="sharp-input" rows="2"></textarea>
+      <div class="form-row-sharp" data-testid="name-form-row">
+        <label for="profileName" data-testid="name-label">FULL_NAME</label>
+        <input
+          id="profileName"
+          type="text"
+          formControlName="name"
+          class="sharp-input"
+          data-testid="name-input"
+        >
       </div>
 
-      <div class="modal-footer-sharp">
-        <button type="button" class="btn-sharp-small" (click)="closeEditModal()">CANCEL</button>
-        <button type="submit" class="btn-sharp-small primary" [disabled]="isSubmitting">
-          {{isSubmitting ? 'SAVING...' : 'SAVE_CHANGES'}}
+      <div class="form-row-sharp" data-testid="email-form-row">
+        <label for="profileEmail" data-testid="email-label">EMAIL</label>
+        <input
+          id="profileEmail"
+          type="email"
+          formControlName="email"
+          class="sharp-input"
+          data-testid="email-input"
+        >
+      </div>
+
+      <div class="form-row-sharp" data-testid="phone-form-row">
+        <label for="profilePhone" data-testid="phone-label">PHONE</label>
+        <input
+          id="profilePhone"
+          type="text"
+          formControlName="phone"
+          class="sharp-input"
+          data-testid="phone-input"
+        >
+      </div>
+
+      <div class="form-row-sharp" data-testid="address-form-row">
+        <label for="profileAddress" data-testid="address-label">ADDRESS</label>
+        <textarea
+          id="profileAddress"
+          formControlName="address"
+          class="sharp-input"
+          rows="2"
+          data-testid="address-input"
+        ></textarea>
+      </div>
+
+      <div class="modal-footer-sharp" data-testid="edit-profile-modal-footer">
+        <button
+          type="button"
+          class="btn-sharp-small"
+          (click)="closeEditModal()"
+          data-testid="cancel-profile-edit-button"
+        >
+          CANCEL
+        </button>
+
+        <button
+          type="submit"
+          class="btn-sharp-small primary"
+          [disabled]="isSubmitting"
+          data-testid="save-profile-button"
+        >
+          {{ isSubmitting ? 'SAVING...' : 'SAVE_CHANGES' }}
         </button>
       </div>
     </form>

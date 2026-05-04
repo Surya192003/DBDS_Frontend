@@ -8,8 +8,8 @@ import { AuthService } from './auth.service';
   providedIn: 'root'
 })
 export class ApiService {
-  private apiUrl = 'https://dbds-backend.onrender.com/api';
-  // private apiUrl = 'http://localhost:5010/api';
+  // private apiUrl = 'https://dbds-backend.onrender.com/api';
+  private apiUrl = 'http://localhost:5010/api';
 
   constructor(private http: HttpClient, private authService: AuthService) { }
 
@@ -307,8 +307,11 @@ getInstructorTagSummary(): Observable<any> {
   }
   // User profile
 updateUserProfile(profileData: any): Observable<any> {
-  return this.http.put(`${this.apiUrl}/users/profile`, profileData, { headers: this.getHeaders() })
-    .pipe(catchError(this.handleHttpError.bind(this)));
+  return this.http.put(`${this.apiUrl}/auth/profile`, profileData, { headers: this.getHeaders() })
+    .pipe(
+      map((res: any) => res.profile),
+      catchError(this.handleHttpError.bind(this))
+    );
 }
 
 // Delete user

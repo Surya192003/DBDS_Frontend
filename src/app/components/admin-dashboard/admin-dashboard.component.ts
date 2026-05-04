@@ -3,11 +3,50 @@ import { ApiService } from '../../services/api.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ModalService } from '../../services/modal.service';
 import { AuthService } from 'src/app/services/auth.service';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { AnnouncementService } from '../../services/announcement.service';
+import { PostService } from '../../services/post.service';
+import { trigger, transition, style, animate, query, stagger } from '@angular/animations';
+
+export const dashboardAnimations = [
+  trigger('fadeIn', [
+    transition(':enter', [
+      style({ opacity: 0 }),
+      animate('600ms ease-out', style({ opacity: 1 }))
+    ])
+  ]),
+  trigger('slideUp', [
+    transition(':enter', [
+      style({ transform: 'translateY(20px)', opacity: 0 }),
+      animate('500ms cubic-bezier(0.2, 0.9, 0.4, 1)',
+        style({ transform: 'translateY(0)', opacity: 1 }))
+    ])
+  ]),
+  trigger('fadeInUp', [
+    transition(':enter', [
+      style({ transform: 'translateY(12px)', opacity: 0 }),
+      animate('400ms ease-out',
+        style({ transform: 'translateY(0)', opacity: 1 }))
+    ])
+  ]),
+  trigger('staggerList', [
+    transition('* => *', [
+      query(':enter', [
+        style({ opacity: 0, transform: 'translateY(12px)' }),
+        stagger('70ms', [
+          animate('350ms ease-out',
+            style({ opacity: 1, transform: 'translateY(0)' }))
+        ])
+      ], { optional: true })
+    ])
+  ])
+];
 
 @Component({
   selector: 'app-admin-dashboard',
   templateUrl: './admin-dashboard.component.html',
-  styleUrls: ['./admin-dashboard.component.css']
+  styleUrls: ['./admin-dashboard.component.css'],
+  animations: [dashboardAnimations]
 })
 export class AdminDashboardComponent implements OnInit {
   users: any[] = [];
@@ -21,6 +60,17 @@ export class AdminDashboardComponent implements OnInit {
   groups: any[] = [];
   loadingGroups: boolean = false;
   currentUser: any = null;
+  announcements: any[] = [];
+  posts: any[] = [];
+
+  // Modal flags and forms
+  // showAnnouncementModal = false;
+  // showPostModal = false;
+  announcementForm: FormGroup | undefined;
+  postForm: FormGroup | undefined;
+  editingAnnouncementId: number | null = null;
+  editingPostId: number | null = null;
+  selectedFile: File | null = null;
 
 
   selectedMonth: string = new Date().toISOString().slice(0, 7);
@@ -53,7 +103,10 @@ export class AdminDashboardComponent implements OnInit {
     private apiService: ApiService,
     private authService: AuthService,
     private fb: FormBuilder,
-    public modalService: ModalService
+    public modalService: ModalService,
+    private announcementService: AnnouncementService,
+    private postService: PostService,
+    private sanitizer: DomSanitizer
   ) {
     // Initialize forms
     this.classForm = this.fb.group({
@@ -67,12 +120,30 @@ export class AdminDashboardComponent implements OnInit {
     this.payRateForm = this.fb.group({
       payRate: [0, [Validators.required, Validators.min(0)]]
     });
+    this.announcementForm = this.fb.group({
+      title: ['', Validators.required],
+      description: ['', Validators.required],
+      category: ['EVENTS', Validators.required],
+      media_type: ['IMAGE', Validators.required],
+      media_url: [''],
+      registration_enabled: [false],
+      registration_type: ['FREE'],
+      price: [0]
+    });
+    this.postForm = this.fb.group({
+      title: [''],
+      description: [''],
+      video_url: ['', Validators.required],
+      thumbnail_url: ['']
+    });
   }
 
   ngOnInit() {
     this.loadAllData();
     this.loadActiveStudents();
     this.loadGroups(); // Add this
+    this.loadAnnouncements();
+    this.loadPosts();
   }
 
   loadGroups() {
@@ -99,6 +170,17 @@ export class AdminDashboardComponent implements OnInit {
     this.loadActiveInstructors();
   }
 
+  sanitizeUrl(url: string): SafeResourceUrl {
+    let embedUrl = url;
+    if (url.includes('youtube.com/watch?v=')) {
+      const videoId = url.split('v=')[1].split('&')[0];
+      embedUrl = `https://www.youtube.com/embed/${videoId}`;
+    } else if (url.includes('youtu.be/')) {
+      const videoId = url.split('youtu.be/')[1].split('?')[0];
+      embedUrl = `https://www.youtube.com/embed/${videoId}`;
+    }
+    return this.sanitizer.bypassSecurityTrustResourceUrl(embedUrl);
+  }
   loadUsers() {
     this.apiService.getUsers().subscribe({
       next: (data: any) => {
@@ -410,7 +492,105 @@ export class AdminDashboardComponent implements OnInit {
   getMissedClasses(stat: any): number {
   return (stat.total_classes || 0) - (stat.attended_classes || 0);
 }
-  
+
+
+loadAnnouncements() {
+  this.announcementService.getAll().subscribe(data => this.announcements = data);
+}
+loadPosts() {
+  this.postService.getAll().subscribe(data => this.posts = data);
+}
+openAnnouncementModal(announcement?: any) {
+  if (announcement) {
+    this.editingAnnouncementId = announcement.id;
+    this.announcementForm?.patchValue(announcement);
+  } else {
+    this.editingAnnouncementId = null;
+    this.announcementForm?.reset({
+      category: 'EVENTS',
+      media_type: 'IMAGE',
+      registration_enabled: false,
+      registration_type: 'FREE',
+      price: 0
+    });
+  }
+  this.selectedFile = null;
+  this.modalService.openModal('announcementModal');
+}
+
+  onFileSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files[0]) this.selectedFile = input.files[0];
+  }
+
+ saveAnnouncement() {
+  if (!this.announcementForm || this.announcementForm.invalid) return;
+  const formData = new FormData();
+  Object.keys(this.announcementForm.value).forEach(key => {
+    let val = this.announcementForm?.value[key];
+    if (val !== undefined && val !== null) formData.append(key, val);
+  });
+  if (this.selectedFile) formData.append('image', this.selectedFile);
+
+  const request = this.editingAnnouncementId
+    ? this.announcementService.update(this.editingAnnouncementId, formData)
+    : this.announcementService.create(formData);
+  request.subscribe({
+    next: () => {
+      this.loadAnnouncements();
+      this.modalService.closeModal('announcementModal');   // ✅ close properly
+      alert('Announcement saved');
+    },
+    error: (err) => alert('Error: ' + err.error?.error)
+  });
+}
+
+  deleteAnnouncement(id: number) {
+    if (confirm('Delete this announcement?')) {
+      this.announcementService.delete(id).subscribe(() => this.loadAnnouncements());
+    }
+  }
+
+  viewRegistrations(ann: any) {
+    this.announcementService.getRegistrations(ann.id).subscribe(regs => {
+      alert(regs.map(r => `${r.name} (${r.role})`).join('\n') || 'No registrations');
+    });
+  }
+
+  // ------------------------------
+  // Posts CRUD
+  // ------------------------------
+  openPostModal(post?: any) {
+  if (post) {
+    this.editingPostId = post.id;
+    this.postForm?.patchValue(post);
+  } else {
+    this.editingPostId = null;
+    this.postForm?.reset();
+  }
+  this.modalService.openModal('postModal');
+}
+  savePost() {
+  if (!this.postForm || this.postForm.invalid) return;
+  const formValue = this.postForm.value;
+  const request = this.editingPostId
+    ? this.postService.update(this.editingPostId, formValue)
+    : this.postService.create(formValue);
+  request.subscribe({
+    next: () => {
+      this.loadPosts();
+      this.modalService.closeModal('postModal');    // ✅ close properly
+      alert('Post saved');
+    },
+    error: (err) => alert('Error: ' + err.error?.error)
+  });
+}
+
+  deletePost(id: number) {
+    if (confirm('Delete this post?')) {
+      this.postService.delete(id).subscribe(() => this.loadPosts());
+    }
+  }
   
 
   getOverallAttendancePercentage(): number {

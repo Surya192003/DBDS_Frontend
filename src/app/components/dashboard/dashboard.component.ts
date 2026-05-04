@@ -5,21 +5,50 @@ import { Subject } from 'rxjs';
 import { take, takeUntil } from 'rxjs/operators';
 import { AuthService } from '../../services/auth.service';
 import { ApiService } from '../../services/api.service';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { AnnouncementService } from '../../services/announcement.service';
+import { PostService } from '../../services/post.service';
+import { trigger, transition, style, animate, query, stagger, animateChild } from '@angular/animations';
+import {environment} from '../../../environments/environment';
+import { firstValueFrom } from 'rxjs';
+
 
 @Component({
   selector: 'app-dashboard',
   standalone: false,
   templateUrl: './dashboard.component.html',
-  styleUrls: ['./dashboard.component.css']
+  styleUrls: ['./dashboard.component.css'],
+  animations: [
+  trigger('fadeStagger', [
+    transition(':enter', [
+      query('.glass-card, .section, .hero', [
+        style({ opacity: 0, transform: 'translateY(30px) scale(0.98)' }),
+        stagger(100, [
+          animate('700ms cubic-bezier(0.2, 1, 0.3, 1)', 
+          style({ opacity: 1, transform: 'translateY(0) scale(1)' }))
+        ])
+      ], { optional: true })
+    ])
+  ])
+]
 })
+
+
 export class DashboardComponent implements OnInit, OnDestroy {
   user: any = null;
   showEditModal = false;
+  isPublic = true;
   profileForm: FormGroup;
   selectedFile: File | null = null;
   previewUrl: string | null = null;
   uploadMessage = '';
   isSubmitting = false;
+  announcements: any[] = [];
+  posts: any[] = [];
+  loadingInitial = true;
+  filteredAnnouncements: any[] = [];
+  categories = ['EVENTS', 'WORKSHOPS', 'PERFORMANCES'];
+  selectedCategory = 'EVENTS';
   private destroy$ = new Subject<void>();
 
   // Dance classes (same as before)
@@ -38,7 +67,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
     private authService: AuthService,
     private apiService: ApiService,
     private fb: FormBuilder,
-    private router: Router
+    private router: Router,
+    private announcementService: AnnouncementService,
+    private postService: PostService,
+    private sanitizer: DomSanitizer
   ) {
     this.profileForm = this.fb.group({
       name: ['', Validators.required],
@@ -49,15 +81,64 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
+    
     this.authService.currentUser$
       .pipe(takeUntil(this.destroy$))
       .subscribe(user => {
-        if (!user) {
-          this.router.navigate(['/login']);
-          return;
+        if (user) {
+          this.user = user;
+          this.isPublic = false;
+          this.loadAnnouncements();
+          
+        } else {
+          this.user = null;
+          this.isPublic = true;
         }
-        this.user = user;
       });
+    this.loadAnnouncements();
+    this.loadPosts();
+  }
+
+  loadAnnouncements() {
+    this.announcementService.getAll().subscribe(data => {
+      this.announcements = data;
+      this.filterAnnouncements(this.selectedCategory);
+      this.loadingInitial = false;
+    });
+  }
+  filterAnnouncements(category: string) {
+    this.selectedCategory = category;
+    this.filteredAnnouncements = this.announcements.filter(a => a.category === category);
+  }
+
+  loadPosts() {
+    this.postService.getAll().subscribe(data => {
+      this.posts = data;
+      this.loadingInitial = false;
+    });
+  }
+
+  registerForAnnouncement(id: number) {
+    if (!this.user) return;
+    this.announcementService.register(id).subscribe({
+      next: () => {
+        alert('Registration successful!');
+        this.loadAnnouncements(); // refresh flags
+      },
+      error: (err) => alert(err.error?.error || 'Registration failed')
+    });
+  }
+  sanitizeUrl(url: string): SafeResourceUrl {
+    // YouTube embed conversion if needed
+    let embedUrl = url;
+    if (url.includes('youtube.com/watch?v=')) {
+      const videoId = url.split('v=')[1].split('&')[0];
+      embedUrl = `https://www.youtube.com/embed/${videoId}`;
+    } else if (url.includes('youtu.be/')) {
+      const videoId = url.split('youtu.be/')[1].split('?')[0];
+      embedUrl = `https://www.youtube.com/embed/${videoId}`;
+    }
+    return this.sanitizer.bypassSecurityTrustResourceUrl(embedUrl);
   }
 
   openEditProfileModal() {
@@ -131,48 +212,63 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }
   }
 
-  updateProfile() {
-    if (this.profileForm.invalid) return;
-    this.isSubmitting = true;
+  async updateProfile() {
+  if (this.profileForm.invalid) return;
+  this.isSubmitting = true;
 
-    const photoPromise = this.selectedFile ? this.uploadPhoto() : Promise.resolve(null);
-    photoPromise.then(() => {
-      const profileData = this.profileForm.value;
-      this.apiService.updateUserProfile(profileData)
-        .pipe(take(1))
-        .subscribe({
-          next: () => {
-            this.isSubmitting = false;
-            this.user = { ...this.user, ...profileData };
-            this.authService.refreshUserData().pipe(take(1)).subscribe();
-            this.closeEditModal();
-            alert('Profile updated successfully');
-          },
-          error: (err) => {
-            this.isSubmitting = false;
-            alert('Update failed: ' + err.message);
-          }
-        });
-    }).catch(() => this.isSubmitting = false);
+  try {
+    // Upload photo if selected
+    if (this.selectedFile) {
+      await firstValueFrom(this.apiService.uploadProfilePhoto(this.selectedFile));
+      // After upload, refresh user data to get updated photo_url
+      const refreshed = await firstValueFrom(this.authService.refreshUserData());
+      this.user = refreshed;
+    }
+
+    // Update profile data (name, email, phone, address)
+    const profileData = this.profileForm.value;
+    await firstValueFrom(this.apiService.updateUserProfile(profileData));
+
+    // Refresh user data again to get latest changes
+    const refreshedUser = await firstValueFrom(this.authService.refreshUserData());
+    this.user = refreshedUser;
+
+    this.closeEditModal();
+    alert('Profile updated successfully');
+  } catch (err: any) {
+    console.error(err);
+    alert('Update failed: ' + (err.message || 'Unknown error'));
+  } finally {
+    this.isSubmitting = false;
   }
+}
 
   comingSoon(feature: string) {
     alert(`${feature} — Coming Soon! 🚀`);
   }
 
   navigateToClass(danceClass: any) {
-  const url = danceClass.link;
-  
-  // Check if it's an external URL (starts with http:// or https://)
-  if (url.startsWith('http://') || url.startsWith('https://')) {
-    // Open external link in a new tab
-    window.open(url, '_blank');
-  } else {
-    // Internal Angular route
-    this.router.navigate([url]);
-  }
-}
+    const url = danceClass.link;
+    // If user not logged in, redirect to login with return URL
+    if (!this.user) {
+      this.router.navigate(['/login'], { queryParams: { returnUrl: '/dashboard' } });
+      return;
+    }
 
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+      window.open(url, '_blank');
+    } else {
+      this.router.navigate([url]);
+    }
+  }
+
+  getFullImageUrl(relativePath: string): string {
+  if (!relativePath) return '';
+  if (relativePath.startsWith('http')) return relativePath;
+  const base = environment.apiBaseUrl ? environment.apiBaseUrl.replace(/\/$/, '') : '';
+  const path = relativePath.startsWith('/') ? relativePath : `/${relativePath}`;
+  return `${base}${path}`;
+}
   ngOnDestroy() {
     this.destroy$.next();
     this.destroy$.complete();

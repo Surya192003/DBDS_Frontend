@@ -12,35 +12,15 @@ import { GroupsManagementComponent } from './components/groups-management/groups
 import { ProfileComponent } from './components/profile/profile.component';
 
 const routes: Routes = [
-  { path: '', redirectTo: '/login', pathMatch: 'full' },
+  { path: '', redirectTo: '/dashboard', pathMatch: 'full' },   // ← now dashboard is home
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
-  { path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuard] },
-  { path: 'profile', component: ProfileComponent, canActivate: [AuthGuard] },  // Add comma here
-  { 
-    path: 'admin/groups', 
-    component: GroupsManagementComponent,
-    canActivate: [AuthGuard, RoleGuard],
-    data: { role: 'ADMIN' }
-  },  // Add comma after closing brace
-  { 
-    path: 'admin', 
-    component: AdminDashboardComponent,
-    canActivate: [AuthGuard, RoleGuard],
-    data: { role: 'ADMIN' }
-  },  // Add comma
-  { 
-    path: 'instructor', 
-    component: InstructorDashboardComponent,
-    canActivate: [AuthGuard, RoleGuard],
-    data: { role: 'INSTRUCTOR' }
-  },  // Add comma
-  { 
-    path: 'student', 
-    component: StudentDashboardComponent,
-    canActivate: [AuthGuard, RoleGuard],
-    data: { role: 'STUDENT' }
-  },  // Add comma
+  { path: 'dashboard', component: DashboardComponent },        // public & private
+  { path: 'profile', component: ProfileComponent, canActivate: [AuthGuard] },
+  { path: 'admin/groups', component: GroupsManagementComponent, canActivate: [AuthGuard, RoleGuard], data: { role: 'ADMIN' } },
+  { path: 'admin', component: AdminDashboardComponent, canActivate: [AuthGuard], data: { role: 'ADMIN' } },
+  { path: 'instructor', component: InstructorDashboardComponent, canActivate: [AuthGuard], data: { role: 'INSTRUCTOR' } },
+  { path: 'student', component: StudentDashboardComponent, canActivate: [AuthGuard], data: { role: 'STUDENT' } },
   { path: '**', redirectTo: '/dashboard' }
 ];
 

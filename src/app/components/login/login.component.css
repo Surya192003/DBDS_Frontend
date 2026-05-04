@@ -1,115 +1,166 @@
-:host { --black: #000; --white: #fff; }
+/* GLOBAL FONT SET – apply to :host or body */
+:host {
+  font-family: 'Courier New', Courier, monospace;
+  --blue: #4FC3F7;
+  --blue-dark: #0a2530;
+  --black: #000;
+  --white: #fff;
+  --glass-bg: rgba(10, 20, 40, 0.7);
+}
 
 .auth-wrapper {
   min-height: 100vh;
-  background: var(--white);
+  background:
+    radial-gradient(circle at 20% 30%, rgba(79, 195, 247, 0.15), transparent 40%),
+    radial-gradient(circle at 80% 70%, rgba(0, 188, 212, 0.1), transparent 40%),
+    #02080f;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 20px;
-  font-family: 'Courier New', Courier, monospace;
 }
 
 .login-card {
   width: 100%;
-  max-width: 450px;
-  border: 4px solid var(--black);
+  max-width: 480px;
+  border: 1px solid rgba(79, 195, 247, 0.2);
   padding: 40px;
-  box-shadow: 15px 15px 0px var(--black);
-  background: var(--white);
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.01)),
+    rgba(10, 18, 30, 0.75);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  box-shadow:
+    0 30px 60px rgba(0, 0, 0, 0.7),
+    0 0 40px rgba(79, 195, 247, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  border-radius: 0; /* sharp edges preserved */
+  color: var(--white);
 }
 
 .auth-header {
-  border-bottom: 4px solid var(--black);
+  border-bottom: 2px solid rgba(79, 195, 247, 0.3);
   margin-bottom: 30px;
-  padding-bottom: 10px;
+  padding-bottom: 15px;
 }
 
 .title-text {
   font-weight: 900;
   letter-spacing: -1px;
   margin: 0;
-  font-size: 1.5rem;
+  font-size: 1.4rem;
+  color: #fff;
+  text-transform: uppercase;
 }
 
 .tagline {
-  font-size: 0.7rem;
-  color: #666;
-  margin-top: 5px;
+  font-size: 0.65rem;
+  color: rgba(255, 255, 255, 0.5);
+  margin-top: 6px;
   font-weight: 700;
+  letter-spacing: 0.05em;
 }
 
 /* INPUT STYLES */
-.field { margin-bottom: 25px; }
+.field {
+  margin-bottom: 24px;
+}
+
 .field label {
   display: block;
   font-weight: 900;
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   margin-bottom: 8px;
+  color: rgba(255, 255, 255, 0.7);
+  letter-spacing: 0.08em;
 }
 
 .sharp-input {
   width: 100%;
-  border: 3px solid var(--black);
-  padding: 12px;
-  font-weight: 900;
-  border-radius: 0;
+  border: 2px solid rgba(79, 195, 247, 0.25);
+  padding: 14px 16px;
+  font-weight: 700;
+  border-radius: 0; /* sharp */
   outline: none;
   font-family: monospace;
-  transition: 0.1s;
+  font-size: 0.95rem;
+  background: rgba(0, 0, 0, 0.35);
+  color: #fff;
+  backdrop-filter: blur(10px);
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+}
+
+.sharp-input::placeholder {
+  color: rgba(255, 255, 255, 0.35);
 }
 
 .sharp-input:focus {
-  background: #f0f0f0;
-  box-shadow: 4px 4px 0px #000;
+  background: rgba(79, 195, 247, 0.08);
+  border-color: var(--blue);
+  box-shadow: 0 0 0 3px rgba(79, 195, 247, 0.2), 4px 4px 0px rgba(79, 195, 247, 0.3);
 }
 
 /* BUTTON STYLES */
 .btn-sharp {
-  background: var(--black);
-  color: var(--white);
+  background: linear-gradient(135deg, #b8efff 0%, #4fc3f7 45%, #1597c9 100%);
+  color: #001018;
   border: none;
-  padding: 15px;
+  padding: 16px;
   font-weight: 900;
-  cursor: pointer;
-  transition: 0.1s;
+  font-size: 0.85rem;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 2px;
+  cursor: pointer;
+  border-radius: 0;
+  box-shadow: 0 0 20px rgba(79, 195, 247, 0.3);
+  transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
+  font-family: inherit;
 }
 
 .btn-sharp:hover:not(:disabled) {
   transform: translate(-4px, -4px);
-  box-shadow: 4px 4px 0px #333;
+  box-shadow: 0 10px 30px rgba(79, 195, 247, 0.5);
+  background: linear-gradient(135deg, #d0f5ff, #5fd5ff);
+}
+
+.btn-sharp:active:not(:disabled) {
+  transform: translate(-1px, -1px);
 }
 
 .btn-sharp:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }
 
 /* LINK & FEEDBACK */
 .link-text {
   text-decoration: none;
-  color: var(--black);
+  color: rgba(79, 195, 247, 0.9);
   font-weight: 900;
-  font-size: 0.75rem;
-  border-bottom: 2px solid var(--black);
+  font-size: 0.7rem;
+  border-bottom: 2px solid rgba(79, 195, 247, 0.5);
+  padding-bottom: 2px;
+  transition: color 0.2s, border-color 0.2s;
 }
 
 .link-text:hover {
-  background: var(--black);
-  color: var(--white);
+  color: #fff;
+  border-bottom-color: #fff;
+  background: transparent;
 }
 
 .msg-box.error {
-  background: #ff0000;
-  color: white;
-  border: 3px solid var(--black);
-  padding: 12px;
+  background: rgba(255, 60, 60, 0.15);
+  border: 2px solid #ff3b3b;
+  color: #ffbbbb;
+  padding: 14px;
   margin-bottom: 20px;
   font-weight: 900;
   font-size: 0.8rem;
   cursor: pointer;
+  backdrop-filter: blur(8px);
 }
 
 /* LOADING SPINNER */
@@ -117,46 +168,26 @@
   display: inline-block;
   width: 14px;
   height: 14px;
-  border: 2px solid var(--white);
+  border: 2px solid #001018;
   border-top-color: transparent;
+  border-radius: 50%;
   animation: spin 0.6s linear infinite;
-}
-.auth-container {
-  padding: 10px; /* Less padding so card has more room */
-}
-
-.auth-card {
-  width: 100%;
-  padding: 20px; /* Compact padding for small screens */
-  box-shadow: 8px 8px 0px var(--black);
-}
-
-/* Make inputs large enough for fingers */
-.sharp-input {
-  font-size: 16px; /* Prevents iOS from auto-zooming on focus */
-  padding: 14px;
-}
-
-/* Responsive Terms Box */
-.terms-box {
-  height: 200px; /* Taller on mobile for easier reading */
-  -webkit-overflow-scrolling: touch; /* Smooth scroll for iPhones */
-}
-
-.checkbox-container {
-  padding: 10px 0;
-  align-items: flex-start; /* Better if text wraps */
-}
-
-.checkbox-container input {
-  width: 20px;
-  height: 20px;
-  margin-top: 2px;
-}
-
-/* Desktop refinements */
-@media (min-width: 768px) {
-  .auth-card { padding: 40px; box-shadow: 15px 15px 0px var(--black); }
 }
 
 @keyframes spin { to { transform: rotate(360deg); } }
+
+/* Responsive adjustments */
+@media (max-width: 576px) {
+  .login-card {
+    padding: 24px 20px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+  }
+  .title-text {
+    font-size: 1.2rem;
+  }
+}
+
+/* Optional global font override */
+body {
+  font-family: 'Courier New', Courier, monospace;
+}

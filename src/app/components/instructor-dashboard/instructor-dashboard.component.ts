@@ -3,7 +3,10 @@ import { ApiService } from '../../services/api.service';
 import { AuthService } from '../../services/auth.service';
 import { ModalService } from '../../services/modal.service';
 import { FormBuilder, FormGroup, FormControl } from '@angular/forms';
-import { Subscription } from 'rxjs';
+import { forkJoin, Subscription } from 'rxjs';
+import { AnnouncementService } from '../../services/announcement.service';
+import { PostService } from '../../services/post.service';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-instructor-dashboard',
@@ -15,7 +18,9 @@ export class InstructorDashboardComponent implements OnInit, OnDestroy {
   monthlyPerformance: any[] = [];
   activeStudents: any[] = [];
   classStudents: any[] = [];
-
+   announcements: any[] = [];
+  posts: any[] = [];
+  registeredAnnouncements: any[] = []; // only events user registered for
   selectedClass: any = null;
   songLink: string = '';
   currentUser: any;
@@ -42,7 +47,10 @@ export class InstructorDashboardComponent implements OnInit, OnDestroy {
     private apiService: ApiService,
     private authService: AuthService,
     private modalService: ModalService,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+     private announcementService: AnnouncementService,
+    private postService: PostService,
+    private sanitizer: DomSanitizer
   ) {
     this.currentUser = this.authService.currentUser;
   }
@@ -59,7 +67,52 @@ export class InstructorDashboardComponent implements OnInit, OnDestroy {
     this.loadClasses();
     this.loadMonthlyPerformance();
     this.loadActiveStudents();
+    this.loadAnnouncementsAndPosts();
+    this.loadMyRegisteredEvents();   // ← NEW
   }
+
+  loadAnnouncementsAndPosts() {
+    forkJoin({
+      announcements: this.announcementService.getAll(),
+      posts: this.postService.getAll()
+    }).subscribe({
+      next: (res) => {
+        this.announcements = res.announcements;
+        this.posts = res.posts;
+      },
+      error: (err) => console.error(err)
+    });
+  }
+  loadMyRegisteredEvents() {
+    this.announcementService.getMyRegistrations().subscribe({
+      next: (data) => this.registeredAnnouncements = data,
+      error: (err) => console.error('Error loading my registrations', err)
+    });
+  }
+
+  registerForAnnouncement(id: number) {
+    this.announcementService.register(id).subscribe({
+      next: () => {
+        alert('Registered successfully!');
+        // Refresh both lists
+        this.loadAnnouncementsAndPosts();
+        this.loadMyRegisteredEvents();
+      },
+      error: (err) => alert('Error: ' + err.error?.error)
+    });
+  }
+
+  sanitizeUrl(url: string): SafeResourceUrl {
+      let embedUrl = url;
+      if (url.includes('youtube.com/watch?v=')) {
+        const videoId = url.split('v=')[1].split('&')[0];
+        embedUrl = `https://www.youtube.com/embed/${videoId}`;
+      } else if (url.includes('youtu.be/')) {
+        const videoId = url.split('youtu.be/')[1].split('?')[0];
+        embedUrl = `https://www.youtube.com/embed/${videoId}`;
+      }
+      return this.sanitizer.bypassSecurityTrustResourceUrl(embedUrl);
+    }
 
   loadClasses() {
     this.loading = true;
@@ -76,8 +129,9 @@ export class InstructorDashboardComponent implements OnInit, OnDestroy {
         } else {
           this.classes = [];
         }
-        this.calculateStatistics();
-        this.loading = false;
+        this.classes.forEach(cls => this.loadTagStatus(cls.id));
+      this.calculateStatistics();
+      this.loading = false;
       },
       error: (error) => {
         console.error('Error loading classes:', error);

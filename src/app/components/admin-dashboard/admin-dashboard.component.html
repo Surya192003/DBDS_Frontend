@@ -1,58 +1,50 @@
-<div class="container-fluid">
+<div class="dashboard-admin container-fluid">
   <!-- Quick Stats Bar -->
-  <div class="row mb-4">
-    <div class="col-md-3 col-sm-6 mb-3">
-      <div class="card bg-primary text-white">
-        <div class="card-body p-3">
-          <div class="d-flex justify-content-between align-items-center">
-            <div>
-              <h6 class="card-title mb-1 fw-normal">Total Users</h6>
-              <h3 class="mb-0 fw-bold">{{users.length}}</h3>
-            </div>
-            <i class="bi bi-people fs-1 opacity-75"></i>
+  <div class="row mb-4 g-3">
+    <div class="col-md-3 col-sm-6">
+      <div class="stat-card accent-primary">
+        <div class="stat-body">
+          <div class="stat-info">
+            <h6 class="stat-label">Total Users</h6>
+            <h3 class="stat-value">{{users.length}}</h3>
           </div>
+          <i class="bi bi-people stat-icon"></i>
         </div>
       </div>
     </div>
 
-    <div class="col-md-3 col-sm-6 mb-3">
-      <div class="card bg-success text-white">
-        <div class="card-body p-3">
-          <div class="d-flex justify-content-between align-items-center">
-            <div>
-              <h6 class="card-title mb-1 fw-normal">Total Classes</h6>
-              <h3 class="mb-0 fw-bold">{{classes.length}}</h3>
-            </div>
-            <i class="bi bi-calendar-check fs-1 opacity-75"></i>
+    <div class="col-md-3 col-sm-6">
+      <div class="stat-card accent-success">
+        <div class="stat-body">
+          <div class="stat-info">
+            <h6 class="stat-label">Total Classes</h6>
+            <h3 class="stat-value">{{classes.length}}</h3>
           </div>
+          <i class="bi bi-calendar-check stat-icon"></i>
         </div>
       </div>
     </div>
 
-    <div class="col-md-3 col-sm-6 mb-3">
-      <div class="card bg-info text-white">
-        <div class="card-body p-3">
-          <div class="d-flex justify-content-between align-items-center">
-            <div>
-              <h6 class="card-title mb-1 fw-normal">Monthly Payments</h6>
-              <h3 class="mb-0 fw-bold">${{getTotalPayments()}}</h3>
-            </div>
-            <i class="bi bi-cash-coin fs-1 opacity-75"></i>
+    <div class="col-md-3 col-sm-6">
+      <div class="stat-card accent-info">
+        <div class="stat-body">
+          <div class="stat-info">
+            <h6 class="stat-label">Monthly Payments</h6>
+            <h3 class="stat-value">${{getTotalPayments()}}</h3>
           </div>
+          <i class="bi bi-cash-coin stat-icon"></i>
         </div>
       </div>
     </div>
 
-    <div class="col-md-3 col-sm-6 mb-3">
-      <div class="card bg-warning text-white">
-        <div class="card-body p-3">
-          <div class="d-flex justify-content-between align-items-center">
-            <div>
-              <h6 class="card-title mb-1 fw-normal">Avg Attendance</h6>
-              <h3 class="mb-0 fw-bold">{{getOverallAttendancePercentage()}}%</h3>
-            </div>
-            <i class="bi bi-graph-up fs-1 opacity-75"></i>
+    <div class="col-md-3 col-sm-6">
+      <div class="stat-card accent-warning">
+        <div class="stat-body">
+          <div class="stat-info">
+            <h6 class="stat-label">Avg Attendance</h6>
+            <h3 class="stat-value">{{getOverallAttendancePercentage()}}%</h3>
           </div>
+          <i class="bi bi-graph-up stat-icon"></i>
         </div>
       </div>
     </div>
@@ -62,38 +54,37 @@
   <div class="row mb-4">
     <div class="col-12">
       <div class="d-flex justify-content-between align-items-center">
-        <h3 class="mb-0">Admin Dashboard</h3>
-        <!-- Add Group Management button in the header -->
+        <h3 class="page-title">Admin Dashboard</h3>
         <div class="btn-group">
-          <button class="btn btn-outline-primary btn-sm" (click)="loadAllData()">
+          <button class="btn-glass btn-sm" (click)="loadAllData()">
             <i class="bi bi-arrow-clockwise"></i> Refresh
           </button>
-          <button class="btn btn-outline-success btn-sm" routerLink="/admin/groups">
+          <button class="btn-glass btn-sm" routerLink="/admin/groups">
             <i class="bi bi-people"></i> Manage Groups
           </button>
         </div>
       </div>
-      <hr>
+      <hr class="divider">
     </div>
   </div>
 
   <!-- Alerts -->
   <div *ngIf="errorMessage" class="row mb-3">
     <div class="col-12">
-      <div class="alert alert-danger alert-dismissible fade show" role="alert">
+      <div class="alert-glass alert-danger">
         <i class="bi bi-exclamation-triangle me-2"></i>
         {{errorMessage}}
-        <button type="button" class="btn-close" (click)="clearError()"></button>
+        <button type="button" class="alert-close" (click)="clearError()">×</button>
       </div>
     </div>
   </div>
 
   <div *ngIf="successMessage" class="row mb-3">
     <div class="col-12">
-      <div class="alert alert-success alert-dismissible fade show" role="alert">
+      <div class="alert-glass alert-success">
         <i class="bi bi-check-circle me-2"></i>
         {{successMessage}}
-        <button type="button" class="btn-close" (click)="clearSuccess()"></button>
+        <button type="button" class="alert-close" (click)="clearSuccess()">×</button>
       </div>
     </div>
   </div>
@@ -101,93 +92,71 @@
   <!-- Class Management Section -->
   <div class="row mb-4">
     <div class="col-12">
-      <div class="card shadow-sm">
-        <div class="card-header bg-white border-bottom-0 pb-0 pt-3">
-          <div class="d-flex justify-content-between align-items-center">
-            <h5 class="card-title mb-0">
-              <i class="bi bi-calendar-week text-primary me-2"></i>Class Management
-            </h5>
-            <button class="btn btn-primary btn-sm" (click)="openCreateClassModal()">
-              <i class="bi bi-plus-circle me-1"></i> Add New Class
-            </button>
-          </div>
+      <div class="glass-panel">
+        <div class="panel-header">
+          <h5 class="panel-title">
+            <i class="bi bi-calendar-week accent me-2"></i>Class Management
+          </h5>
+          <button class="btn-glass btn-sm" (click)="openCreateClassModal()">
+            <i class="bi bi-plus-circle me-1"></i> Add New Class
+          </button>
         </div>
-        <div class="card-body">
+        <div class="panel-body">
           <div *ngIf="loadingClasses" class="text-center py-4">
-            <div class="spinner-border text-primary" role="status">
-              <span class="visually-hidden">Loading...</span>
-            </div>
+            <div class="spinner accent"></div>
             <p class="mt-2 text-muted">Loading classes...</p>
           </div>
 
           <div *ngIf="!loadingClasses">
-            <div *ngIf="classes.length === 0" class="text-center py-5">
-              <i class="bi bi-calendar-x fs-1 text-muted mb-3"></i>
-              <h5 class="text-muted">No Classes Found</h5>
-              <p class="text-muted mb-4">Start by creating your first class</p>
-              <button class="btn btn-primary" (click)="openCreateClassModal()">
+            <div *ngIf="classes.length === 0" class="empty-state">
+              <i class="bi bi-calendar-x empty-icon"></i>
+              <h5>No Classes Found</h5>
+              <p>Start by creating your first class</p>
+              <button class="btn-glass" (click)="openCreateClassModal()">
                 <i class="bi bi-plus-circle me-1"></i> Create First Class
               </button>
             </div>
 
             <div *ngIf="classes.length > 0" class="table-responsive">
-              <table class="table table-hover table-borderless">
-                <thead class="table-light">
+              <table class="glass-table">
+                <thead>
                   <tr>
-                    <th width="50">ID</th>
-                    <th width="120">Date</th>
-                    <th width="100">Time</th>
+                    <th>ID</th>
+                    <th>Date</th>
+                    <th>Time</th>
                     <th>Instructor</th>
-                    <th>Song Link</th>
-                    <th width="120">Attendance</th>
-                    <th width="100">Actions</th>
+                    <th>Song</th>
+                    <th>Attendance</th>
+                    <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr *ngFor="let classItem of classes">
                     <td class="text-muted">#{{classItem.id}}</td>
-                    <td>
-                      <strong>{{classItem.class_date | date:'dd MMM yyyy'}}</strong>
-                    </td>
-                    <td>
-                      <span class="badge bg-light text-dark">{{classItem.class_time}}</span>
-                    </td>
+                    <td><strong>{{classItem.class_date | date:'dd MMM yyyy'}}</strong></td>
+                    <td><span class="badge">{{classItem.class_time}}</span></td>
                     <td>
                       <div *ngIf="classItem.instructor_name">
                         <div class="fw-medium">{{classItem.instructor_name}}</div>
                         <small class="text-muted">{{classItem.instructor_email}}</small>
                       </div>
-                      <span *ngIf="!classItem.instructor_name" class="text-muted fst-italic">
-                        Not Assigned
-                      </span>
+                      <span *ngIf="!classItem.instructor_name" class="text-muted fst-italic">Not Assigned</span>
                     </td>
                     <td>
-                      <a *ngIf="classItem.song_link" [href]="classItem.song_link" target="_blank"
-                        class="btn btn-sm btn-outline-primary">
-                        <i class="bi bi-music-note-beamed me-1"></i> Listen
+                      <a *ngIf="classItem.song_link" [href]="classItem.song_link" target="_blank" class="btn-glass btn-sm">
+                        <i class="bi bi-music-note-beamed"></i> Listen
                       </a>
-                      <span *ngIf="!classItem.song_link" class="text-muted fst-italic">
-                        <i class="bi bi-music-note"></i> Not set
-                      </span>
+                      <span *ngIf="!classItem.song_link" class="text-muted"><i class="bi bi-music-note"></i> Not set</span>
                     </td>
                     <td>
-                      <span class="badge bg-info rounded-pill px-3 py-2">
-                        {{classItem.attendance_count || 0}} <i class="bi bi-person ms-1"></i>
-                      </span>
+                      <span class="badge accent-badge">{{classItem.attendance_count || 0}} <i class="bi bi-person"></i></span>
                     </td>
                     <td>
-                      <div class="btn-group btn-group-sm" role="group">
-                        <button class="btn btn-outline-danger" (click)="deleteClass(classItem.id)" title="Delete Class">
-                          <i class="bi bi-trash"></i>
-                        </button>
-
-                        <button class="btn btn-outline-primary" (click)="openAssignStudentModal(classItem)"
-                          title="Assign Student">
-                          <i class="bi bi-person-plus"></i>
-                        </button>
+                      <div class="btn-group-sm">
+                        <button class="btn-glass btn-sm danger" (click)="deleteClass(classItem.id)" title="Delete"><i class="bi bi-trash"></i></button>
+                        <button class="btn-glass btn-sm" (click)="openAssignStudentModal(classItem)" title="Assign"><i class="bi bi-person-plus"></i></button>
                       </div>
                     </td>
-
                   </tr>
                 </tbody>
               </table>
@@ -202,28 +171,20 @@
   <div class="row mb-4">
     <!-- User Management -->
     <div class="col-lg-6 mb-4">
-      <div class="card shadow-sm h-100">
-        <div class="card-header bg-white border-bottom-0 pb-0 pt-3">
-          <h5 class="card-title mb-0">
-            <i class="bi bi-people text-primary me-2"></i>User Management
-          </h5>
+      <div class="glass-panel h-100">
+        <div class="panel-header">
+          <h5 class="panel-title"><i class="bi bi-people accent me-2"></i>User Management</h5>
         </div>
-        <div class="card-body">
-          <div class="mb-3">
-            <div class="input-group">
-              <span class="input-group-text">
-                <i class="bi bi-search"></i>
-              </span>
-              <input type="text" class="form-control" placeholder="Search users by name, email or role..."
-                [(ngModel)]="userSearchTerm" (input)="filterUsers()">
-            </div>
+        <div class="panel-body">
+          <div class="search-box mb-3">
+            <span class="search-icon"><i class="bi bi-search"></i></span>
+            <input type="text" class="sharp-input" placeholder="Search users..." [(ngModel)]="userSearchTerm" (input)="filterUsers()">
           </div>
-
-          <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
-            <table class="table table-hover table-sm">
-              <thead class="sticky-top bg-white" style="z-index: 1000 !important">
+          <div class="table-responsive glass-scroll">
+            <table class="glass-table compact">
+              <thead>
                 <tr>
-                  <th style=" z-index: -1000;">User</th>
+                  <th>User</th>
                   <th>Role</th>
                   <th>Status</th>
                   <th>Actions</th>
@@ -232,73 +193,51 @@
               <tbody>
                 <tr *ngFor="let user of filteredUsers">
                   <td>
-                    <div class="d-flex align-items-center">
-                      <div class="flex-shrink-0">
-                        <div class="avatar-sm rounded-circle bg-light d-flex align-items-center justify-content-center"
-                          [ngClass]="{
-                               'bg-danger text-white': user.role === 'ADMIN',
-                               'bg-primary text-white': user.role === 'INSTRUCTOR',
-                               'bg-success text-white': user.role === 'STUDENT'
-                             }" style="width: 32px; height: 32px;">
-                          {{user.name?.charAt(0) || 'U'}}
-                        </div>
-                      </div>
-                      <div class="flex-grow-1 ms-2">
+                    <div class="user-avatar-cell">
+                      <div class="avatar-sm" [ngClass]="{
+                        'avatar-admin': user.role === 'ADMIN',
+                        'avatar-inst': user.role === 'INSTRUCTOR',
+                        'avatar-stud': user.role === 'STUDENT'
+                      }">{{user.name?.charAt(0) || 'U'}}</div>
+                      <div>
                         <div class="fw-medium">{{user.name}}</div>
                         <small class="text-muted">{{user.email}}</small>
                       </div>
                     </div>
                   </td>
+                  <td><span class="badge" [ngClass]="{
+                    'badge-admin': user.role === 'ADMIN',
+                    'badge-inst': user.role === 'INSTRUCTOR',
+                    'badge-stud': user.role === 'STUDENT'
+                  }">{{user.role}}</span></td>
                   <td>
-                    <span class="badge" [ngClass]="{
-                            'bg-danger': user.role === 'ADMIN',
-                            'bg-primary': user.role === 'INSTRUCTOR',
-                            'bg-success': user.role === 'STUDENT'
-                          }">
-                      {{user.role}}
-                    </span>
-                  </td>
-                  <td>
-                    <span [class]="user.is_active ? 'badge bg-success' : 'badge bg-secondary'">
+                    <span [class]="user.is_active ? 'badge badge-active' : 'badge badge-inactive'">
                       <i class="bi" [ngClass]="user.is_active ? 'bi-check-circle' : 'bi-x-circle'"></i>
                       {{user.is_active ? 'Active' : 'Inactive'}}
                     </span>
                   </td>
                   <td>
-                    <div class="btn-group btn-group-sm" role="group">
-                      <button class="btn btn-outline-primary me-1" (click)="toggleUserStatus(user.id)"
-                        [disabled]="user.role === 'ADMIN'"
-                        [title]="user.is_active ? 'Deactivate User' : 'Activate User'">
+                    <div class="btn-group-sm">
+                      <button class="btn-glass btn-sm" (click)="toggleUserStatus(user.id)" [disabled]="user.role === 'ADMIN'">
                         <i class="bi" [ngClass]="user.is_active ? 'bi-person-x' : 'bi-person-check'"></i>
                       </button>
-
-                      <button *ngIf="user.role === 'INSTRUCTOR' && user.instructor_id" class="btn btn-outline-info me-1"
-                        (click)="openPayRateModal(user)" title="Set Pay Rate">
+                      <button *ngIf="user.role === 'INSTRUCTOR' && user.instructor_id" class="btn-glass btn-sm" (click)="openPayRateModal(user)">
                         <i class="bi bi-cash-coin"></i>
                       </button>
-
-                      <!-- Delete User Button -->
-                      <button class="btn btn-outline-danger" (click)="deleteUser(user.id)"
-                        [disabled]="user.role === 'ADMIN' || user.id === currentUser?.id" title="Delete User">
+                      <button class="btn-glass btn-sm danger" (click)="deleteUser(user.id)" [disabled]="user.role === 'ADMIN' || user.id === currentUser?.id">
                         <i class="bi bi-trash"></i>
                       </button>
                     </div>
-                     </tr>
-                <tr *ngIf="filteredUsers.length === 0">
-                  <td colspan="4" class="text-center py-4">
-                    <i class="bi bi-people text-muted fs-1 mb-2"></i>
-                    <p class="text-muted mb-0">No users found</p>
                   </td>
+                </tr>
+                <tr *ngIf="filteredUsers.length === 0">
+                  <td colspan="4" class="empty-cell"><i class="bi bi-people"></i> No users found</td>
                 </tr>
               </tbody>
             </table>
           </div>
-
-          <div class="mt-3 text-muted">
-            <small>
-              Showing {{filteredUsers.length}} of {{users.length}} users
-              <span *ngIf="userSearchTerm"> matching "{{userSearchTerm}}"</span>
-            </small>
+          <div class="table-footer">
+            <small>Showing {{filteredUsers.length}} of {{users.length}} users <span *ngIf="userSearchTerm"> matching "{{userSearchTerm}}"</span></small>
           </div>
         </div>
       </div>
@@ -306,51 +245,40 @@
 
     <!-- Monthly Payments -->
     <div class="col-lg-6 mb-4">
-      <div class="card shadow-sm h-100">
-        <div class="card-header bg-white border-bottom-0 pb-0 pt-3">
-          <h5 class="card-title mb-0">
-            <i class="bi bi-cash-stack text-success me-2"></i>Monthly Payments
-          </h5>
+      <div class="glass-panel h-100">
+        <div class="panel-header">
+          <h5 class="panel-title"><i class="bi bi-cash-stack accent me-2"></i>Monthly Payments</h5>
         </div>
-        <div class="card-body">
+        <div class="panel-body">
           <div class="mb-3">
-            <label class="form-label fw-medium">Select Month & Year:</label>
-            <div class="input-group">
-              <span class="input-group-text">
-                <i class="bi bi-calendar"></i>
-              </span>
-              <input type="month" class="form-control" [(ngModel)]="selectedMonth" (change)="loadPayments()">
+            <label class="form-label">Select Month & Year:</label>
+            <div class="search-box">
+              <span class="search-icon"><i class="bi bi-calendar"></i></span>
+              <input type="month" class="sharp-input" [(ngModel)]="selectedMonth" (change)="loadPayments()">
             </div>
           </div>
-
-          <div class="d-grid gap-2 d-md-flex justify-content-md-start mb-4">
-            <button class="btn btn-primary" (click)="calculatePayments()"
-              [disabled]="!selectedMonth || calculatingPayments || loadingPayments">
-              <span *ngIf="calculatingPayments" class="spinner-border spinner-border-sm me-2"></span>
-              <i class="bi bi-calculator me-1"></i>
-              Calculate Payments
+          <div class="d-flex gap-2 mb-4">
+            <button class="btn-glass" (click)="calculatePayments()" [disabled]="!selectedMonth || calculatingPayments || loadingPayments">
+              <span *ngIf="calculatingPayments" class="spinner spinner-sm me-2"></span>
+              <i class="bi bi-calculator me-1"></i> Calculate
             </button>
-            <button class="btn btn-outline-secondary" (click)="loadPayments()" [disabled]="loadingPayments">
-              <span *ngIf="loadingPayments" class="spinner-border spinner-border-sm me-2"></span>
-              Refresh
+            <button class="btn-glass" (click)="loadPayments()" [disabled]="loadingPayments">
+              <span *ngIf="loadingPayments" class="spinner spinner-sm me-2"></span> Refresh
             </button>
           </div>
-
           <div *ngIf="loadingPayments" class="text-center py-3">
-            <div class="spinner-border spinner-border-sm text-primary"></div>
+            <div class="spinner spinner-sm accent"></div>
             <small class="text-muted ms-2">Loading payments...</small>
           </div>
-
           <div *ngIf="!loadingPayments">
-            <div *ngIf="payments.length === 0" class="text-center py-4">
-              <i class="bi bi-cash text-muted fs-1 mb-3"></i>
-              <h6 class="text-muted">No Payments Found</h6>
-              <p class="text-muted mb-0">Select a month and calculate payments</p>
+            <div *ngIf="payments.length === 0" class="empty-state">
+              <i class="bi bi-cash empty-icon"></i>
+              <h6>No Payments Found</h6>
+              <p>Select a month and calculate payments</p>
             </div>
-
             <div *ngIf="payments.length > 0" class="table-responsive">
-              <table class="table table-hover table-sm">
-                <thead class="table-light">
+              <table class="glass-table compact">
+                <thead>
                   <tr>
                     <th>Instructor</th>
                     <th class="text-center">Classes</th>
@@ -361,39 +289,26 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr *ngFor="let payment of payments" [class.table-success]="payment.is_paid">
-                    <td>
-                      <div class="fw-medium">{{payment.instructor_name}}</div>
-                    </td>
+                  <tr *ngFor="let payment of payments" [class]="payment.is_paid ? 'highlight-paid' : ''">
+                    <td><div class="fw-medium">{{payment.instructor_name}}</div></td>
+                    <td class="text-center"><span class="badge">{{payment.total_classes}}</span></td>
+                    <td class="text-center"><small>${{payment.pay_per_class || 0}}</small></td>
+                    <td class="text-end fw-bold">${{payment.total_amount || 0}}</td>
                     <td class="text-center">
-                      <span class="badge bg-light text-dark">{{payment.total_classes}}</span>
-                    </td>
-                    <td class="text-center">
-                      <small class="text-muted">${{payment.pay_per_class || 0}}</small>
-                    </td>
-                    <td class="text-end fw-bold">
-                      ${{payment.total_amount || 0}}
-                    </td>
-                    <td class="text-center">
-                      <span [class]="payment.is_paid ? 'badge bg-success' : 'badge bg-warning'">
+                      <span [class]="payment.is_paid ? 'badge badge-active' : 'badge badge-pending'">
                         {{payment.is_paid ? 'Paid' : 'Pending'}}
                       </span>
                     </td>
                     <td class="text-center">
-                      <button class="btn btn-sm btn-success" *ngIf="!payment.is_paid" (click)="markAsPaid(payment.id)"
-                        title="Mark as Paid">
-                        <i class="bi bi-check-lg"></i>
-                      </button>
-                      <span *ngIf="payment.is_paid" class="text-muted">
-                        <i class="bi bi-check-circle"></i>
-                      </span>
+                      <button class="btn-glass btn-sm success" *ngIf="!payment.is_paid" (click)="markAsPaid(payment.id)" title="Mark Paid"><i class="bi bi-check-lg"></i></button>
+                      <span *ngIf="payment.is_paid" class="text-success fw-bold"><i class="bi bi-check-circle"></i></span>
                     </td>
                   </tr>
                 </tbody>
-                <tfoot class="table-light">
+                <tfoot>
                   <tr>
                     <td colspan="3" class="text-end fw-bold">Total:</td>
-                    <td class="text-end fw-bold text-primary">${{getTotalPayments()}}</td>
+                    <td class="text-end fw-bold accent">${{getTotalPayments()}}</td>
                     <td colspan="2"></td>
                   </tr>
                 </tfoot>
@@ -408,38 +323,26 @@
   <!-- Student Statistics Section -->
   <div class="row mb-4">
     <div class="col-12">
-      <div class="card shadow-sm">
-        <div class="card-header bg-white border-bottom-0 pb-0 pt-3">
-          <div class="d-flex justify-content-between align-items-center">
-            <h5 class="card-title mb-0">
-              <i class="bi bi-graph-up text-info me-2"></i>Student Statistics
-            </h5>
-            <div class="text-muted">
-              <small>Overall Attendance: {{getOverallAttendancePercentage()}}%</small>
-            </div>
-          </div>
+      <div class="glass-panel">
+        <div class="panel-header">
+          <h5 class="panel-title"><i class="bi bi-graph-up accent me-2"></i>Student Statistics</h5>
+          <small class="text-muted">Overall Attendance: {{getOverallAttendancePercentage()}}%</small>
         </div>
-        <div class="card-body">
-          <div class="mb-3">
-            <div class="input-group">
-              <span class="input-group-text">
-                <i class="bi bi-search"></i>
-              </span>
-              <input type="text" class="form-control" placeholder="Search students by name or email..."
-                [(ngModel)]="studentSearchTerm" (input)="filterStudents()">
-            </div>
+        <div class="panel-body">
+          <div class="search-box mb-3">
+            <span class="search-icon"><i class="bi bi-search"></i></span>
+            <input type="text" class="sharp-input" placeholder="Search students..." [(ngModel)]="studentSearchTerm" (input)="filterStudents()">
           </div>
-
           <div class="table-responsive">
-            <table class="table table-hover">
-              <thead class="table-light">
+            <table class="glass-table">
+              <thead>
                 <tr>
                   <th>Student</th>
-                  <th class="text-center">Total Classes</th>
+                  <th class="text-center">Total</th>
                   <th class="text-center">Attended</th>
                   <th class="text-center">Missed</th>
-                  <th>Attendance %</th>
-                  <th class="text-center">Performance</th>
+                  <th>Attendance</th>
+                  <th class="text-center">Perf.</th>
                 </tr>
               </thead>
               <tbody>
@@ -448,45 +351,30 @@
                     <div class="fw-medium">{{stat.student_name}}</div>
                     <small class="text-muted">{{stat.email}}</small>
                   </td>
-                  <td class="text-center">
-                    <span class="badge bg-light text-dark">{{stat.total_classes || 0}}</span>
-                  </td>
-                  <td class="text-center">
-                    <span class="badge bg-success">{{stat.attended_classes || 0}}</span>
-                  </td>
-                  <td class="text-center">
-  <span class="badge bg-danger">{{ getMissedClasses(stat) }}</span>
-</td>
+                  <td class="text-center"><span class="badge">{{stat.total_classes || 0}}</span></td>
+                  <td class="text-center"><span class="badge badge-success">{{stat.attended_classes || 0}}</span></td>
+                  <td class="text-center"><span class="badge badge-danger">{{ getMissedClasses(stat) }}</span></td>
                   <td>
-                    <div class="d-flex align-items-center">
-                      <div class="progress flex-grow-1 me-3" style="height: 8px;">
-                        <div class="progress-bar" [ngClass]="{
-                               'bg-success': getAttendancePercentage(stat) >= 80,
-                               'bg-warning': getAttendancePercentage(stat) >= 50 && getAttendancePercentage(stat) < 80,
-                               'bg-danger': getAttendancePercentage(stat) < 50
-                             }" [style.width]="getAttendancePercentage(stat) + '%'" role="progressbar">
-                        </div>
-                      </div>
-                      <span class="fw-medium">{{getAttendancePercentage(stat)}}%</span>
+                    <div class="progress-bar-wrap">
+                      <div class="progress" [ngClass]="{
+                        'progress-high': getAttendancePercentage(stat) >= 80,
+                        'progress-mid': getAttendancePercentage(stat) >= 50 && getAttendancePercentage(stat) < 80,
+                        'progress-low': getAttendancePercentage(stat) < 50
+                      }" [style.width]="getAttendancePercentage(stat) + '%'"></div>
+                      <span class="progress-text">{{getAttendancePercentage(stat)}}%</span>
                     </div>
                   </td>
                   <td class="text-center">
-                    <i *ngIf="getAttendancePercentage(stat) >= 80" class="bi bi-emoji-smile text-success fs-5"
-                      title="Excellent"></i>
-                    <i *ngIf="getAttendancePercentage(stat) >= 50 && getAttendancePercentage(stat) < 80"
-                      class="bi bi-emoji-neutral text-warning fs-5" title="Good"></i>
-                    <i *ngIf="getAttendancePercentage(stat) < 50" class="bi bi-emoji-frown text-danger fs-5"
-                      title="Needs Improvement"></i>
+                    <i *ngIf="getAttendancePercentage(stat) >= 80" class="bi bi-emoji-smile text-success fs-5"></i>
+                    <i *ngIf="getAttendancePercentage(stat) >= 50 && getAttendancePercentage(stat) < 80" class="bi bi-emoji-neutral text-warning fs-5"></i>
+                    <i *ngIf="getAttendancePercentage(stat) < 50" class="bi bi-emoji-frown text-danger fs-5"></i>
                   </td>
                 </tr>
                 <tr *ngIf="filteredStudentStats.length === 0">
-                  <td colspan="6" class="text-center py-4">
-                    <i class="bi bi-person-x text-muted fs-1 mb-3"></i>
-                    <p class="text-muted mb-0">No student statistics found</p>
-                  </td>
+                  <td colspan="6" class="empty-cell"><i class="bi bi-person-x"></i> No statistics found</td>
                 </tr>
               </tbody>
-              <tfoot class="table-light" *ngIf="filteredStudentStats.length > 0">
+              <tfoot *ngIf="filteredStudentStats.length > 0">
                 <tr>
                   <td class="fw-bold">Totals</td>
                   <td class="text-center fw-bold">{{getTotalClasses()}}</td>
@@ -505,62 +393,47 @@
   <!-- Instructor Statistics Section -->
   <div class="row">
     <div class="col-12">
-      <div class="card shadow-sm">
-        <div class="card-header bg-white border-bottom-0 pb-0 pt-3">
-          <h5 class="card-title mb-0">
-            <i class="bi bi-person-badge text-primary me-2"></i>Instructor Statistics
-          </h5>
+      <div class="glass-panel">
+        <div class="panel-header">
+          <h5 class="panel-title"><i class="bi bi-person-badge accent me-2"></i>Instructor Statistics</h5>
         </div>
-        <div class="card-body">
+        <div class="panel-body">
           <div class="table-responsive">
-            <table class="table table-hover">
-              <thead class="table-light">
-  <tr>
-    <th>Instructor</th>
-    <th class="text-center">Pay Rate</th>
-    <th class="text-center">Total Classes</th>
-    <th class="text-center">Completed</th>
-    <th class="text-center">Tagged In</th>
-    <th>Last Tag In</th>
-    <th class="text-end">Potential Earnings</th>
-    <th class="text-center">Status</th>
-  </tr>
-</thead>
-<tbody>
-  <tr *ngFor="let instructor of instructorStats">
-    <td>
-      <div class="fw-medium">{{instructor.instructor_name}}</div>
-      <small class="text-muted">{{instructor.email}}</small>
-    </td>
-    <td class="text-center">
-      <span class="badge bg-light text-dark">${{instructor.pay_per_class || 0}}/class</span>
-    </td>
-    <td class="text-center">{{instructor.total_classes_assigned || 0}}</td>
-    <td class="text-center">
-      <span class="badge bg-info">{{instructor.completed_classes || 0}}</span>
-    </td>
-    <td class="text-center">
-      <span class="badge bg-primary">{{instructor.classes_tagged_in || 0}}</span>
-    </td>
-    <td>
-      {{instructor.last_tag_in ? (instructor.last_tag_in | date:'dd.MM.yy HH:mm') : '—'}}
-    </td>
-    <td class="text-end fw-bold text-success">
-      ${{instructor.potential_earnings || 0}}
-    </td>
-    <td class="text-center">
-      <span [class]="instructor.is_active ? 'badge bg-success' : 'badge bg-secondary'">
-        {{instructor.is_active ? 'Active' : 'Inactive'}}
-      </span>
-    </td>
-  </tr>
-  <tr *ngIf="instructorStats.length === 0">
-    <td colspan="8" class="text-center py-4">
-      <i class="bi bi-person-badge text-muted fs-1 mb-3"></i>
-      <p class="text-muted mb-0">No instructor statistics found</p>
-    </td>
-  </tr>
-</tbody>
+            <table class="glass-table compact">
+              <thead>
+                <tr>
+                  <th>Instructor</th>
+                  <th class="text-center">Pay Rate</th>
+                  <th class="text-center">Total</th>
+                  <th class="text-center">Completed</th>
+                  <th class="text-center">Tagged</th>
+                  <th>Last Tag</th>
+                  <th class="text-end">Earnings</th>
+                  <th class="text-center">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let instructor of instructorStats">
+                  <td>
+                    <div class="fw-medium">{{instructor.instructor_name}}</div>
+                    <small class="text-muted">{{instructor.email}}</small>
+                  </td>
+                  <td class="text-center"><span class="badge">${{instructor.pay_per_class || 0}}/class</span></td>
+                  <td class="text-center">{{instructor.total_classes_assigned || 0}}</td>
+                  <td class="text-center"><span class="badge badge-info">{{instructor.completed_classes || 0}}</span></td>
+                  <td class="text-center"><span class="badge badge-primary">{{instructor.classes_tagged_in || 0}}</span></td>
+                  <td>{{instructor.last_tag_in ? (instructor.last_tag_in | date:'dd.MM.yy HH:mm') : '—'}}</td>
+                  <td class="text-end fw-bold text-success">${{instructor.potential_earnings || 0}}</td>
+                  <td class="text-center">
+                    <span [class]="instructor.is_active ? 'badge badge-active' : 'badge badge-inactive'">
+                      {{instructor.is_active ? 'Active' : 'Inactive'}}
+                    </span>
+                  </td>
+                </tr>
+                <tr *ngIf="instructorStats.length === 0">
+                  <td colspan="8" class="empty-cell"><i class="bi bi-person-badge"></i> No instructor stats found</td>
+                </tr>
+              </tbody>
             </table>
           </div>
         </div>
@@ -568,98 +441,122 @@
     </div>
   </div>
 
+  <!-- ==================== ANNOUNCEMENTS MANAGEMENT ==================== -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="glass-panel">
+        <div class="panel-header">
+          <h5 class="panel-title"><i class="bi bi-megaphone accent me-2"></i>Announcements</h5>
+          <button class="btn-glass btn-sm" (click)="openAnnouncementModal()"><i class="bi bi-plus-circle"></i> Create</button>
+        </div>
+        <div class="panel-body">
+          <div class="table-responsive">
+            <table class="glass-table compact">
+              <thead>
+                <tr><th>Title</th><th>Category</th><th>Media</th><th>Regs</th><th>Actions</th></tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let ann of announcements">
+                  <td>{{ann.title}}</td>
+                  <td><span class="badge">{{ann.category}}</span></td>
+                  <td>{{ann.media_type}}</td>
+                  <td><button class="btn-glass btn-sm" (click)="viewRegistrations(ann)">{{ann.registrations_count || 0}} regs</button></td>
+                  <td>
+                    <div class="btn-group-sm">
+                      <button class="btn-glass btn-sm" (click)="openAnnouncementModal(ann)"><i class="bi bi-pencil"></i></button>
+                      <button class="btn-glass btn-sm danger" (click)="deleteAnnouncement(ann.id)"><i class="bi bi-trash"></i></button>
+                    </div>
+                  </td>
+                </tr>
+                <tr *ngIf="announcements.length === 0"><td colspan="5" class="empty-cell">No announcements yet.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== POSTS MANAGEMENT ==================== -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="glass-panel">
+        <div class="panel-header">
+          <h5 class="panel-title"><i class="bi bi-youtube accent me-2"></i>Posts / Video Feed</h5>
+          <button class="btn-glass btn-sm" (click)="openPostModal()"><i class="bi bi-plus-circle"></i> Add Post</button>
+        </div>
+        <div class="panel-body">
+          <div class="row g-3">
+            <div class="col-md-4 col-sm-6" *ngFor="let post of posts">
+              <div class="glass-card p-0 video-card">
+                <div class="video-thumb">
+                  <iframe [src]="sanitizeUrl(post.video_url)" frameborder="0" allowfullscreen></iframe>
+                </div>
+                <div class="p-3">
+                  <h6 class="mb-1">{{post.title || 'Untitled'}}</h6>
+                  <p class="small text-muted mb-2">{{post.description | slice:0:80}}...</p>
+                  <div class="d-flex gap-2">
+                    <button class="btn-glass btn-sm" (click)="openPostModal(post)">Edit</button>
+                    <button class="btn-glass btn-sm danger" (click)="deletePost(post.id)">Delete</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div *ngIf="posts.length === 0" class="col-12 empty-state">No posts yet.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== MODALS ==================== -->
   <!-- Create Class Modal -->
   <div class="modal fade" id="createClassModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header bg-light">
-          <h5 class="modal-title">
-            <i class="bi bi-calendar-plus text-primary me-2"></i>Create New Class
-          </h5>
-          <button type="button" class="btn-close" (click)="closeCreateClassModal()" [disabled]="creatingClass"></button>
+      <div class="modal-content sharp-modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title"><i class="bi bi-calendar-plus accent me-2"></i>Create New Class</h5>
+          <button type="button" class="btn-close-custom" (click)="closeCreateClassModal()">×</button>
         </div>
         <div class="modal-body">
           <form [formGroup]="classForm" (ngSubmit)="createClass()">
             <div class="mb-3">
-              <label class="form-label fw-medium">
-                <i class="bi bi-card-heading text-primary me-1"></i>Class Name
-                <span class="text-danger">*</span>
-              </label>
-              <input type="text" class="form-control" formControlName="class_name"
-                placeholder="e.g., Beginner Hip-Hop, Advanced Ballet">
-              <div *ngIf="classForm.get('class_name')?.invalid && classForm.get('class_name')?.touched"
-                class="invalid-feedback">
-                Class name is required
+              <label class="form-label">Class Name <span class="text-danger">*</span></label>
+              <input type="text" class="sharp-input" formControlName="class_name" placeholder="e.g., Beginner Hip-Hop">
+            </div>
+            <div class="row mb-3">
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Date <span class="text-danger">*</span></label>
+                <input type="date" class="sharp-input" formControlName="class_date" [min]="today">
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Time <span class="text-danger">*</span></label>
+                <input type="time" class="sharp-input" formControlName="class_time">
               </div>
             </div>
-
-            <div class="row">
-              <div class="col-md-6 mb-3">
-                <label class="form-label fw-medium">
-                  <i class="bi bi-calendar-date text-primary me-1"></i>Date
-                  <span class="text-danger">*</span>
-                </label>
-                <input type="date" class="form-control" formControlName="class_date" [min]="today">
-              </div>
-
-              <div class="col-md-6 mb-3">
-                <label class="form-label fw-medium">
-                  <i class="bi bi-clock text-primary me-1"></i>Time
-                  <span class="text-danger">*</span>
-                </label>
-                <input type="time" class="form-control" formControlName="class_time">
-              </div>
-            </div>
-
             <div class="mb-3">
-              <label class="form-label fw-medium">
-                <i class="bi bi-person-check text-primary me-1"></i>Instructor (Optional)
-              </label>
-              <select class="form-select" formControlName="instructor_id">
-                <option value="">Select an instructor...</option>
-                <option *ngFor="let instructor of activeInstructors" [value]="instructor.instructor_id">
-                  {{instructor.name}} • {{instructor.email}}
-                </option>
+              <label class="form-label">Instructor (Optional)</label>
+              <select class="sharp-input" formControlName="instructor_id">
+                <option value="">Select instructor...</option>
+                <option *ngFor="let instructor of activeInstructors" [value]="instructor.instructor_id">{{instructor.name}} • {{instructor.email}}</option>
               </select>
             </div>
-
             <div class="mb-3">
-              <label class="form-label fw-medium">
-                <i class="bi bi-people text-primary me-1"></i>Student Group
-                <span class="text-danger">*</span>
-              </label>
-              <select class="form-select" formControlName="group_id">
-                <option value="">Select a student group...</option>
-                <option *ngFor="let group of groups" [value]="group.id">
-                  {{group.group_name}} ({{group.student_count || 0}} students)
-                </option>
+              <label class="form-label">Student Group <span class="text-danger">*</span></label>
+              <select class="sharp-input" formControlName="group_id">
+                <option value="">Select group...</option>
+                <option *ngFor="let group of groups" [value]="group.id">{{group.group_name}} ({{group.student_count || 0}} students)</option>
               </select>
-              <div class="form-text">
-                All students in this group will be automatically enrolled
-              </div>
+              <div class="form-text">All students in this group will be automatically enrolled</div>
             </div>
-
-            <div class="alert alert-info bg-light border-info">
-              <div class="d-flex">
-                <i class="bi bi-info-circle text-info fs-5 me-2"></i>
-                <div>
-                  <small class="fw-medium">How it works:</small>
-                  <small class="d-block">1. Create student groups in Group Management</small>
-                  <small class="d-block">2. Add students to groups</small>
-                  <small class="d-block">3. Create classes for groups</small>
-                  <small class="d-block">4. Instructors can mark attendance for the whole group</small>
-                </div>
-              </div>
+            <div class="alert-box info">
+              <i class="bi bi-info-circle"></i>
+              <small>1. Create student groups in Group Management<br>2. Add students to groups<br>3. Create classes for groups<br>4. Instructors can mark attendance for the whole group</small>
             </div>
-
-            <div class="modal-footer border-top-0 pt-0">
-              <button type="button" class="btn btn-outline-secondary" (click)="closeCreateClassModal()"
-                [disabled]="creatingClass">
-                Cancel
-              </button>
-              <button type="submit" class="btn btn-primary" [disabled]="classForm.invalid || creatingClass">
-                <span *ngIf="creatingClass" class="spinner-border spinner-border-sm me-2"></span>
-                <i *ngIf="!creatingClass" class="bi bi-plus-circle me-1"></i>
+            <div class="modal-footer">
+              <button type="button" class="btn-glass" (click)="closeCreateClassModal()" [disabled]="creatingClass">Cancel</button>
+              <button type="submit" class="btn-glass primary" [disabled]="classForm.invalid || creatingClass">
+                <span *ngIf="creatingClass" class="spinner spinner-sm me-2"></span>
                 {{creatingClass ? 'Creating...' : 'Create Class'}}
               </button>
             </div>
@@ -672,100 +569,111 @@
   <!-- Pay Rate Modal -->
   <div class="modal fade" id="payRateModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header bg-light">
-          <h5 class="modal-title">
-            <i class="bi bi-cash-coin text-success me-2"></i>
-            Set Pay Rate for {{selectedInstructor?.name}}
-          </h5>
-          <button type="button" class="btn-close" (click)="closePayRateModal()"></button>
+      <div class="modal-content sharp-modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title"><i class="bi bi-cash-coin accent me-2"></i>Set Pay Rate for {{selectedInstructor?.name}}</h5>
+          <button type="button" class="btn-close-custom" (click)="closePayRateModal()">×</button>
         </div>
         <div class="modal-body">
           <form [formGroup]="payRateForm" (ngSubmit)="updatePayRate()">
             <div class="mb-4">
-              <label class="form-label fw-medium">Pay Per Class ($)</label>
-              <div class="input-group">
+              <label class="form-label">Pay Per Class ($)</label>
+              <div class="input-group-custom">
                 <span class="input-group-text">$</span>
-                <input type="number" class="form-control" formControlName="payRate" step="0.01" min="0"
-                  placeholder="Enter amount per class"
-                  [class.is-invalid]="payRateForm.get('payRate')?.invalid && payRateForm.get('payRate')?.touched">
+                <input type="number" class="sharp-input" formControlName="payRate" step="0.01" min="0">
               </div>
-              <div *ngIf="payRateForm.get('payRate')?.invalid && payRateForm.get('payRate')?.touched"
-                class="invalid-feedback">
-                Please enter a valid amount (minimum $0)
-              </div>
-              <div class="form-text">
-                Current rate: <strong>${{selectedInstructor?.pay_per_class || 0}}</strong> per class
-              </div>
+              <small>Current: <strong>${{selectedInstructor?.pay_per_class || 0}}</strong>/class</small>
             </div>
-
-            <div class="alert alert-warning bg-light border-warning">
-              <div class="d-flex">
-                <i class="bi bi-exclamation-triangle text-warning fs-5 me-2"></i>
-                <div>
-                  <small class="fw-medium">Important:</small>
-                  <small class="d-block">Changing pay rate will affect future payment calculations only.</small>
-                </div>
-              </div>
-            </div>
-
-            <div class="modal-footer border-top-0 pt-0">
-              <button type="button" class="btn btn-outline-secondary" (click)="closePayRateModal()">
-                Cancel
-              </button>
-              <button type="submit" class="btn btn-success" [disabled]="payRateForm.invalid">
-                <i class="bi bi-check-circle me-1"></i>
-                Update Pay Rate
-              </button>
+            <div class="modal-footer">
+              <button type="button" class="btn-glass" (click)="closePayRateModal()">Cancel</button>
+              <button type="submit" class="btn-glass primary" [disabled]="payRateForm.invalid">Update Pay Rate</button>
             </div>
           </form>
         </div>
       </div>
     </div>
   </div>
+
   <!-- Assign Student Modal -->
   <div class="modal fade" id="assignStudentModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-
+      <div class="modal-content sharp-modal-content">
         <div class="modal-header">
-          <h5 class="modal-title">
-            <i class="bi bi-person-plus me-2"></i>
-            Assign Student to Class
-          </h5>
-          <button type="button" class="btn-close" (click)="modalService.closeModal('assignStudentModal')">
-          </button>
+          <h5 class="modal-title"><i class="bi bi-person-plus me-2"></i>Assign Student to Class</h5>
+          <button type="button" class="btn-close-custom" (click)="modalService.closeModal('assignStudentModal')">×</button>
         </div>
-
         <div class="modal-body">
           <div class="mb-3">
-            <label class="form-label fw-medium">Select Student</label>
-
-            <select class="form-select" [(ngModel)]="selectedStudent">
+            <label class="form-label">Select Student</label>
+            <select class="sharp-input" [(ngModel)]="selectedStudent">
               <option [ngValue]="null">Select a student...</option>
-
-              <option *ngFor="let student of activeStudents" [ngValue]="student">
-                {{ student.name }} ({{ student.email }})
-              </option>
+              <option *ngFor="let student of activeStudents" [ngValue]="student">{{ student.name }} ({{ student.email }})</option>
             </select>
           </div>
         </div>
-
         <div class="modal-footer">
-          <button class="btn btn-secondary" (click)="modalService.closeModal('assignStudentModal')">
-            Cancel
-          </button>
-
-          <button class="btn btn-primary" (click)="assignStudentToClass()"
-            [disabled]="!selectedStudent || assigningStudent">
-
-            <span *ngIf="assigningStudent" class="spinner-border spinner-border-sm me-2">
-            </span>
-
-            Assign Student
+          <button class="btn-glass" (click)="modalService.closeModal('assignStudentModal')">Cancel</button>
+          <button class="btn-glass primary" (click)="assignStudentToClass()" [disabled]="!selectedStudent || assigningStudent">
+            <span *ngIf="assigningStudent" class="spinner spinner-sm me-2"></span> Assign Student
           </button>
         </div>
+      </div>
+    </div>
+  </div>
 
+  <!-- Announcement Modal -->
+  <div class="modal fade" id="announcementModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content sharp-modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">{{ editingAnnouncementId ? 'EDIT' : 'NEW' }} ANNOUNCEMENT</h5>
+          <button type="button" class="btn-close-custom" (click)="modalService.closeModal('announcementModal')">×</button>
+        </div>
+        <div class="modal-body">
+          <form [formGroup]="announcementForm!">
+            <div class="mb-3"><label>Title</label><input type="text" class="sharp-input w-100" formControlName="title"></div>
+            <div class="mb-3"><label>Description</label><textarea class="sharp-input w-100" rows="3" formControlName="description"></textarea></div>
+            <div class="row mb-3">
+              <div class="col-md-6"><label>Category</label><select class="sharp-input w-100" formControlName="category"><option value="EVENTS">EVENTS</option><option value="WORKSHOPS">WORKSHOPS</option><option value="PERFORMANCES">PERFORMANCES</option></select></div>
+              <div class="col-md-6"><label>Media Type</label><select class="sharp-input w-100" formControlName="media_type"><option value="IMAGE">IMAGE</option><option value="VIDEO">VIDEO</option></select></div>
+            </div>
+            <div class="mb-3"><label>Media URL</label><input type="text" class="sharp-input w-100" formControlName="media_url"></div>
+            <div class="mb-3"><label>Upload Image</label><input type="file" (change)="onFileSelected($event)" accept="image/*" class="form-control"></div>
+            <div class="form-check mb-3"><input type="checkbox" class="form-check-input" formControlName="registration_enabled"><label class="form-check-label">Enable registration</label></div>
+            <div *ngIf="announcementForm?.get('registration_enabled')?.value" class="row mb-3">
+              <div class="col-md-6"><label>Reg. type</label><select class="sharp-input w-100" formControlName="registration_type"><option value="FREE">FREE</option><option value="PAID">PAID</option></select></div>
+              <div class="col-md-6" *ngIf="announcementForm?.get('registration_type')?.value === 'PAID'"><label>Price (€)</label><input type="number" class="sharp-input w-100" formControlName="price" min="0" step="0.01"></div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-glass" (click)="modalService.closeModal('announcementModal')">CANCEL</button>
+          <button type="button" class="btn-glass primary" (click)="saveAnnouncement()">SAVE</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Post Modal -->
+  <div class="modal fade" id="postModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content sharp-modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">{{ editingPostId ? 'EDIT' : 'NEW' }} POST</h5>
+          <button type="button" class="btn-close-custom" (click)="modalService.closeModal('postModal')">×</button>
+        </div>
+        <div class="modal-body">
+          <form [formGroup]="postForm!">
+            <div class="mb-3"><label>Title</label><input type="text" class="sharp-input w-100" formControlName="title"></div>
+            <div class="mb-3"><label>Description</label><textarea class="sharp-input w-100" rows="3" formControlName="description"></textarea></div>
+            <div class="mb-3"><label>YouTube URL</label><input type="text" class="sharp-input w-100" formControlName="video_url" required></div>
+            <div class="mb-3"><label>Thumbnail URL</label><input type="text" class="sharp-input w-100" formControlName="thumbnail_url"></div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-glass" (click)="modalService.closeModal('postModal')">CANCEL</button>
+          <button type="button" class="btn-glass primary" (click)="savePost()">SAVE</button>
+        </div>
       </div>
     </div>
   </div>
