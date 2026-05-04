@@ -5,8 +5,8 @@ import { Post } from '../models/announcement.model';
 
 @Injectable({ providedIn: 'root' })
 export class PostService {
-//   private apiUrl = 'https://dbds-backend.onrender.com/api/posts';
-  private apiUrl = 'http://localhost:5010/api/posts';
+  private apiUrl = 'https://dbds-backend.onrender.com/api/posts';
+  // private apiUrl = 'http://localhost:5010/api/posts';
 
   constructor(private http: HttpClient) {}
 
