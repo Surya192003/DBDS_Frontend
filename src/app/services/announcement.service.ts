@@ -5,7 +5,7 @@ import { Announcement } from '../models/announcement.model';
 
 @Injectable({ providedIn: 'root' })
 export class AnnouncementService {
-  private apiUrl = 'https://dbds-backend.onrender.com/api/announcements';A
+  private apiUrl = 'https://dbds-backend.onrender.com/api/announcements';
   // private apiUrl = 'http://localhost:5010/api/announcements';
 
   constructor(private http: HttpClient) {}
