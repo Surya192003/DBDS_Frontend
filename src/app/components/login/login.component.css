@@ -1,193 +1,156 @@
-/* GLOBAL FONT SET – apply to :host or body */
 :host {
-  font-family: 'Courier New', Courier, monospace;
-  --blue: #4FC3F7;
-  --blue-dark: #0a2530;
-  --black: #000;
-  --white: #fff;
-  --glass-bg: rgba(10, 20, 40, 0.7);
+  display: block;
+  font-family: var(--font-family-primary);   /* "Nunito", not monospace */
 }
 
+/* ---- Page wrapper (light background) ---- */
 .auth-wrapper {
   min-height: 100vh;
-  background:
-    radial-gradient(circle at 20% 30%, rgba(79, 195, 247, 0.15), transparent 40%),
-    radial-gradient(circle at 80% 70%, rgba(0, 188, 212, 0.1), transparent 40%),
-    #02080f;
+  background: var(--color-surface);           /* warm off‑white */
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 20px;
+  padding: 24px;
+  /* optional subtle pattern, keep clean */
 }
 
+/* ---- The card itself ---- */
 .login-card {
   width: 100%;
-  max-width: 480px;
-  border: 1px solid rgba(79, 195, 247, 0.2);
-  padding: 40px;
-  background:
-    linear-gradient(145deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.01)),
-    rgba(10, 18, 30, 0.75);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  box-shadow:
-    0 30px 60px rgba(0, 0, 0, 0.7),
-    0 0 40px rgba(79, 195, 247, 0.08),
-    inset 0 1px 0 rgba(255, 255, 255, 0.08);
-  border-radius: 0; /* sharp edges preserved */
-  color: var(--white);
+  max-width: 440px;
+  border-radius: var(--radius-card);          /* 24px – soft and inviting */
+  padding: 40px 32px;
+  background: var(--color-white);
+  box-shadow: var(--shadow-lg);               /* airy depth */
+  border: var(--border-light);
+  color: var(--color-text);
+  /* no blur, no dark glass */
 }
 
+/* ---- Header ---- */
 .auth-header {
-  border-bottom: 2px solid rgba(79, 195, 247, 0.3);
-  margin-bottom: 30px;
-  padding-bottom: 15px;
+  margin-bottom: 32px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(0,0,0,0.06);
 }
 
 .title-text {
   font-weight: 900;
-  letter-spacing: -1px;
-  margin: 0;
-  font-size: 1.4rem;
-  color: #fff;
-  text-transform: uppercase;
+  font-size: 1.8rem;
+  margin: 0 0 4px;
+  background: var(--gradient-1);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;                          /* gradient text */
+  letter-spacing: -0.02em;
+  text-transform: none;                       /* friendlier, not all‑caps */
 }
 
 .tagline {
-  font-size: 0.65rem;
-  color: rgba(255, 255, 255, 0.5);
-  margin-top: 6px;
-  font-weight: 700;
-  letter-spacing: 0.05em;
+  font-size: 0.8rem;
+  color: var(--color-text-soft);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  margin-top: 4px;
 }
 
-/* INPUT STYLES */
+/* ---- Form fields ---- */
 .field {
-  margin-bottom: 24px;
+  margin-bottom: 22px;
 }
 
 .field label {
   display: block;
-  font-weight: 900;
-  font-size: 0.7rem;
-  margin-bottom: 8px;
-  color: rgba(255, 255, 255, 0.7);
-  letter-spacing: 0.08em;
+  font-weight: 700;
+  font-size: 0.75rem;
+  margin-bottom: 6px;
+  color: var(--color-text-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
 }
 
 .sharp-input {
   width: 100%;
-  border: 2px solid rgba(79, 195, 247, 0.25);
-  padding: 14px 16px;
-  font-weight: 700;
-  border-radius: 0; /* sharp */
+  padding: 14px 18px;
+  border: 2px solid #eaeaea;
+  border-radius: 14px;                        /* match global radius */
   outline: none;
-  font-family: monospace;
+  font-family: inherit;
   font-size: 0.95rem;
-  background: rgba(0, 0, 0, 0.35);
-  color: #fff;
-  backdrop-filter: blur(10px);
+  font-weight: 600;
+  color: var(--color-text);
+  background: #fafafa;
   transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
 }
 
 .sharp-input::placeholder {
-  color: rgba(255, 255, 255, 0.35);
+  color: #b0b0b0;
+  font-weight: 500;
 }
 
 .sharp-input:focus {
-  background: rgba(79, 195, 247, 0.08);
-  border-color: var(--blue);
-  box-shadow: 0 0 0 3px rgba(79, 195, 247, 0.2), 4px 4px 0px rgba(79, 195, 247, 0.3);
+  background: #fff;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(253, 101, 133, 0.15);   /* pink glow */
 }
 
-/* BUTTON STYLES */
+/* ---- Buttons (rely on global .btn-sharp, just override width) ---- */
 .btn-sharp {
-  background: linear-gradient(135deg, #b8efff 0%, #4fc3f7 45%, #1597c9 100%);
-  color: #001018;
-  border: none;
-  padding: 16px;
-  font-weight: 900;
-  font-size: 0.85rem;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  cursor: pointer;
-  border-radius: 0;
-  box-shadow: 0 0 20px rgba(79, 195, 247, 0.3);
-  transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
-  font-family: inherit;
+  width: 100%;
 }
 
-.btn-sharp:hover:not(:disabled) {
-  transform: translate(-4px, -4px);
-  box-shadow: 0 10px 30px rgba(79, 195, 247, 0.5);
-  background: linear-gradient(135deg, #d0f5ff, #5fd5ff);
-}
-
-.btn-sharp:active:not(:disabled) {
-  transform: translate(-1px, -1px);
-}
-
-.btn-sharp:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  transform: none;
-  box-shadow: none;
-}
-
-/* LINK & FEEDBACK */
+/* ---- Link ---- */
 .link-text {
+  display: inline-block;
   text-decoration: none;
-  color: rgba(79, 195, 247, 0.9);
-  font-weight: 900;
-  font-size: 0.7rem;
-  border-bottom: 2px solid rgba(79, 195, 247, 0.5);
+  color: var(--color-primary);
+  font-weight: 700;
+  font-size: 0.9rem;
+  border-bottom: 2px solid rgba(253, 101, 133, 0.3);
   padding-bottom: 2px;
-  transition: color 0.2s, border-color 0.2s;
+  transition: 0.2s;
 }
 
 .link-text:hover {
-  color: #fff;
-  border-bottom-color: #fff;
-  background: transparent;
+  border-bottom-color: var(--color-primary);
+  color: var(--color-primary);
 }
 
+/* ---- Error message ---- */
 .msg-box.error {
-  background: rgba(255, 60, 60, 0.15);
-  border: 2px solid #ff3b3b;
-  color: #ffbbbb;
-  padding: 14px;
-  margin-bottom: 20px;
-  font-weight: 900;
-  font-size: 0.8rem;
+  background: #fff5f5;
+  border: 1px solid #fecaca;
+  border-radius: 14px;
+  padding: 14px 18px;
+  margin-bottom: 24px;
+  color: #b91c1c;
+  font-weight: 700;
+  font-size: 0.85rem;
   cursor: pointer;
-  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
-/* LOADING SPINNER */
+/* ---- Loading spinner ---- */
 .spinner-square-sm {
   display: inline-block;
-  width: 14px;
-  height: 14px;
-  border: 2px solid #001018;
-  border-top-color: transparent;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255,255,255,0.4);
+  border-top-color: white;
   border-radius: 50%;
   animation: spin 0.6s linear infinite;
 }
 
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* Responsive adjustments */
-@media (max-width: 576px) {
+/* ---- Responsive ---- */
+@media (max-width: 480px) {
   .login-card {
-    padding: 24px 20px;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+    padding: 28px 20px;
   }
   .title-text {
-    font-size: 1.2rem;
+    font-size: 1.5rem;
   }
-}
-
-/* Optional global font override */
-body {
-  font-family: 'Courier New', Courier, monospace;
 }

@@ -1,471 +1,149 @@
-<div class="dashboard-wrapper" data-testid="dashboard-wrapper">
-  <!-- Loading state (only while fetching initial data) - static, no animation -->
-  <div class="loading-overlay" *ngIf="loadingInitial" data-testid="dashboard-loading-overlay">
-    <div class="loader-placeholder" data-testid="dashboard-loader"></div>
-    <p data-testid="dashboard-loading-text">LOADING_DASHBOARD...</p>
+<div class="dashboard-wrapper">
+  <!-- Loading -->
+  <div class="loading-overlay" *ngIf="loadingInitial">
+    <p>Loading dashboard…</p>
   </div>
 
-  <div class="dashboard-shell" *ngIf="!loadingInitial" data-testid="dashboard-shell">
-    <!-- PROFILE & PORTALS -->
-    <div class="user-area glass-panel" *ngIf="user" data-testid="user-area">
-      <div class="profile-summary" data-testid="profile-summary">
-        <div
-          class="profile-photo"
-          (click)="openEditProfileModal()"
-          role="button"
-          tabindex="0"
-          aria-label="Edit profile photo"
-          data-testid="profile-photo-button"
-        >
-          <img
-            *ngIf="user?.photo_url"
-            [src]="getFullImageUrl(user.photo_url)"
-            class="profile-img"
-            alt="Profile photo"
-            data-testid="profile-image"
-          >
-
-          <div
-            *ngIf="!user?.photo_url"
-            class="profile-placeholder"
-            data-testid="profile-placeholder"
-          >
-            {{ user?.name?.charAt(0) }}
-          </div>
+  <div class="dashboard-shell" *ngIf="!loadingInitial">
+    <!-- User Area -->
+    <div class="user-area glass-panel" *ngIf="user">
+      <div class="profile-summary">
+        <div class="profile-photo" (click)="openEditProfileModal()">
+          <img *ngIf="user?.photo_url" [src]="getFullImageUrl(user.photo_url)" alt="Profile photo">
+          <div *ngIf="!user?.photo_url" class="profile-placeholder">{{ user?.name?.charAt(0) }}</div>
         </div>
-
-        <div class="profile-info" data-testid="profile-info">
-          <div class="info-line" data-testid="profile-id">ID: 00{{ user?.id }}</div>
-          <div class="info-line profile-name" data-testid="profile-name">
-            {{ user?.name | uppercase }}
-          </div>
-          <div class="info-line role-badge" data-testid="profile-role">
-            {{ user?.role }}
-          </div>
+        <div class="profile-info">
+          <div class="info-line">ID: 00{{ user?.id }}</div>
+          <div class="info-line profile-name">{{ user?.name | uppercase }}</div>
+          <div class="role-badge">{{ user?.role }}</div>
         </div>
-
-        <button
-          class="btn-sharp-small"
-          (click)="openEditProfileModal()"
-          data-testid="edit-profile-button"
-        >
-          EDIT_PROFILE
-        </button>
+        <button class="btn-sharp" (click)="openEditProfileModal()">EDIT PROFILE</button>
       </div>
-
-      <!-- FIXED: removed incorrect role exclusion, now shows for any logged-in user -->
-      <div class="portal-buttons" *ngIf="user" data-testid="portal-buttons">
-        <a
-          *ngIf="user?.role === 'ADMIN'"
-          routerLink="/admin"
-          class="btn-sharp"
-          data-testid="admin-portal-link"
-        >
-          ADMIN_PORTAL
-        </a>
-
-        <a
-          *ngIf="user?.role === 'INSTRUCTOR'"
-          routerLink="/instructor"
-          class="btn-sharp"
-          data-testid="instructor-portal-link"
-        >
-          INSTRUCTOR_PORTAL
-        </a>
-
-        <a
-          *ngIf="user?.role === 'STUDENT'"
-          routerLink="/student"
-          class="btn-sharp"
-          data-testid="student-portal-link"
-        >
-          LEARNING_PORTAL
-        </a>
+      <div class="portal-buttons">
+        <a *ngIf="user?.role === 'ADMIN'" routerLink="/admin" class="btn-sharp">ADMIN</a>
+        <a *ngIf="user?.role === 'INSTRUCTOR'" routerLink="/instructor" class="btn-sharp">INSTRUCTOR</a>
+        <a *ngIf="user?.role === 'STUDENT'" routerLink="/student" class="btn-sharp">STUDENT</a>
       </div>
     </div>
 
-    <!-- HERO SECTION -->
-    <div
-      class="hero-section glass-panel"
-      [class.logged-in-hero]="user"
-      data-testid="hero-section"
-    >
-      <div class="hero-glow hero-glow-one"></div>
-      <div class="hero-glow hero-glow-two"></div>
-
-      <div class="hero-content" data-testid="hero-content">
-        <span class="eyebrow" data-testid="hero-eyebrow" style="color: black;">Premium Dance Academy</span>
-
-        <h1 class="school-name" data-testid="school-name">
-          DHARMENDRA BOLLYWOOD DANCE SCHOOL
-        </h1>
-
-        <p class="hero-tagline" data-testid="hero-tagline">
-          DANCE • FITNESS • CULTURE • IRELAND
-        </p>
-
-        <div class="hero-buttons" *ngIf="!user" data-testid="hero-buttons">
-          <a
-            routerLink="/register"
-            class="btn-sharp-large"
-            data-testid="join-now-link"
-          >
-            JOIN NOW
-          </a>
-
-          <a
-            routerLink="/login"
-            class="btn-sharp-large outline"
-            data-testid="login-link"
-          >
-            LOGIN
-          </a>
+    <!-- Hero -->
+    <div class="hero-section glass-panel" [@fadeSlide]>
+      <div class="hero-content">
+        <span class="eyebrow">Premium Dance Academy</span>
+        <h1 class="school-name">DHARMENDRA BOLLYWOOD DANCE SCHOOL</h1>
+        <p class="hero-tagline">DANCE • FITNESS • CULTURE • IRELAND</p>
+        <div class="hero-buttons" *ngIf="!user">
+          <a routerLink="/register" class="btn-sharp-large">JOIN NOW</a>
+          <a routerLink="/login" class="btn-sharp-large outline">LOGIN</a>
         </div>
-
-        <div class="hero-greeting" *ngIf="user" data-testid="hero-greeting">
-          <p>
-            Welcome back,
-            <strong>{{ user.name }}</strong>!
-          </p>
+        <div class="hero-greeting" *ngIf="user">
+          <p>Welcome back, <strong>{{ user.name }}</strong>!</p>
         </div>
       </div>
-
-      <!-- 3D floating visual -->
-      <div class="hero-visual" aria-hidden="true" data-testid="hero-visual">
-        <div class="visual-backplate"></div>
-
-        <!-- Replace this src with your transparent PNG/WebeP dancer image -->
-        <img
-          src="/assets/images/DBDS.png"
-          alt=""
-          class="floating-dancer"
-          data-testid="hero-floating-dancer-image"
-        >
-
-        <div class="floating-card floating-card-top" data-testid="hero-floating-card-top">
-          BOLLYWOOD
-        </div>
-
-        <div class="floating-card floating-card-bottom" data-testid="hero-floating-card-bottom">
-          DUBLIN
-        </div>
+      <div class="hero-visual">
+        <img src="/assets/images/DBDS.png" alt="" class="floating-dancer">
       </div>
     </div>
 
-    <!-- ANNOUNCEMENTS -->
-    <div class="announcements-section glass-panel" data-testid="announcements-section">
-      <div class="section-header" data-testid="announcements-header">
-        <div>
-          <span class="section-kicker" data-testid="announcements-kicker">Latest updates</span>
-          <label class="section-label" data-testid="announcements-title">
-            LATEST_ANNOUNCEMENTS
-          </label>
-        </div>
-
-        <div class="category-filters" data-testid="category-filters">
-          <button
-            *ngFor="let cat of categories"
-            (click)="filterAnnouncements(cat)"
-            [class.active]="selectedCategory === cat"
-            class="filter-chip"
-            [attr.data-testid]="'category-filter-' + cat"
-          >
+    <!-- Announcements -->
+    <div class="announcements-section glass-panel">
+      <div class="section-header">
+        <h2 class="section-label" style="margin:0 0 20px;font-weight:800;">Latest Announcements</h2>
+        <div class="category-filters">
+          <button *ngFor="let cat of categories" (click)="filterAnnouncements(cat)"
+                  [class.active]="selectedCategory === cat" class="btn-sharp-small outline">
             {{ cat }}
           </button>
         </div>
       </div>
-
-      <div class="announcement-grid" data-testid="announcement-grid">
-        <div
-          *ngFor="let ann of filteredAnnouncements"
-          class="announcement-card glass-card"
-          [attr.data-testid]="'announcement-card-' + ann.id"
-        >
-          <div class="media-preview" data-testid="announcement-media">
-            <img
-              *ngIf="ann.media_type === 'IMAGE'"
-              [src]="ann.image_storage || ann.media_url"
-              [alt]="ann.title"
-              data-testid="announcement-image"
-            >
-
-            <iframe
-              *ngIf="ann.media_type === 'VIDEO'"
-              [src]="sanitizeUrl(ann.media_url)"
-              frameborder="0"
-              allowfullscreen
-              title="Announcement video"
-              data-testid="announcement-video"
-            ></iframe>
+      <div class="announcement-grid" [@cardEnter]="filteredAnnouncements.length">
+        <div *ngFor="let ann of filteredAnnouncements" class="announcement-card glass-card">
+          <div class="media-preview">
+            <img *ngIf="ann.media_type === 'IMAGE'" [src]="ann.image_storage || ann.media_url" [alt]="ann.title">
+            <iframe *ngIf="ann.media_type === 'VIDEO'" [src]="sanitizeUrl(ann.media_url)" frameborder="0" allowfullscreen></iframe>
           </div>
-
-          <div class="announcement-content" data-testid="announcement-content">
-            <span class="category-badge" data-testid="announcement-category">
-              {{ ann.category }}
-            </span>
-
-            <h4 data-testid="announcement-title">{{ ann.title }}</h4>
-
-            <p data-testid="announcement-description">{{ ann.description }}</p>
-
-            <div
-              *ngIf="ann.registration_enabled"
-              class="register-area"
-              data-testid="announcement-register-area"
-            >
-              <button
-                *ngIf="!ann.user_registered && user"
-                class="btn-sharp-small"
-                (click)="registerForAnnouncement(ann.id)"
-                [attr.data-testid]="'announcement-register-button-' + ann.id"
-              >
-                REGISTER
-              </button>
-
-              <span
-                *ngIf="ann.user_registered"
-                class="registered-badge"
-                data-testid="announcement-registered-badge"
-              >
-                REGISTERED
-              </span>
-
-              <span
-                *ngIf="ann.registration_type === 'PAID'"
-                class="price-badge"
-                data-testid="announcement-price"
-              >
-                €{{ ann.price }}
-              </span>
-
-              <a
-                *ngIf="!user"
-                routerLink="/login"
-                class="login-link"
-                data-testid="announcement-login-to-register-link"
-              >
-                Login to register
-              </a>
+          <div class="announcement-content">
+            <span class="category-badge">{{ ann.category }}</span>
+            <h4>{{ ann.title }}</h4>
+            <p>{{ ann.description }}</p>
+            <div *ngIf="ann.registration_enabled" class="register-area">
+              <button *ngIf="!ann.user_registered && user" class="btn-sharp-small" (click)="registerForAnnouncement(ann.id)">REGISTER</button>
+              <span *ngIf="ann.user_registered" class="registered-badge">REGISTERED</span>
+              <span *ngIf="ann.registration_type === 'PAID'" class="price-badge">€{{ ann.price }}</span>
+              <a *ngIf="!user" routerLink="/login" class="login-link">Login to register</a>
             </div>
           </div>
         </div>
-
-        <div
-          *ngIf="filteredAnnouncements.length === 0"
-          class="empty-state"
-          data-testid="announcements-empty-state"
-        >
-          No announcements in this category.
-        </div>
+        <div *ngIf="filteredAnnouncements.length === 0" class="empty-state">No announcements yet</div>
       </div>
     </div>
 
-    <!-- POSTS FEED -->
-    <div class="posts-section glass-panel" data-testid="posts-section">
-      <div class="section-header compact" data-testid="posts-header">
-        <div>
-          <span class="section-kicker" data-testid="posts-kicker">Community feed</span>
-          <label class="section-label" data-testid="posts-title">
-            DANCE_VIDEOS // COMMUNITY_FEED
-          </label>
-        </div>
-      </div>
-
-      <div class="posts-feed" data-testid="posts-feed">
-        <div
-          *ngFor="let post of posts"
-          class="post-card glass-card"
-          data-testid="post-card"
-        >
-          <div class="video-wrapper" data-testid="post-video-wrapper">
-            <iframe
-              [src]="sanitizeUrl(post.video_url)"
-              frameborder="0"
-              allowfullscreen
-              title="Dance video"
-              data-testid="post-video"
-            ></iframe>
+    <!-- Posts Feed -->
+    <div class="posts-section glass-panel">
+      <h2 class="section-label" style="margin-bottom:20px;font-weight:800;">Community Videos</h2>
+      <div class="posts-feed">
+        <div *ngFor="let post of posts" class="post-card glass-card">
+          <div class="video-wrapper">
+            <iframe [src]="sanitizeUrl(post.video_url)" frameborder="0" allowfullscreen></iframe>
           </div>
-
-          <h4 data-testid="post-title">{{ post.title }}</h4>
-
-          <p data-testid="post-description">{{ post.description }}</p>
-
-          <div class="post-meta" data-testid="post-meta">
-            <span data-testid="post-date">{{ post.created_at | date:'dd.MM.yy' }}</span>
-            <span data-testid="post-author">{{ post.author_name }}</span>
+          <h4>{{ post.title }}</h4>
+          <p>{{ post.description }}</p>
+          <div class="post-meta">
+            <span>{{ post.created_at | date:'dd.MM.yy' }}</span>
+            <span>{{ post.author_name }}</span>
           </div>
         </div>
-
-        <div
-          *ngIf="posts.length === 0"
-          class="empty-state"
-          data-testid="posts-empty-state"
-        >
-          No videos yet. Check back soon!
-        </div>
+        <div *ngIf="posts.length === 0" class="empty-state">No videos yet. Check back soon!</div>
       </div>
     </div>
 
-    <!-- FOOTER -->
-    <div class="footer-contact glass-panel" data-testid="footer-contact">
-      <p data-testid="footer-contact-text">
-        +353 89 468 5565 // INFO@DBDS.IE // DUBLIN, IRELAND
-      </p>
+    <!-- Footer -->
+    <div class="footer-contact glass-panel">
+      <p>+353 89 468 5565 · INFO@DBDS.IE · DUBLIN, IRELAND</p>
     </div>
   </div>
 </div>
 
-<!-- EDIT PROFILE MODAL -->
-<div
-  class="modal-overlay"
-  *ngIf="showEditModal"
-  (click)="closeModalOnOverlay($event)"
-  data-testid="edit-profile-modal-overlay"
->
-  <div class="sharp-modal glass-panel" data-testid="edit-profile-modal">
-    <div class="modal-header-sharp" data-testid="edit-profile-modal-header">
-      <h3 data-testid="edit-profile-modal-title">
-        EDIT_PROFILE // {{ user?.name | uppercase }}
-      </h3>
-
-      <button
-        class="modal-close"
-        (click)="closeEditModal()"
-        aria-label="Close edit profile modal"
-        data-testid="edit-profile-modal-close-button"
-      >
-        ×
-      </button>
+<!-- Edit Profile Modal -->
+<div class="modal-overlay" *ngIf="showEditModal" (click)="closeModalOnOverlay($event)" [@modalEnter]>
+  <div class="sharp-modal glass-panel">
+    <div class="modal-header-sharp">
+      <h3>Edit Profile // {{ user?.name | uppercase }}</h3>
+      <button class="modal-close" (click)="closeEditModal()">×</button>
     </div>
-
-    <form
-      [formGroup]="profileForm"
-      (ngSubmit)="updateProfile()"
-      class="modal-body-sharp"
-      data-testid="edit-profile-form"
-    >
-      <!-- Photo Upload -->
-      <div class="photo-upload-section" data-testid="photo-upload-section">
-        <div class="current-photo" data-testid="current-photo">
-          <img
-            *ngIf="previewUrl || user?.photo_url"
-            [src]="previewUrl || getFullImageUrl(user?.photo_url)"
-            alt="Profile"
-            data-testid="current-profile-image"
-          >
-
-          <div
-            *ngIf="!previewUrl && !user?.photo_url"
-            class="photo-placeholder"
-            data-testid="current-profile-placeholder"
-          >
-            {{ user?.name?.charAt(0) }}
-          </div>
+    <form [formGroup]="profileForm" (ngSubmit)="updateProfile()" class="modal-body-sharp">
+      <!-- photo upload same as before but with light styling -->
+      <div class="photo-upload-section">
+        <div class="current-photo">
+          <img *ngIf="previewUrl || user?.photo_url" [src]="previewUrl || getFullImageUrl(user?.photo_url)" alt="Profile">
+          <div *ngIf="!previewUrl && !user?.photo_url" class="photo-placeholder">{{ user?.name?.charAt(0) }}</div>
         </div>
-
-        <div class="photo-actions" data-testid="photo-actions">
-          <input
-            type="file"
-            #fileInput
-            accept="image/*"
-            (change)="onFileSelected($event)"
-            style="display:none"
-            data-testid="profile-photo-file-input"
-          >
-
-          <button
-            type="button"
-            class="btn-sharp-small"
-            (click)="fileInput.click()"
-            data-testid="upload-new-photo-button"
-          >
-            UPLOAD_NEW
-          </button>
-
-          <button
-            type="button"
-            class="btn-sharp-small danger"
-            (click)="deletePhoto()"
-            *ngIf="user?.photo_url"
-            data-testid="remove-photo-button"
-          >
-            REMOVE
-          </button>
+        <div class="photo-actions">
+          <input type="file" #fileInput accept="image/*" (change)="onFileSelected($event)" style="display:none">
+          <button type="button" class="btn-sharp-small" (click)="fileInput.click()">UPLOAD</button>
+          <button type="button" class="btn-sharp-small" style="background: #ccc; color: #333;" (click)="deletePhoto()" *ngIf="user?.photo_url">REMOVE</button>
         </div>
-
-        <div
-          *ngIf="uploadMessage"
-          class="upload-message"
-          data-testid="upload-message"
-        >
-          {{ uploadMessage }}
-        </div>
+        <div *ngIf="uploadMessage" class="upload-message">{{ uploadMessage }}</div>
       </div>
-
-      <!-- Editable Fields -->
-      <div class="form-row-sharp" data-testid="name-form-row">
-        <label for="profileName" data-testid="name-label">FULL_NAME</label>
-        <input
-          id="profileName"
-          type="text"
-          formControlName="name"
-          class="sharp-input"
-          data-testid="name-input"
-        >
+      <div class="form-row-sharp">
+        <label>Full Name</label>
+        <input type="text" formControlName="name" class="sharp-input">
       </div>
-
-      <div class="form-row-sharp" data-testid="email-form-row">
-        <label for="profileEmail" data-testid="email-label">EMAIL</label>
-        <input
-          id="profileEmail"
-          type="email"
-          formControlName="email"
-          class="sharp-input"
-          data-testid="email-input"
-        >
+      <div class="form-row-sharp">
+        <label>Email</label>
+        <input type="email" formControlName="email" class="sharp-input">
       </div>
-
-      <div class="form-row-sharp" data-testid="phone-form-row">
-        <label for="profilePhone" data-testid="phone-label">PHONE</label>
-        <input
-          id="profilePhone"
-          type="text"
-          formControlName="phone"
-          class="sharp-input"
-          data-testid="phone-input"
-        >
+      <div class="form-row-sharp">
+        <label>Phone</label>
+        <input type="text" formControlName="phone" class="sharp-input">
       </div>
-
-      <div class="form-row-sharp" data-testid="address-form-row">
-        <label for="profileAddress" data-testid="address-label">ADDRESS</label>
-        <textarea
-          id="profileAddress"
-          formControlName="address"
-          class="sharp-input"
-          rows="2"
-          data-testid="address-input"
-        ></textarea>
+      <div class="form-row-sharp">
+        <label>Address</label>
+        <textarea formControlName="address" class="sharp-input" rows="2"></textarea>
       </div>
-
-      <div class="modal-footer-sharp" data-testid="edit-profile-modal-footer">
-        <button
-          type="button"
-          class="btn-sharp-small"
-          (click)="closeEditModal()"
-          data-testid="cancel-profile-edit-button"
-        >
-          CANCEL
-        </button>
-
-        <button
-          type="submit"
-          class="btn-sharp-small primary"
-          [disabled]="isSubmitting"
-          data-testid="save-profile-button"
-        >
-          {{ isSubmitting ? 'SAVING...' : 'SAVE_CHANGES' }}
-        </button>
+      <div class="modal-footer-sharp">
+        <button type="button" class="btn-sharp outline" (click)="closeEditModal()">Cancel</button>
+        <button type="submit" class="btn-sharp" [disabled]="isSubmitting">Save Changes</button>
       </div>
     </form>
   </div>

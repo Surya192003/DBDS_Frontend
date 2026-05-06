@@ -8,7 +8,7 @@ import { ApiService } from '../../services/api.service';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { AnnouncementService } from '../../services/announcement.service';
 import { PostService } from '../../services/post.service';
-import { trigger, transition, style, animate, query, stagger, animateChild } from '@angular/animations';
+import { trigger, transition, style, animate, query, stagger } from '@angular/animations';
 import {environment} from '../../../environments/environment';
 import { firstValueFrom } from 'rxjs';
 
@@ -18,21 +18,31 @@ import { firstValueFrom } from 'rxjs';
   standalone: false,
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css'],
-  animations: [
-  trigger('fadeStagger', [
-    transition(':enter', [
-      query('.glass-card, .section, .hero', [
-        style({ opacity: 0, transform: 'translateY(30px) scale(0.98)' }),
-        stagger(100, [
-          animate('700ms cubic-bezier(0.2, 1, 0.3, 1)', 
-          style({ opacity: 1, transform: 'translateY(0) scale(1)' }))
-        ])
-      ], { optional: true })
+ animations: [
+    trigger('fadeSlide', [
+      transition(':enter', [
+        style({ opacity: 0, transform: 'translateY(20px)' }),
+        animate('0.4s ease-out', style({ opacity: 1, transform: 'translateY(0)' }))
+      ])
+    ]),
+    trigger('cardEnter', [
+      transition('* => *', [
+        query(':enter', [
+          style({ opacity: 0, transform: 'translateY(30px)' }),
+          stagger(100, [
+            animate('0.3s ease-out', style({ opacity: 1, transform: 'translateY(0)' }))
+          ])
+        ], { optional: true })
+      ])
+    ]),
+    trigger('modalEnter', [
+      transition(':enter', [
+        style({ opacity: 0, transform: 'scale(0.95)' }),
+        animate('0.2s ease-out', style({ opacity: 1, transform: 'scale(1)' }))
+      ])
     ])
-  ])
-]
+  ]
 })
-
 
 export class DashboardComponent implements OnInit, OnDestroy {
   user: any = null;
@@ -273,4 +283,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.destroy$.next();
     this.destroy$.complete();
   }
+  toggleDarkLight() {
+  document.body.classList.toggle('light-mode');
+}
 }

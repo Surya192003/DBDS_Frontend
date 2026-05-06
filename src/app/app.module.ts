@@ -15,6 +15,8 @@ import { AuthInterceptor } from './interceptors/auth.interceptor';
 import { ReactiveFormsModule } from '@angular/forms';
 import { GroupsManagementComponent } from './components/groups-management/groups-management.component';
 import { ProfileComponent } from './components/profile/profile.component';
+// app.module.ts (or main.ts if standalone)
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 @NgModule({
   declarations: [
     AppComponent,
@@ -25,7 +27,8 @@ import { ProfileComponent } from './components/profile/profile.component';
     InstructorDashboardComponent,
     StudentDashboardComponent,
     GroupsManagementComponent,
-    ProfileComponent
+    ProfileComponent,
+    
   ],
   imports: [
     BrowserModule,
@@ -33,7 +36,8 @@ import { ProfileComponent } from './components/profile/profile.component';
     HttpClientModule,
     FormsModule,
     CommonModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    BrowserAnimationsModule
   ],
   providers: [
     {

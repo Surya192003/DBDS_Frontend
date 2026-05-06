@@ -24,6 +24,9 @@ export class InstructorDashboardComponent implements OnInit, OnDestroy {
   selectedClass: any = null;
   songLink: string = '';
   currentUser: any;
+  instructorFilter: string = '';
+groupFilter: string = '';
+filteredClasses: any[] = [];
 
   // Statistics
   totalClasses: number = 0;
@@ -114,6 +117,31 @@ export class InstructorDashboardComponent implements OnInit, OnDestroy {
       return this.sanitizer.bypassSecurityTrustResourceUrl(embedUrl);
     }
 
+    get uniqueInstructors(): string[] {
+  return [...new Set(this.classes.map(c => c.instructor_name).filter(Boolean))].sort();
+}
+
+get uniqueGroups(): string[] {
+  return [...new Set(this.classes.map(c => c.group_name).filter(Boolean))].sort();
+}
+
+applyClassFilters() {
+  let result = this.classes;
+  if (this.instructorFilter) {
+    result = result.filter(c => c.instructor_name === this.instructorFilter);
+  }
+  if (this.groupFilter) {
+    result = result.filter(c => c.group_name === this.groupFilter);
+  }
+  this.filteredClasses = result;
+}
+
+resetClassFilters() {
+  this.instructorFilter = '';
+  this.groupFilter = '';
+  this.filteredClasses = [...this.classes];
+}
+
   loadClasses() {
     this.loading = true;
     const sub = this.apiService.getClasses().subscribe({
@@ -122,6 +150,7 @@ export class InstructorDashboardComponent implements OnInit, OnDestroy {
         // 🔧 FIX: Handle both array and object with rows property
         if (Array.isArray(data)) {
           this.classes = data;
+          this.filteredClasses = [...this.classes]; 
         } else if (data?.rows && Array.isArray(data.rows)) {
           this.classes = data.rows;
         } else if (data?.data && Array.isArray(data.data)) {

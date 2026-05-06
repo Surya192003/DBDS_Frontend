@@ -1,0 +1,101 @@
+<nav class="light-nav" [class.nav-hidden]="!isNavVisible">
+  <div class="nav-inner">
+    <!-- Brand -->
+    <a class="nav-brand" routerLink="/dashboard" (click)="isMenuOpen = false">
+      <img src="assets/images/dbds-logo.png" alt="DBDS Logo" class="logo" />
+      <span class="brand-text">
+        <span class="brand-main">DBDS</span>
+        <span class="brand-sub">IRELAND</span>
+      </span>
+    </a>
+
+    <!-- Mobile toggle button -->
+    <button class="menu-toggle" (click)="isMenuOpen = !isMenuOpen" aria-label="Menu">
+      <span class="toggle-bar" [class.open]="isMenuOpen"></span>
+      <span class="toggle-bar" [class.open]="isMenuOpen"></span>
+      <span class="toggle-bar" [class.open]="isMenuOpen"></span>
+    </button>
+
+    <!-- Navigation content (shows on desktop, toggles on mobile) -->
+    <div class="nav-content" [class.mobile-open]="isMenuOpen">
+      <div class="nav-links">
+        <a
+          class="nav-link"
+          routerLink="/dashboard"
+          routerLinkActive="active"
+          (click)="isMenuOpen = false"
+        >
+          <span>🏠</span> Dashboard
+        </a>
+
+        <ng-container *ngIf="!isAuthenticated">
+          <a
+            class="nav-link"
+            routerLink="/login"
+            routerLinkActive="active"
+            (click)="isMenuOpen = false"
+          >
+            <span>🔑</span> Login
+          </a>
+          <a
+            class="nav-link nav-link--cta"
+            routerLink="/register"
+            routerLinkActive="active"
+            (click)="isMenuOpen = false"
+          >
+            <span>✨</span> Join Now
+          </a>
+        </ng-container>
+
+        <ng-container *ngIf="isAuthenticated">
+          <a
+            *ngIf="user?.role === 'ADMIN'"
+            class="nav-link"
+            routerLink="/admin"
+            routerLinkActive="active"
+            (click)="isMenuOpen = false"
+          >
+            <span>⚙️</span> Admin
+          </a>
+          <a
+            *ngIf="user?.role === 'INSTRUCTOR'"
+            class="nav-link"
+            routerLink="/instructor"
+            routerLinkActive="active"
+            (click)="isMenuOpen = false"
+          >
+            <span>🎓</span> Instructor
+          </a>
+          <a
+            *ngIf="user?.role === 'STUDENT'"
+            class="nav-link"
+            routerLink="/student"
+            routerLinkActive="active"
+            (click)="isMenuOpen = false"
+          >
+            <span>📚</span> Learning
+          </a>
+        </ng-container>
+      </div>
+
+      <!-- User pill (only when logged in) -->
+      <div class="user-pill" *ngIf="isAuthenticated">
+        <div class="pill-avatar">
+          <img *ngIf="user?.photo_url" [src]="getFullImageUrl(user.photo_url)" alt="User" />
+          <span *ngIf="!user?.photo_url" class="avatar-placeholder">{{ user?.name?.charAt(0) }}</span>
+        </div>
+        <div class="pill-info">
+          <span class="pill-name">{{ user?.name | uppercase }}</span>
+          <span class="pill-role">{{ user?.role }}</span>
+        </div>
+        <button class="logout-btn" (click)="logout()" title="Logout">
+          <span>⏻</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<div class="page-view">
+  <router-outlet></router-outlet>
+</div>

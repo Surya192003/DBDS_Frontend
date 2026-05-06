@@ -41,6 +41,40 @@
       </div>
 
       <div class="table-container" *ngIf="!loading && classes.length > 0">
+         <!-- FILTER BAR -->
+    <div class="filter-bar">
+      <div class="filter-field">
+        <label class="filter-label"><i class="bi bi-person-badge me-1"></i> Instructor</label>
+        <select
+          class="sharp-input filter-select"
+          [(ngModel)]="instructorFilter"
+          (change)="applyClassFilters()"
+        >
+          <option value="">All Instructors</option>
+          <option *ngFor="let inst of uniqueInstructors" [value]="inst">{{ inst }}</option>
+        </select>
+      </div>
+
+      <div class="filter-field">
+        <label class="filter-label"><i class="bi bi-people me-1"></i> Group</label>
+        <select
+          class="sharp-input filter-select"
+          [(ngModel)]="groupFilter"
+          (change)="applyClassFilters()"
+        >
+          <option value="">All Groups</option>
+          <option *ngFor="let grp of uniqueGroups" [value]="grp">{{ grp }}</option>
+        </select>
+      </div>
+
+      <button
+        class="btn-glass btn-sm filter-reset"
+        (click)="resetClassFilters()"
+        [disabled]="!instructorFilter && !groupFilter"
+      >
+        <i class="bi bi-arrow-counterclockwise"></i> Clear
+      </button>
+    </div>
         <table class="sharp-table">
           <thead>
             <tr>
@@ -52,7 +86,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let classItem of classes">
+            <tr *ngFor="let classItem of filteredClasses">
               <td>
                 <div class="fw-bold">{{classItem.class_name}}</div>
                 <div class="muted-id">ID: #{{classItem.id}}</div>

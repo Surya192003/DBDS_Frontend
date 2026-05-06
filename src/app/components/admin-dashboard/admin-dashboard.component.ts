@@ -63,6 +63,10 @@ export class AdminDashboardComponent implements OnInit {
   announcements: any[] = [];
   posts: any[] = [];
 
+  instructorFilter: string = '';
+groupFilter: string = '';
+filteredClasses: any[] = [];
+
   // Modal flags and forms
   // showAnnouncementModal = false;
   // showPostModal = false;
@@ -198,7 +202,11 @@ export class AdminDashboardComponent implements OnInit {
   this.loadingClasses = true;
   this.apiService.getAllClassesForAdmin().subscribe({
     next: (data: any) => {
+      console.log('Classes response:', data);           // ← add
       this.classes = data;
+      this.filteredClasses = [...this.classes];
+      // this.filteredClasses = [{ id: 1, class_date: new Date(), class_time: '10:00', instructor_name: 'Test', group_name: 'Test' }];
+      console.log('Loaded classes:', this.classes.length); // ← add
       this.loadingClasses = false;
     },
     error: (error) => {
@@ -370,6 +378,38 @@ export class AdminDashboardComponent implements OnInit {
       });
     }
   }
+
+  get uniqueInstructors(): string[] {
+  const names = this.classes
+    .map(c => c.instructor_name)
+    .filter((name, i, arr) => name && arr.indexOf(name) === i);
+  return names.sort();
+}
+
+get uniqueGroups(): string[] {
+  const groups = this.classes
+    .map(c => c.group_name)
+    .filter((name, i, arr) => name && arr.indexOf(name) === i);
+  return groups.sort();
+}
+
+applyClassFilters() {
+  let result = this.classes;
+  if (this.instructorFilter) {
+    result = result.filter(c => c.instructor_name === this.instructorFilter);
+  }
+  if (this.groupFilter) {
+    result = result.filter(c => c.group_name === this.groupFilter);
+  }
+  this.filteredClasses = result;
+}
+
+resetClassFilters() {
+  this.instructorFilter = '';
+  this.groupFilter = '';
+  this.filteredClasses = [...this.classes];
+}
+
 
   // User Management
   toggleUserStatus(userId: number) {

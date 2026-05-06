@@ -90,83 +90,120 @@
   </div>
 
   <!-- Class Management Section -->
-  <div class="row mb-4">
-    <div class="col-12">
-      <div class="glass-panel">
-        <div class="panel-header">
-          <h5 class="panel-title">
-            <i class="bi bi-calendar-week accent me-2"></i>Class Management
-          </h5>
-          <button class="btn-glass btn-sm" (click)="openCreateClassModal()">
-            <i class="bi bi-plus-circle me-1"></i> Add New Class
-          </button>
-        </div>
-        <div class="panel-body">
-          <div *ngIf="loadingClasses" class="text-center py-4">
-            <div class="spinner accent"></div>
-            <p class="mt-2 text-muted">Loading classes...</p>
-          </div>
+  <!-- ==================== CLASS MANAGEMENT ==================== -->
+<div class="glass-panel">
+  <div class="panel-header">
+    <h5 class="panel-title">
+      <i class="bi bi-calendar-week me-2"></i>Class Management
+    </h5>
+    <button class="btn-glass btn-sm" (click)="openCreateClassModal()">
+      <i class="bi bi-plus-circle me-1"></i> Add New Class
+    </button>
+  </div>
 
-          <div *ngIf="!loadingClasses">
-            <div *ngIf="classes.length === 0" class="empty-state">
-              <i class="bi bi-calendar-x empty-icon"></i>
-              <h5>No Classes Found</h5>
-              <p>Start by creating your first class</p>
-              <button class="btn-glass" (click)="openCreateClassModal()">
-                <i class="bi bi-plus-circle me-1"></i> Create First Class
-              </button>
-            </div>
+  <div class="panel-body">
+    <!-- FILTER BAR -->
+    <div class="filter-bar">
+      <div class="filter-field">
+        <label class="filter-label"><i class="bi bi-person-badge me-1"></i> Instructor</label>
+        <select
+          class="sharp-input filter-select"
+          [(ngModel)]="instructorFilter"
+          (change)="applyClassFilters()"
+        >
+          <option value="">All Instructors</option>
+          <option *ngFor="let inst of uniqueInstructors" [value]="inst">{{ inst }}</option>
+        </select>
+      </div>
 
-            <div *ngIf="classes.length > 0" class="table-responsive">
-              <table class="glass-table">
-                <thead>
-                  <tr>
-                    <th>ID</th>
-                    <th>Date</th>
-                    <th>Time</th>
-                    <th>Instructor</th>
-                    <th>Song</th>
-                    <th>Attendance</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr *ngFor="let classItem of classes">
-                    <td class="text-muted">#{{classItem.id}}</td>
-                    <td><strong>{{classItem.class_date | date:'dd MMM yyyy'}}</strong></td>
-                    <td><span class="badge">{{classItem.class_time}}</span></td>
-                    <td>
-                      <div *ngIf="classItem.instructor_name">
-                        <div class="fw-medium">{{classItem.instructor_name}}</div>
-                        <small class="text-muted">{{classItem.instructor_email}}</small>
-                      </div>
-                      <span *ngIf="!classItem.instructor_name" class="text-muted fst-italic">Not Assigned</span>
-                    </td>
-                    <td>
-                      <a *ngIf="classItem.song_link" [href]="classItem.song_link" target="_blank" class="btn-glass btn-sm">
-                        <i class="bi bi-music-note-beamed"></i> Listen
-                      </a>
-                      <span *ngIf="!classItem.song_link" class="text-muted"><i class="bi bi-music-note"></i> Not set</span>
-                    </td>
-                    <td>
-                      <span class="badge accent-badge">{{classItem.attendance_count || 0}} <i class="bi bi-person"></i></span>
-                    </td>
-                    <td>
-                      <div class="btn-group-sm">
-                        <button class="btn-glass btn-sm danger" (click)="deleteClass(classItem.id)" title="Delete"><i class="bi bi-trash"></i></button>
-                        <button class="btn-glass btn-sm" (click)="openAssignStudentModal(classItem)" title="Assign"><i class="bi bi-person-plus"></i></button>
-                      </div>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
+      <div class="filter-field">
+        <label class="filter-label"><i class="bi bi-people me-1"></i> Group</label>
+        <select
+          class="sharp-input filter-select"
+          [(ngModel)]="groupFilter"
+          (change)="applyClassFilters()"
+        >
+          <option value="">All Groups</option>
+          <option *ngFor="let grp of uniqueGroups" [value]="grp">{{ grp }}</option>
+        </select>
+      </div>
+
+      <button
+        class="btn-glass btn-sm filter-reset"
+        (click)="resetClassFilters()"
+        [disabled]="!instructorFilter && !groupFilter"
+      >
+        <i class="bi bi-arrow-counterclockwise"></i> Clear
+      </button>
+    </div>
+
+    <!-- Loading state -->
+    <div *ngIf="loadingClasses" class="text-center py-4">
+      <div class="spinner accent"></div>
+      <p class="mt-2 text-muted">Loading classes...</p>
+    </div>
+
+    <!-- Empty state or table -->
+    <div *ngIf="!loadingClasses">
+      <div *ngIf="filteredClasses.length === 0" class="empty-state">
+        <i class="bi bi-calendar-x empty-icon"></i>
+        <h5>No Classes Found</h5>
+        <p *ngIf="instructorFilter || groupFilter">
+          Try clearing filters or adjusting your selection.
+        </p>
+        <p *ngIf="!instructorFilter && !groupFilter">Start by creating your first class</p>
+        <button class="btn-glass" (click)="openCreateClassModal()">
+          <i class="bi bi-plus-circle me-1"></i> Create First Class
+        </button>
+      </div>
+
+      <div *ngIf="filteredClasses.length > 0" class="table-responsive">
+        <table class="glass-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Date</th>
+              <th>Time</th>
+              <th>Instructor</th>
+              <th>Song</th>
+              <th>Attendance</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let classItem of filteredClasses">
+              <td class="text-muted">#{{classItem.id}}</td>
+              <td><strong>{{classItem.class_date | date:'dd MMM yyyy'}}</strong></td>
+              <td><span class="badge">{{classItem.class_time}}</span></td>
+              <td>
+                <div *ngIf="classItem.instructor_name">
+                  <div class="fw-medium">{{classItem.instructor_name}}</div>
+                  <small class="text-muted">{{classItem.instructor_email}}</small>
+                </div>
+                <span *ngIf="!classItem.instructor_name" class="text-muted fst-italic">Not Assigned</span>
+              </td>
+              <td>
+                <a *ngIf="classItem.song_link" [href]="classItem.song_link" target="_blank" class="btn-glass btn-sm">
+                  <i class="bi bi-music-note-beamed"></i> Listen
+                </a>
+                <span *ngIf="!classItem.song_link" class="text-muted"><i class="bi bi-music-note"></i> Not set</span>
+              </td>
+              <td>
+                <span class="badge accent-badge">{{classItem.attendance_count || 0}} <i class="bi bi-person"></i></span>
+              </td>
+              <td>
+                <div class="btn-group-sm">
+                  <button class="btn-glass btn-sm danger" (click)="deleteClass(classItem.id)" title="Delete"><i class="bi bi-trash"></i></button>
+                  <button class="btn-glass btn-sm" (click)="openAssignStudentModal(classItem)" title="Assign"><i class="bi bi-person-plus"></i></button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
   </div>
-
+</div>
   <!-- User Management & Payments Section -->
   <div class="row mb-4">
     <!-- User Management -->

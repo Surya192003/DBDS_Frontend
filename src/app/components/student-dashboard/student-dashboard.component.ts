@@ -20,6 +20,9 @@ export class StudentDashboardComponent implements OnInit {
   posts: any[] = [];
   loading = false;
   currentUser: any;
+  historySearchTerm: string = '';
+historyStatusFilter: string = 'ALL';
+filteredAttendanceHistory: any[] = [];
   today: string|number|Date|null = new Date();
 
   constructor(
@@ -51,6 +54,7 @@ export class StudentDashboardComponent implements OnInit {
         this.allClasses = results.allClasses;
         this.upcomingClasses = results.upcoming;
         this.attendanceHistory = results.attendance;
+        this.filteredAttendanceHistory = [...this.attendanceHistory];
         this.announcements = results.myAnnouncements;
         this.posts = results.posts;
         this.calculateSummary();
@@ -68,6 +72,33 @@ export class StudentDashboardComponent implements OnInit {
     this.attendanceSummary.present = this.attendanceHistory.filter(r => r.is_present).length;
     this.attendanceSummary.absent = this.attendanceSummary.totalClasses - this.attendanceSummary.present;
   }
+  applyHistoryFilters() {
+  let result = this.attendanceHistory;
+
+  // Filter by search term
+  if (this.historySearchTerm?.trim()) {
+    const term = this.historySearchTerm.trim().toLowerCase();
+    result = result.filter(record => {
+      const className = this.getClassName(record.class_id).toLowerCase();
+      return className.includes(term);
+    });
+  }
+
+  // Filter by status
+  if (this.historyStatusFilter === 'PRESENT') {
+    result = result.filter(record => record.is_present);
+  } else if (this.historyStatusFilter === 'ABSENT') {
+    result = result.filter(record => !record.is_present);
+  }
+
+  this.filteredAttendanceHistory = result;
+}
+
+resetHistoryFilters() {
+  this.historySearchTerm = '';
+  this.historyStatusFilter = 'ALL';
+  this.filteredAttendanceHistory = [...this.attendanceHistory];
+}
 
   getClassName(classId: number): string {
     const classItem = this.allClasses.find(c => c.id === classId);
