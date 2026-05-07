@@ -36,7 +36,7 @@
           <a routerLink="/register" class="btn-sharp-large">JOIN NOW</a>
           <a routerLink="/login" class="btn-sharp-large outline">LOGIN</a>
         </div>
-        <div class="hero-greeting" *ngIf="user">
+        <div class="herof-greeting" *ngIf="user">
           <p>Welcome back, <strong>{{ user.name }}</strong>!</p>
         </div>
       </div>
@@ -51,7 +51,7 @@
         <h2 class="section-label" style="margin:0 0 20px;font-weight:800;">Latest Announcements</h2>
         <div class="category-filters">
           <button *ngFor="let cat of categories" (click)="filterAnnouncements(cat)"
-                  [class.active]="selectedCategory === cat" class="btn-sharp-small outline">
+            [class.active]="selectedCategory === cat" class="btn-sharp-small outline">
             {{ cat }}
           </button>
         </div>
@@ -59,15 +59,22 @@
       <div class="announcement-grid" [@cardEnter]="filteredAnnouncements.length">
         <div *ngFor="let ann of filteredAnnouncements" class="announcement-card glass-card">
           <div class="media-preview">
-            <img *ngIf="ann.media_type === 'IMAGE'" [src]="ann.image_storage || ann.media_url" [alt]="ann.title">
-            <iframe *ngIf="ann.media_type === 'VIDEO'" [src]="sanitizeUrl(ann.media_url)" frameborder="0" allowfullscreen></iframe>
+            <img *ngIf="ann.media_type === 'IMAGE'" [src]="ann.fullImageUrl" [alt]="ann.title" />
+
+            <iframe *ngIf="ann.media_type === 'VIDEO'" [src]="ann.safeVideoUrl" frameborder="0" allowfullscreen
+              loading="lazy" title="Announcement video"></iframe>
           </div>
           <div class="announcement-content">
             <span class="category-badge">{{ ann.category }}</span>
             <h4>{{ ann.title }}</h4>
             <p>{{ ann.description }}</p>
+            <div class="event-datetime" *ngIf="ann.event_date">
+              📅 {{ ann.event_date | date:'mediumDate' }}
+              <span *ngIf="ann.event_start_time"> • {{ formatTime(ann.event_start_time) }}</span>
+            </div>
             <div *ngIf="ann.registration_enabled" class="register-area">
-              <button *ngIf="!ann.user_registered && user" class="btn-sharp-small" (click)="registerForAnnouncement(ann.id)">REGISTER</button>
+              <button *ngIf="!ann.user_registered && user" class="btn-sharp-small"
+                (click)="registerForAnnouncement(ann.id)">REGISTER</button>
               <span *ngIf="ann.user_registered" class="registered-badge">REGISTERED</span>
               <span *ngIf="ann.registration_type === 'PAID'" class="price-badge">€{{ ann.price }}</span>
               <a *ngIf="!user" routerLink="/login" class="login-link">Login to register</a>
@@ -84,7 +91,8 @@
       <div class="posts-feed">
         <div *ngFor="let post of posts" class="post-card glass-card">
           <div class="video-wrapper">
-            <iframe [src]="sanitizeUrl(post.video_url)" frameborder="0" allowfullscreen></iframe>
+            <iframe [src]="post.safeVideoUrl" frameborder="0" allowfullscreen loading="lazy"
+              title="Dance video"></iframe>
           </div>
           <h4>{{ post.title }}</h4>
           <p>{{ post.description }}</p>
@@ -115,13 +123,15 @@
       <!-- photo upload same as before but with light styling -->
       <div class="photo-upload-section">
         <div class="current-photo">
-          <img *ngIf="previewUrl || user?.photo_url" [src]="previewUrl || getFullImageUrl(user?.photo_url)" alt="Profile">
+          <img *ngIf="previewUrl || user?.photo_url" [src]="previewUrl || getFullImageUrl(user?.photo_url)"
+            alt="Profile">
           <div *ngIf="!previewUrl && !user?.photo_url" class="photo-placeholder">{{ user?.name?.charAt(0) }}</div>
         </div>
         <div class="photo-actions">
           <input type="file" #fileInput accept="image/*" (change)="onFileSelected($event)" style="display:none">
           <button type="button" class="btn-sharp-small" (click)="fileInput.click()">UPLOAD</button>
-          <button type="button" class="btn-sharp-small" style="background: #ccc; color: #333;" (click)="deletePhoto()" *ngIf="user?.photo_url">REMOVE</button>
+          <button type="button" class="btn-sharp-small" style="background: #ccc; color: #333;" (click)="deletePhoto()"
+            *ngIf="user?.photo_url">REMOVE</button>
         </div>
         <div *ngIf="uploadMessage" class="upload-message">{{ uploadMessage }}</div>
       </div>

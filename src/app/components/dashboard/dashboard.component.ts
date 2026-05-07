@@ -61,18 +61,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
   selectedCategory = 'EVENTS';
   private destroy$ = new Subject<void>();
 
-  // Dance classes (same as before)
-  danceClasses = [
-    { name: 'BOLLYWOOD DANCE', description: 'Bollywood dance classes for all ages starting from 5 years', icon: '💃', link: 'https://www.dbds.ie/service-page/bollywood-dance-classes-kids?referral=service_list_widget' },
-    { name: 'HIP HOP DANCE', description: 'Energetic Hip‑Hop classes for all levels', icon: '🕺', link: 'https://www.dbds.ie/service-page/hip-hop-dance-class?referral=service_list_widget' },
-    { name: 'BHANGRA DANCE', description: 'Vibrant, colorful, energetic Punjabi folk dance', icon: '🥁', link: 'https://www.dbds.ie/service-page/hip-hop-dance-class?referral=service_list_widget' },
-    { name: 'KATHAK DANCE', description: 'Classical Indian dance with graceful movements', icon: '✨', link: 'https://www.dbds.ie/booking-calendar/kathak-dance-class?referral=service_list_widget' },
-    { name: 'BHARATANATYAM', description: 'Ancient classical dance form of South India', icon: '🪭', link: 'https://www.dbds.ie/booking-calendar/bharatanatyam-dance?referral=service_list_widget' },
-    { name: 'BOLLYWOOD FITNESS', description: 'Fun fitness with Bollywood music', icon: '🏋️', link: 'https://www.dbds.ie/service-page/bollywood-fitness-class-adults-sword?referral=service_list_widget' },
-    { name: 'CERTIFICATION COURSE', description: '1‑Year Certificate in Bollywood Dance & Music', icon: '📜', link: 'https://www.dbds.ie/service-page/certificate-in-bollywood-dance-and-music?referral=service_list_widget' },
-    { name: 'KIDS BOLLYWOOD', description: 'Special classes for children 5+ years', icon: '🧒', link: 'https://www.dbds.ie/booking-calendar/bollywood-dance-classes-adults-in-dublin?referral=service_list_widget' }
-  ];
-
   constructor(
     private authService: AuthService,
     private apiService: ApiService,
@@ -107,27 +95,37 @@ export class DashboardComponent implements OnInit, OnDestroy {
       });
     this.loadAnnouncements();
     this.loadPosts();
+    this.loadingInitial = false;
   }
 
   loadAnnouncements() {
-    this.announcementService.getAll().subscribe(data => {
-      this.announcements = data;
-      this.filterAnnouncements(this.selectedCategory);
-      this.loadingInitial = false;
-    });
-  }
+  this.announcementService.getAll().subscribe((data: any[]) => {
+    this.announcements = data.map(ann => ({
+      ...ann,
+      // full image URL (using an absolute path)
+      fullImageUrl: this.getFullImageUrl(ann.image_storage || ann.media_url),
+      // pre‑sanitized video URL for iframes
+      safeVideoUrl: ann.media_type === 'VIDEO'
+        ? this.sanitizeUrl(ann.media_url)
+        : null,
+    }));
+    this.filterAnnouncements(this.selectedCategory); // re‑apply filter if needed
+  });
+}
+
   filterAnnouncements(category: string) {
     this.selectedCategory = category;
     this.filteredAnnouncements = this.announcements.filter(a => a.category === category);
   }
 
-  loadPosts() {
-    this.postService.getAll().subscribe(data => {
-      this.posts = data;
-      this.loadingInitial = false;
-    });
-  }
-
+ loadPosts() {
+  this.postService.getAll().subscribe((data: any[]) => {
+    this.posts = data.map(post => ({
+      ...post,
+      safeVideoUrl: this.sanitizeUrl(post.video_url),
+    }));
+  });
+}
   registerForAnnouncement(id: number) {
     if (!this.user) return;
     this.announcementService.register(id).subscribe({
@@ -253,10 +251,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 }
 
-  comingSoon(feature: string) {
-    alert(`${feature} — Coming Soon! 🚀`);
-  }
-
   navigateToClass(danceClass: any) {
     const url = danceClass.link;
     // If user not logged in, redirect to login with return URL
@@ -274,10 +268,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   getFullImageUrl(relativePath: string): string {
   if (!relativePath) return '';
-  if (relativePath.startsWith('http')) return relativePath;
-  const base = environment.apiBaseUrl ? environment.apiBaseUrl.replace(/\/$/, '') : '';
-  const path = relativePath.startsWith('/') ? relativePath : `/${relativePath}`;
-  return `${base}${path}`;
+  if (relativePath.startsWith('http')) return relativePath; // already full
+  return environment.apiBaseUrl + relativePath;
 }
   ngOnDestroy() {
     this.destroy$.next();
@@ -285,5 +277,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
   toggleDarkLight() {
   document.body.classList.toggle('light-mode');
+}
+formatTime(time: string): string {
+  return time ? time.substring(0, 5) : '';   // "HH:MM"
 }
 }

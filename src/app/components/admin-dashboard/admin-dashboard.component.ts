@@ -64,8 +64,8 @@ export class AdminDashboardComponent implements OnInit {
   posts: any[] = [];
 
   instructorFilter: string = '';
-groupFilter: string = '';
-filteredClasses: any[] = [];
+  groupFilter: string = '';
+  filteredClasses: any[] = [];
 
   // Modal flags and forms
   // showAnnouncementModal = false;
@@ -95,7 +95,7 @@ filteredClasses: any[] = [];
   selectedStudent: any = null;
   selectedClass: any = null;
   loadingStudents: boolean = false;
-  
+
 
 
   today: string = new Date().toISOString().split('T')[0];
@@ -132,7 +132,9 @@ filteredClasses: any[] = [];
       media_url: [''],
       registration_enabled: [false],
       registration_type: ['FREE'],
-      price: [0]
+      price: [0],
+      event_date: [''],          // add
+      event_start_time: ['']     // add
     });
     this.postForm = this.fb.group({
       title: [''],
@@ -199,23 +201,23 @@ filteredClasses: any[] = [];
   }
 
   loadClasses() {
-  this.loadingClasses = true;
-  this.apiService.getAllClassesForAdmin().subscribe({
-    next: (data: any) => {
-      console.log('Classes response:', data);           // ← add
-      this.classes = data;
-      this.filteredClasses = [...this.classes];
-      // this.filteredClasses = [{ id: 1, class_date: new Date(), class_time: '10:00', instructor_name: 'Test', group_name: 'Test' }];
-      console.log('Loaded classes:', this.classes.length); // ← add
-      this.loadingClasses = false;
-    },
-    error: (error) => {
-      console.error('Error loading classes:', error);
-      this.errorMessage = 'Failed to load classes: ' + error.message;
-      this.loadingClasses = false;
-    }
-  });
-}
+    this.loadingClasses = true;
+    this.apiService.getAllClassesForAdmin().subscribe({
+      next: (data: any) => {
+        console.log('Classes response:', data);           // ← add
+        this.classes = data;
+        this.filteredClasses = [...this.classes];
+        // this.filteredClasses = [{ id: 1, class_date: new Date(), class_time: '10:00', instructor_name: 'Test', group_name: 'Test' }];
+        console.log('Loaded classes:', this.classes.length); // ← add
+        this.loadingClasses = false;
+      },
+      error: (error) => {
+        console.error('Error loading classes:', error);
+        this.errorMessage = 'Failed to load classes: ' + error.message;
+        this.loadingClasses = false;
+      }
+    });
+  }
 
   // Update the loadActiveInstructors method
   loadActiveInstructors() {
@@ -291,16 +293,16 @@ filteredClasses: any[] = [];
   }
 
   loadInstructorStats() {
-  this.apiService.getInstructorTagSummary().subscribe({
-    next: (data: any) => {
-      this.instructorStats = data;
-    },
-    error: (error) => {
-      console.error('Error loading instructor tag summary:', error);
-      this.instructorStats = [];
-    }
-  });
-}
+    this.apiService.getInstructorTagSummary().subscribe({
+      next: (data: any) => {
+        this.instructorStats = data;
+      },
+      error: (error) => {
+        console.error('Error loading instructor tag summary:', error);
+        this.instructorStats = [];
+      }
+    });
+  }
 
   // Modal Methods
   openCreateClassModal() {
@@ -333,8 +335,8 @@ filteredClasses: any[] = [];
 
   // Class Management
   createClass() {
-     console.log('createClass called, form valid?', this.classForm.valid);
-  console.log('Form value:', this.classForm.value);
+    console.log('createClass called, form valid?', this.classForm.valid);
+    console.log('Form value:', this.classForm.value);
     if (this.classForm.valid) {
       this.creatingClass = true;
       this.setFormDisabled(true);
@@ -380,35 +382,35 @@ filteredClasses: any[] = [];
   }
 
   get uniqueInstructors(): string[] {
-  const names = this.classes
-    .map(c => c.instructor_name)
-    .filter((name, i, arr) => name && arr.indexOf(name) === i);
-  return names.sort();
-}
-
-get uniqueGroups(): string[] {
-  const groups = this.classes
-    .map(c => c.group_name)
-    .filter((name, i, arr) => name && arr.indexOf(name) === i);
-  return groups.sort();
-}
-
-applyClassFilters() {
-  let result = this.classes;
-  if (this.instructorFilter) {
-    result = result.filter(c => c.instructor_name === this.instructorFilter);
+    const names = this.classes
+      .map(c => c.instructor_name)
+      .filter((name, i, arr) => name && arr.indexOf(name) === i);
+    return names.sort();
   }
-  if (this.groupFilter) {
-    result = result.filter(c => c.group_name === this.groupFilter);
-  }
-  this.filteredClasses = result;
-}
 
-resetClassFilters() {
-  this.instructorFilter = '';
-  this.groupFilter = '';
-  this.filteredClasses = [...this.classes];
-}
+  get uniqueGroups(): string[] {
+    const groups = this.classes
+      .map(c => c.group_name)
+      .filter((name, i, arr) => name && arr.indexOf(name) === i);
+    return groups.sort();
+  }
+
+  applyClassFilters() {
+    let result = this.classes;
+    if (this.instructorFilter) {
+      result = result.filter(c => c.instructor_name === this.instructorFilter);
+    }
+    if (this.groupFilter) {
+      result = result.filter(c => c.group_name === this.groupFilter);
+    }
+    this.filteredClasses = result;
+  }
+
+  resetClassFilters() {
+    this.instructorFilter = '';
+    this.groupFilter = '';
+    this.filteredClasses = [...this.classes];
+  }
 
 
   // User Management
@@ -527,63 +529,65 @@ resetClassFilters() {
   }
 
   getTotalMissed(): number {
-  return this.filteredStudentStats.reduce((total, stat) => total + (stat.total_classes - stat.attended_classes), 0);
-}
-  getMissedClasses(stat: any): number {
-  return (stat.total_classes || 0) - (stat.attended_classes || 0);
-}
-
-
-loadAnnouncements() {
-  this.announcementService.getAll().subscribe(data => this.announcements = data);
-}
-loadPosts() {
-  this.postService.getAll().subscribe(data => this.posts = data);
-}
-openAnnouncementModal(announcement?: any) {
-  if (announcement) {
-    this.editingAnnouncementId = announcement.id;
-    this.announcementForm?.patchValue(announcement);
-  } else {
-    this.editingAnnouncementId = null;
-    this.announcementForm?.reset({
-      category: 'EVENTS',
-      media_type: 'IMAGE',
-      registration_enabled: false,
-      registration_type: 'FREE',
-      price: 0
-    });
+    return this.filteredStudentStats.reduce((total, stat) => total + (stat.total_classes - stat.attended_classes), 0);
   }
-  this.selectedFile = null;
-  this.modalService.openModal('announcementModal');
-}
+  getMissedClasses(stat: any): number {
+    return (stat.total_classes || 0) - (stat.attended_classes || 0);
+  }
+
+
+  loadAnnouncements() {
+    this.announcementService.getAll().subscribe(data => this.announcements = data);
+  }
+  loadPosts() {
+    this.postService.getAll().subscribe(data => this.posts = data);
+  }
+  openAnnouncementModal(announcement?: any) {
+    if (announcement) {
+      this.editingAnnouncementId = announcement.id;
+      this.announcementForm?.patchValue(announcement);
+    } else {
+      this.editingAnnouncementId = null;
+      this.announcementForm?.reset({
+        category: 'EVENTS',
+        media_type: 'IMAGE',
+        registration_enabled: false,
+        registration_type: 'FREE',
+        price: 0,
+        event_date: [''],
+        event_start_time: ['']
+      });
+    }
+    this.selectedFile = null;
+    this.modalService.openModal('announcementModal');
+  }
 
   onFileSelected(event: Event) {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files[0]) this.selectedFile = input.files[0];
   }
 
- saveAnnouncement() {
-  if (!this.announcementForm || this.announcementForm.invalid) return;
-  const formData = new FormData();
-  Object.keys(this.announcementForm.value).forEach(key => {
-    let val = this.announcementForm?.value[key];
-    if (val !== undefined && val !== null) formData.append(key, val);
-  });
-  if (this.selectedFile) formData.append('image', this.selectedFile);
+  saveAnnouncement() {
+    if (!this.announcementForm || this.announcementForm.invalid) return;
+    const formData = new FormData();
+    Object.keys(this.announcementForm.value).forEach(key => {
+      let val = this.announcementForm?.value[key];
+      if (val !== undefined && val !== null) formData.append(key, val);
+    });
+    if (this.selectedFile) formData.append('image', this.selectedFile);
 
-  const request = this.editingAnnouncementId
-    ? this.announcementService.update(this.editingAnnouncementId, formData)
-    : this.announcementService.create(formData);
-  request.subscribe({
-    next: () => {
-      this.loadAnnouncements();
-      this.modalService.closeModal('announcementModal');   // ✅ close properly
-      alert('Announcement saved');
-    },
-    error: (err) => alert('Error: ' + err.error?.error)
-  });
-}
+    const request = this.editingAnnouncementId
+      ? this.announcementService.update(this.editingAnnouncementId, formData)
+      : this.announcementService.create(formData);
+    request.subscribe({
+      next: () => {
+        this.loadAnnouncements();
+        this.modalService.closeModal('announcementModal');   // ✅ close properly
+        alert('Announcement saved');
+      },
+      error: (err) => alert('Error: ' + err.error?.error)
+    });
+  }
 
   deleteAnnouncement(id: number) {
     if (confirm('Delete this announcement?')) {
@@ -601,37 +605,37 @@ openAnnouncementModal(announcement?: any) {
   // Posts CRUD
   // ------------------------------
   openPostModal(post?: any) {
-  if (post) {
-    this.editingPostId = post.id;
-    this.postForm?.patchValue(post);
-  } else {
-    this.editingPostId = null;
-    this.postForm?.reset();
+    if (post) {
+      this.editingPostId = post.id;
+      this.postForm?.patchValue(post);
+    } else {
+      this.editingPostId = null;
+      this.postForm?.reset();
+    }
+    this.modalService.openModal('postModal');
   }
-  this.modalService.openModal('postModal');
-}
   savePost() {
-  if (!this.postForm || this.postForm.invalid) return;
-  const formValue = this.postForm.value;
-  const request = this.editingPostId
-    ? this.postService.update(this.editingPostId, formValue)
-    : this.postService.create(formValue);
-  request.subscribe({
-    next: () => {
-      this.loadPosts();
-      this.modalService.closeModal('postModal');    // ✅ close properly
-      alert('Post saved');
-    },
-    error: (err) => alert('Error: ' + err.error?.error)
-  });
-}
+    if (!this.postForm || this.postForm.invalid) return;
+    const formValue = this.postForm.value;
+    const request = this.editingPostId
+      ? this.postService.update(this.editingPostId, formValue)
+      : this.postService.create(formValue);
+    request.subscribe({
+      next: () => {
+        this.loadPosts();
+        this.modalService.closeModal('postModal');    // ✅ close properly
+        alert('Post saved');
+      },
+      error: (err) => alert('Error: ' + err.error?.error)
+    });
+  }
 
   deletePost(id: number) {
     if (confirm('Delete this post?')) {
       this.postService.delete(id).subscribe(() => this.loadPosts());
     }
   }
-  
+
 
   getOverallAttendancePercentage(): number {
     const total = this.getTotalClasses();
@@ -721,19 +725,19 @@ openAnnouncementModal(announcement?: any) {
     });
   }
   deleteUser(userId: number) {
-  if (confirm(`Are you sure you want to delete this user? This action cannot be undone and will delete all associated data.`)) {
-    this.apiService.deleteUser(userId).subscribe({
-      next: (response: any) => {
-        this.successMessage = `User "${response.deletedUser.name}" deleted successfully`;
-        setTimeout(() => this.successMessage = '', 5000);
-        this.loadUsers();
-      },
-      error: (error) => {
-        console.error('Error deleting user:', error);
-        this.errorMessage = 'Failed to delete user: ' + error.message;
-        setTimeout(() => this.errorMessage = '', 5000);
-      }
-    });
+    if (confirm(`Are you sure you want to delete this user? This action cannot be undone and will delete all associated data.`)) {
+      this.apiService.deleteUser(userId).subscribe({
+        next: (response: any) => {
+          this.successMessage = `User "${response.deletedUser.name}" deleted successfully`;
+          setTimeout(() => this.successMessage = '', 5000);
+          this.loadUsers();
+        },
+        error: (error) => {
+          console.error('Error deleting user:', error);
+          this.errorMessage = 'Failed to delete user: ' + error.message;
+          setTimeout(() => this.errorMessage = '', 5000);
+        }
+      });
+    }
   }
-}
 }

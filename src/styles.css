@@ -10,11 +10,13 @@
   --color-text-soft: #5a5a5a;
   --color-white: #ffffff;
 
-  /* –– Gradients –– */
-  --gradient-1: linear-gradient(135deg, #FFD3A5 10%, #FD6585 100%);
-  --gradient-2: linear-gradient(315deg, #8EC5FC 0%, #E0C3FC 100%);
-  --gradient-3: linear-gradient(210deg, #74EBD5 0%, #f7e8ad 100%);
-  --gradient-4: linear-gradient(to right, #ffd3a4, #fe788a);
+
+  --gradient-1: radial-gradient(circle at 20% 80%, #b3f0e8, #0abde3);
+  --gradient-2: radial-gradient(circle at 20% 30%, #ffe6b0, #ff8c5a);
+  --gradient-3: radial-gradient(circle at 20% 80%, #74EBD5, #f7e8ad);
+  --gradient-4: radial-gradient(circle at 30% 70%, #dbb0ff, #9b59b6);
+
+  
 
   /* –– Typography –– */
   --font-family-primary: 'Nunito', sans-serif;

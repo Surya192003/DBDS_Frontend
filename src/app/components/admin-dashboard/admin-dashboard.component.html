@@ -91,119 +91,111 @@
 
   <!-- Class Management Section -->
   <!-- ==================== CLASS MANAGEMENT ==================== -->
-<div class="glass-panel">
-  <div class="panel-header">
-    <h5 class="panel-title">
-      <i class="bi bi-calendar-week me-2"></i>Class Management
-    </h5>
-    <button class="btn-glass btn-sm" (click)="openCreateClassModal()">
-      <i class="bi bi-plus-circle me-1"></i> Add New Class
-    </button>
-  </div>
-
-  <div class="panel-body">
-    <!-- FILTER BAR -->
-    <div class="filter-bar">
-      <div class="filter-field">
-        <label class="filter-label"><i class="bi bi-person-badge me-1"></i> Instructor</label>
-        <select
-          class="sharp-input filter-select"
-          [(ngModel)]="instructorFilter"
-          (change)="applyClassFilters()"
-        >
-          <option value="">All Instructors</option>
-          <option *ngFor="let inst of uniqueInstructors" [value]="inst">{{ inst }}</option>
-        </select>
-      </div>
-
-      <div class="filter-field">
-        <label class="filter-label"><i class="bi bi-people me-1"></i> Group</label>
-        <select
-          class="sharp-input filter-select"
-          [(ngModel)]="groupFilter"
-          (change)="applyClassFilters()"
-        >
-          <option value="">All Groups</option>
-          <option *ngFor="let grp of uniqueGroups" [value]="grp">{{ grp }}</option>
-        </select>
-      </div>
-
-      <button
-        class="btn-glass btn-sm filter-reset"
-        (click)="resetClassFilters()"
-        [disabled]="!instructorFilter && !groupFilter"
-      >
-        <i class="bi bi-arrow-counterclockwise"></i> Clear
+  <div class="glass-panel">
+    <div class="panel-header">
+      <h5 class="panel-title">
+        <i class="bi bi-calendar-week me-2"></i>Class Management
+      </h5>
+      <button class="btn-glass btn-sm" (click)="openCreateClassModal()">
+        <i class="bi bi-plus-circle me-1"></i> Add New Class
       </button>
     </div>
 
-    <!-- Loading state -->
-    <div *ngIf="loadingClasses" class="text-center py-4">
-      <div class="spinner accent"></div>
-      <p class="mt-2 text-muted">Loading classes...</p>
-    </div>
+    <div class="panel-body">
+      <!-- FILTER BAR -->
+      <div class="filter-bar">
+        <div class="filter-field">
+          <label class="filter-label"><i class="bi bi-person-badge me-1"></i> Instructor</label>
+          <select class="sharp-input filter-select" [(ngModel)]="instructorFilter" (change)="applyClassFilters()">
+            <option value="">All Instructors</option>
+            <option *ngFor="let inst of uniqueInstructors" [value]="inst">{{ inst }}</option>
+          </select>
+        </div>
 
-    <!-- Empty state or table -->
-    <div *ngIf="!loadingClasses">
-      <div *ngIf="filteredClasses.length === 0" class="empty-state">
-        <i class="bi bi-calendar-x empty-icon"></i>
-        <h5>No Classes Found</h5>
-        <p *ngIf="instructorFilter || groupFilter">
-          Try clearing filters or adjusting your selection.
-        </p>
-        <p *ngIf="!instructorFilter && !groupFilter">Start by creating your first class</p>
-        <button class="btn-glass" (click)="openCreateClassModal()">
-          <i class="bi bi-plus-circle me-1"></i> Create First Class
+        <div class="filter-field">
+          <label class="filter-label"><i class="bi bi-people me-1"></i> Group</label>
+          <select class="sharp-input filter-select" [(ngModel)]="groupFilter" (change)="applyClassFilters()">
+            <option value="">All Groups</option>
+            <option *ngFor="let grp of uniqueGroups" [value]="grp">{{ grp }}</option>
+          </select>
+        </div>
+
+        <button class="btn-glass btn-sm filter-reset" (click)="resetClassFilters()"
+          [disabled]="!instructorFilter && !groupFilter">
+          <i class="bi bi-arrow-counterclockwise"></i> Clear
         </button>
       </div>
 
-      <div *ngIf="filteredClasses.length > 0" class="table-responsive">
-        <table class="glass-table">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Date</th>
-              <th>Time</th>
-              <th>Instructor</th>
-              <th>Song</th>
-              <th>Attendance</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let classItem of filteredClasses">
-              <td class="text-muted">#{{classItem.id}}</td>
-              <td><strong>{{classItem.class_date | date:'dd MMM yyyy'}}</strong></td>
-              <td><span class="badge">{{classItem.class_time}}</span></td>
-              <td>
-                <div *ngIf="classItem.instructor_name">
-                  <div class="fw-medium">{{classItem.instructor_name}}</div>
-                  <small class="text-muted">{{classItem.instructor_email}}</small>
-                </div>
-                <span *ngIf="!classItem.instructor_name" class="text-muted fst-italic">Not Assigned</span>
-              </td>
-              <td>
-                <a *ngIf="classItem.song_link" [href]="classItem.song_link" target="_blank" class="btn-glass btn-sm">
-                  <i class="bi bi-music-note-beamed"></i> Listen
-                </a>
-                <span *ngIf="!classItem.song_link" class="text-muted"><i class="bi bi-music-note"></i> Not set</span>
-              </td>
-              <td>
-                <span class="badge accent-badge">{{classItem.attendance_count || 0}} <i class="bi bi-person"></i></span>
-              </td>
-              <td>
-                <div class="btn-group-sm">
-                  <button class="btn-glass btn-sm danger" (click)="deleteClass(classItem.id)" title="Delete"><i class="bi bi-trash"></i></button>
-                  <button class="btn-glass btn-sm" (click)="openAssignStudentModal(classItem)" title="Assign"><i class="bi bi-person-plus"></i></button>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+      <!-- Loading state -->
+      <div *ngIf="loadingClasses" class="text-center py-4">
+        <div class="spinner accent"></div>
+        <p class="mt-2 text-muted">Loading classes...</p>
+      </div>
+
+      <!-- Empty state or table -->
+      <div *ngIf="!loadingClasses">
+        <div *ngIf="filteredClasses.length === 0" class="empty-state">
+          <i class="bi bi-calendar-x empty-icon"></i>
+          <h5>No Classes Found</h5>
+          <p *ngIf="instructorFilter || groupFilter">
+            Try clearing filters or adjusting your selection.
+          </p>
+          <p *ngIf="!instructorFilter && !groupFilter">Start by creating your first class</p>
+          <button class="btn-glass" (click)="openCreateClassModal()">
+            <i class="bi bi-plus-circle me-1"></i> Create First Class
+          </button>
+        </div>
+
+        <div *ngIf="filteredClasses.length > 0" class="table-responsive">
+          <table class="glass-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Instructor</th>
+                <th>Song</th>
+                <th>Attendance</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let classItem of filteredClasses">
+                <td class="text-muted">#{{classItem.id}}</td>
+                <td><strong>{{classItem.class_date | date:'dd MMM yyyy'}}</strong></td>
+                <td><span class="badge">{{classItem.class_time}}</span></td>
+                <td>
+                  <div *ngIf="classItem.instructor_name">
+                    <div class="fw-medium">{{classItem.instructor_name}}</div>
+                    <small class="text-muted">{{classItem.instructor_email}}</small>
+                  </div>
+                  <span *ngIf="!classItem.instructor_name" class="text-muted fst-italic">Not Assigned</span>
+                </td>
+                <td>
+                  <a *ngIf="classItem.song_link" [href]="classItem.song_link" target="_blank" class="btn-glass btn-sm">
+                    <i class="bi bi-music-note-beamed"></i> Listen
+                  </a>
+                  <span *ngIf="!classItem.song_link" class="text-muted"><i class="bi bi-music-note"></i> Not set</span>
+                </td>
+                <td>
+                  <span class="badge accent-badge">{{classItem.attendance_count || 0}} <i
+                      class="bi bi-person"></i></span>
+                </td>
+                <td>
+                  <div class="btn-group-sm">
+                    <button class="btn-glass btn-sm danger" (click)="deleteClass(classItem.id)" title="Delete"><i
+                        class="bi bi-trash"></i></button>
+                    <button class="btn-glass btn-sm" (click)="openAssignStudentModal(classItem)" title="Assign"><i
+                        class="bi bi-person-plus"></i></button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   </div>
-</div>
   <!-- User Management & Payments Section -->
   <div class="row mb-4">
     <!-- User Management -->
@@ -215,7 +207,8 @@
         <div class="panel-body">
           <div class="search-box mb-3">
             <span class="search-icon"><i class="bi bi-search"></i></span>
-            <input type="text" class="sharp-input" placeholder="Search users..." [(ngModel)]="userSearchTerm" (input)="filterUsers()">
+            <input type="text" class="sharp-input" placeholder="Search users..." [(ngModel)]="userSearchTerm"
+              (input)="filterUsers()">
           </div>
           <div class="table-responsive glass-scroll">
             <table class="glass-table compact">
@@ -255,13 +248,16 @@
                   </td>
                   <td>
                     <div class="btn-group-sm">
-                      <button class="btn-glass btn-sm" (click)="toggleUserStatus(user.id)" [disabled]="user.role === 'ADMIN'">
+                      <button class="btn-glass btn-sm" (click)="toggleUserStatus(user.id)"
+                        [disabled]="user.role === 'ADMIN'">
                         <i class="bi" [ngClass]="user.is_active ? 'bi-person-x' : 'bi-person-check'"></i>
                       </button>
-                      <button *ngIf="user.role === 'INSTRUCTOR' && user.instructor_id" class="btn-glass btn-sm" (click)="openPayRateModal(user)">
+                      <button *ngIf="user.role === 'INSTRUCTOR' && user.instructor_id" class="btn-glass btn-sm"
+                        (click)="openPayRateModal(user)">
                         <i class="bi bi-cash-coin"></i>
                       </button>
-                      <button class="btn-glass btn-sm danger" (click)="deleteUser(user.id)" [disabled]="user.role === 'ADMIN' || user.id === currentUser?.id">
+                      <button class="btn-glass btn-sm danger" (click)="deleteUser(user.id)"
+                        [disabled]="user.role === 'ADMIN' || user.id === currentUser?.id">
                         <i class="bi bi-trash"></i>
                       </button>
                     </div>
@@ -274,7 +270,8 @@
             </table>
           </div>
           <div class="table-footer">
-            <small>Showing {{filteredUsers.length}} of {{users.length}} users <span *ngIf="userSearchTerm"> matching "{{userSearchTerm}}"</span></small>
+            <small>Showing {{filteredUsers.length}} of {{users.length}} users <span *ngIf="userSearchTerm"> matching
+                "{{userSearchTerm}}"</span></small>
           </div>
         </div>
       </div>
@@ -295,7 +292,8 @@
             </div>
           </div>
           <div class="d-flex gap-2 mb-4">
-            <button class="btn-glass" (click)="calculatePayments()" [disabled]="!selectedMonth || calculatingPayments || loadingPayments">
+            <button class="btn-glass" (click)="calculatePayments()"
+              [disabled]="!selectedMonth || calculatingPayments || loadingPayments">
               <span *ngIf="calculatingPayments" class="spinner spinner-sm me-2"></span>
               <i class="bi bi-calculator me-1"></i> Calculate
             </button>
@@ -327,7 +325,9 @@
                 </thead>
                 <tbody>
                   <tr *ngFor="let payment of payments" [class]="payment.is_paid ? 'highlight-paid' : ''">
-                    <td><div class="fw-medium">{{payment.instructor_name}}</div></td>
+                    <td>
+                      <div class="fw-medium">{{payment.instructor_name}}</div>
+                    </td>
                     <td class="text-center"><span class="badge">{{payment.total_classes}}</span></td>
                     <td class="text-center"><small>${{payment.pay_per_class || 0}}</small></td>
                     <td class="text-end fw-bold">${{payment.total_amount || 0}}</td>
@@ -337,8 +337,10 @@
                       </span>
                     </td>
                     <td class="text-center">
-                      <button class="btn-glass btn-sm success" *ngIf="!payment.is_paid" (click)="markAsPaid(payment.id)" title="Mark Paid"><i class="bi bi-check-lg"></i></button>
-                      <span *ngIf="payment.is_paid" class="text-success fw-bold"><i class="bi bi-check-circle"></i></span>
+                      <button class="btn-glass btn-sm success" *ngIf="!payment.is_paid" (click)="markAsPaid(payment.id)"
+                        title="Mark Paid"><i class="bi bi-check-lg"></i></button>
+                      <span *ngIf="payment.is_paid" class="text-success fw-bold"><i
+                          class="bi bi-check-circle"></i></span>
                     </td>
                   </tr>
                 </tbody>
@@ -368,7 +370,8 @@
         <div class="panel-body">
           <div class="search-box mb-3">
             <span class="search-icon"><i class="bi bi-search"></i></span>
-            <input type="text" class="sharp-input" placeholder="Search students..." [(ngModel)]="studentSearchTerm" (input)="filterStudents()">
+            <input type="text" class="sharp-input" placeholder="Search students..." [(ngModel)]="studentSearchTerm"
+              (input)="filterStudents()">
           </div>
           <div class="table-responsive">
             <table class="glass-table">
@@ -403,7 +406,8 @@
                   </td>
                   <td class="text-center">
                     <i *ngIf="getAttendancePercentage(stat) >= 80" class="bi bi-emoji-smile text-success fs-5"></i>
-                    <i *ngIf="getAttendancePercentage(stat) >= 50 && getAttendancePercentage(stat) < 80" class="bi bi-emoji-neutral text-warning fs-5"></i>
+                    <i *ngIf="getAttendancePercentage(stat) >= 50 && getAttendancePercentage(stat) < 80"
+                      class="bi bi-emoji-neutral text-warning fs-5"></i>
                     <i *ngIf="getAttendancePercentage(stat) < 50" class="bi bi-emoji-frown text-danger fs-5"></i>
                   </td>
                 </tr>
@@ -457,8 +461,10 @@
                   </td>
                   <td class="text-center"><span class="badge">${{instructor.pay_per_class || 0}}/class</span></td>
                   <td class="text-center">{{instructor.total_classes_assigned || 0}}</td>
-                  <td class="text-center"><span class="badge badge-info">{{instructor.completed_classes || 0}}</span></td>
-                  <td class="text-center"><span class="badge badge-primary">{{instructor.classes_tagged_in || 0}}</span></td>
+                  <td class="text-center"><span class="badge badge-info">{{instructor.completed_classes || 0}}</span>
+                  </td>
+                  <td class="text-center"><span class="badge badge-primary">{{instructor.classes_tagged_in || 0}}</span>
+                  </td>
                   <td>{{instructor.last_tag_in ? (instructor.last_tag_in | date:'dd.MM.yy HH:mm') : '—'}}</td>
                   <td class="text-end fw-bold text-success">${{instructor.potential_earnings || 0}}</td>
                   <td class="text-center">
@@ -484,28 +490,40 @@
       <div class="glass-panel">
         <div class="panel-header">
           <h5 class="panel-title"><i class="bi bi-megaphone accent me-2"></i>Announcements</h5>
-          <button class="btn-glass btn-sm" (click)="openAnnouncementModal()"><i class="bi bi-plus-circle"></i> Create</button>
+          <button class="btn-glass btn-sm" (click)="openAnnouncementModal()"><i class="bi bi-plus-circle"></i>
+            Create</button>
         </div>
         <div class="panel-body">
           <div class="table-responsive">
             <table class="glass-table compact">
               <thead>
-                <tr><th>Title</th><th>Category</th><th>Media</th><th>Regs</th><th>Actions</th></tr>
+                <tr>
+                  <th>Title</th>
+                  <th>Category</th>
+                  <th>Media</th>
+                  <th>Regs</th>
+                  <th>Actions</th>
+                </tr>
               </thead>
               <tbody>
                 <tr *ngFor="let ann of announcements">
                   <td>{{ann.title}}</td>
                   <td><span class="badge">{{ann.category}}</span></td>
                   <td>{{ann.media_type}}</td>
-                  <td><button class="btn-glass btn-sm" (click)="viewRegistrations(ann)">{{ann.registrations_count || 0}} regs</button></td>
+                  <td><button class="btn-glass btn-sm" (click)="viewRegistrations(ann)">{{ann.registrations_count || 0}}
+                      regs</button></td>
                   <td>
                     <div class="btn-group-sm">
-                      <button class="btn-glass btn-sm" (click)="openAnnouncementModal(ann)"><i class="bi bi-pencil"></i></button>
-                      <button class="btn-glass btn-sm danger" (click)="deleteAnnouncement(ann.id)"><i class="bi bi-trash"></i></button>
+                      <button class="btn-glass btn-sm" (click)="openAnnouncementModal(ann)"><i
+                          class="bi bi-pencil"></i></button>
+                      <button class="btn-glass btn-sm danger" (click)="deleteAnnouncement(ann.id)"><i
+                          class="bi bi-trash"></i></button>
                     </div>
                   </td>
                 </tr>
-                <tr *ngIf="announcements.length === 0"><td colspan="5" class="empty-cell">No announcements yet.</td></tr>
+                <tr *ngIf="announcements.length === 0">
+                  <td colspan="5" class="empty-cell">No announcements yet.</td>
+                </tr>
               </tbody>
             </table>
           </div>
@@ -575,23 +593,27 @@
               <label class="form-label">Instructor (Optional)</label>
               <select class="sharp-input" formControlName="instructor_id">
                 <option value="">Select instructor...</option>
-                <option *ngFor="let instructor of activeInstructors" [value]="instructor.instructor_id">{{instructor.name}} • {{instructor.email}}</option>
+                <option *ngFor="let instructor of activeInstructors" [value]="instructor.instructor_id">
+                  {{instructor.name}} • {{instructor.email}}</option>
               </select>
             </div>
             <div class="mb-3">
               <label class="form-label">Student Group <span class="text-danger">*</span></label>
               <select class="sharp-input" formControlName="group_id">
                 <option value="">Select group...</option>
-                <option *ngFor="let group of groups" [value]="group.id">{{group.group_name}} ({{group.student_count || 0}} students)</option>
+                <option *ngFor="let group of groups" [value]="group.id">{{group.group_name}} ({{group.student_count ||
+                  0}} students)</option>
               </select>
               <div class="form-text">All students in this group will be automatically enrolled</div>
             </div>
             <div class="alert-box info">
               <i class="bi bi-info-circle"></i>
-              <small>1. Create student groups in Group Management<br>2. Add students to groups<br>3. Create classes for groups<br>4. Instructors can mark attendance for the whole group</small>
+              <small>1. Create student groups in Group Management<br>2. Add students to groups<br>3. Create classes for
+                groups<br>4. Instructors can mark attendance for the whole group</small>
             </div>
             <div class="modal-footer">
-              <button type="button" class="btn-glass" (click)="closeCreateClassModal()" [disabled]="creatingClass">Cancel</button>
+              <button type="button" class="btn-glass" (click)="closeCreateClassModal()"
+                [disabled]="creatingClass">Cancel</button>
               <button type="submit" class="btn-glass primary" [disabled]="classForm.invalid || creatingClass">
                 <span *ngIf="creatingClass" class="spinner spinner-sm me-2"></span>
                 {{creatingClass ? 'Creating...' : 'Create Class'}}
@@ -608,7 +630,8 @@
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content sharp-modal-content">
         <div class="modal-header">
-          <h5 class="modal-title"><i class="bi bi-cash-coin accent me-2"></i>Set Pay Rate for {{selectedInstructor?.name}}</h5>
+          <h5 class="modal-title"><i class="bi bi-cash-coin accent me-2"></i>Set Pay Rate for
+            {{selectedInstructor?.name}}</h5>
           <button type="button" class="btn-close-custom" (click)="closePayRateModal()">×</button>
         </div>
         <div class="modal-body">
@@ -637,20 +660,23 @@
       <div class="modal-content sharp-modal-content">
         <div class="modal-header">
           <h5 class="modal-title"><i class="bi bi-person-plus me-2"></i>Assign Student to Class</h5>
-          <button type="button" class="btn-close-custom" (click)="modalService.closeModal('assignStudentModal')">×</button>
+          <button type="button" class="btn-close-custom"
+            (click)="modalService.closeModal('assignStudentModal')">×</button>
         </div>
         <div class="modal-body">
           <div class="mb-3">
             <label class="form-label">Select Student</label>
             <select class="sharp-input" [(ngModel)]="selectedStudent">
               <option [ngValue]="null">Select a student...</option>
-              <option *ngFor="let student of activeStudents" [ngValue]="student">{{ student.name }} ({{ student.email }})</option>
+              <option *ngFor="let student of activeStudents" [ngValue]="student">{{ student.name }} ({{ student.email
+                }})</option>
             </select>
           </div>
         </div>
         <div class="modal-footer">
           <button class="btn-glass" (click)="modalService.closeModal('assignStudentModal')">Cancel</button>
-          <button class="btn-glass primary" (click)="assignStudentToClass()" [disabled]="!selectedStudent || assigningStudent">
+          <button class="btn-glass primary" (click)="assignStudentToClass()"
+            [disabled]="!selectedStudent || assigningStudent">
             <span *ngIf="assigningStudent" class="spinner spinner-sm me-2"></span> Assign Student
           </button>
         </div>
@@ -664,22 +690,52 @@
       <div class="modal-content sharp-modal-content">
         <div class="modal-header">
           <h5 class="modal-title">{{ editingAnnouncementId ? 'EDIT' : 'NEW' }} ANNOUNCEMENT</h5>
-          <button type="button" class="btn-close-custom" (click)="modalService.closeModal('announcementModal')">×</button>
+          <button type="button" class="btn-close-custom"
+            (click)="modalService.closeModal('announcementModal')">×</button>
         </div>
         <div class="modal-body">
           <form [formGroup]="announcementForm!">
-            <div class="mb-3"><label>Title</label><input type="text" class="sharp-input w-100" formControlName="title"></div>
-            <div class="mb-3"><label>Description</label><textarea class="sharp-input w-100" rows="3" formControlName="description"></textarea></div>
-            <div class="row mb-3">
-              <div class="col-md-6"><label>Category</label><select class="sharp-input w-100" formControlName="category"><option value="EVENTS">EVENTS</option><option value="WORKSHOPS">WORKSHOPS</option><option value="PERFORMANCES">PERFORMANCES</option></select></div>
-              <div class="col-md-6"><label>Media Type</label><select class="sharp-input w-100" formControlName="media_type"><option value="IMAGE">IMAGE</option><option value="VIDEO">VIDEO</option></select></div>
+            <div class="mb-3"><label>Title</label><input type="text" class="sharp-input w-100" formControlName="title">
             </div>
-            <div class="mb-3"><label>Media URL</label><input type="text" class="sharp-input w-100" formControlName="media_url"></div>
-            <div class="mb-3"><label>Upload Image</label><input type="file" (change)="onFileSelected($event)" accept="image/*" class="form-control"></div>
-            <div class="form-check mb-3"><input type="checkbox" class="form-check-input" formControlName="registration_enabled"><label class="form-check-label">Enable registration</label></div>
+            <div class="mb-3"><label>Description</label><textarea class="sharp-input w-100" rows="3"
+                formControlName="description"></textarea></div>
+            <div class="row mb-3">
+              <div class="col-md-6"><label>Category</label><select class="sharp-input w-100" formControlName="category">
+                  <option value="EVENTS">EVENTS</option>
+                  <option value="WORKSHOPS">WORKSHOPS</option>
+                  <option value="PERFORMANCES">PERFORMANCES</option>
+                </select></div>
+              <div class="col-md-6"><label>Media Type</label><select class="sharp-input w-100"
+                  formControlName="media_type">
+                  <option value="IMAGE">IMAGE</option>
+                  <option value="VIDEO">VIDEO</option>
+                </select></div>
+            </div>
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label>Event Date</label>
+                <input type="date" class="sharp-input w-100" formControlName="event_date" [min]="today">
+              </div>
+              <div class="col-md-6">
+                <label>Start Time</label>
+                <input type="time" class="sharp-input w-100" formControlName="event_start_time">
+              </div>
+            </div>
+            <div class="mb-3"><label>Media URL</label><input type="text" class="sharp-input w-100"
+                formControlName="media_url"></div>
+            <div class="mb-3"><label>Upload Image</label><input type="file" (change)="onFileSelected($event)"
+                accept="image/*" class="form-control"></div>
+            <div class="form-check mb-3"><input type="checkbox" class="form-check-input"
+                formControlName="registration_enabled"><label class="form-check-label">Enable registration</label></div>
             <div *ngIf="announcementForm?.get('registration_enabled')?.value" class="row mb-3">
-              <div class="col-md-6"><label>Reg. type</label><select class="sharp-input w-100" formControlName="registration_type"><option value="FREE">FREE</option><option value="PAID">PAID</option></select></div>
-              <div class="col-md-6" *ngIf="announcementForm?.get('registration_type')?.value === 'PAID'"><label>Price (€)</label><input type="number" class="sharp-input w-100" formControlName="price" min="0" step="0.01"></div>
+              <div class="col-md-6"><label>Reg. type</label><select class="sharp-input w-100"
+                  formControlName="registration_type">
+                  <option value="FREE">FREE</option>
+                  <option value="PAID">PAID</option>
+                </select></div>
+              <div class="col-md-6" *ngIf="announcementForm?.get('registration_type')?.value === 'PAID'"><label>Price
+                  (€)</label><input type="number" class="sharp-input w-100" formControlName="price" min="0" step="0.01">
+              </div>
             </div>
           </form>
         </div>
@@ -701,10 +757,14 @@
         </div>
         <div class="modal-body">
           <form [formGroup]="postForm!">
-            <div class="mb-3"><label>Title</label><input type="text" class="sharp-input w-100" formControlName="title"></div>
-            <div class="mb-3"><label>Description</label><textarea class="sharp-input w-100" rows="3" formControlName="description"></textarea></div>
-            <div class="mb-3"><label>YouTube URL</label><input type="text" class="sharp-input w-100" formControlName="video_url" required></div>
-            <div class="mb-3"><label>Thumbnail URL</label><input type="text" class="sharp-input w-100" formControlName="thumbnail_url"></div>
+            <div class="mb-3"><label>Title</label><input type="text" class="sharp-input w-100" formControlName="title">
+            </div>
+            <div class="mb-3"><label>Description</label><textarea class="sharp-input w-100" rows="3"
+                formControlName="description"></textarea></div>
+            <div class="mb-3"><label>YouTube URL</label><input type="text" class="sharp-input w-100"
+                formControlName="video_url" required></div>
+            <div class="mb-3"><label>Thumbnail URL</label><input type="text" class="sharp-input w-100"
+                formControlName="thumbnail_url"></div>
           </form>
         </div>
         <div class="modal-footer">

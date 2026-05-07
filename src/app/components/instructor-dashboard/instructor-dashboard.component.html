@@ -41,40 +41,20 @@
       </div>
 
       <div class="table-container" *ngIf="!loading && classes.length > 0">
-         <!-- FILTER BAR -->
-    <div class="filter-bar">
-      <div class="filter-field">
-        <label class="filter-label"><i class="bi bi-person-badge me-1"></i> Instructor</label>
-        <select
-          class="sharp-input filter-select"
-          [(ngModel)]="instructorFilter"
-          (change)="applyClassFilters()"
-        >
-          <option value="">All Instructors</option>
-          <option *ngFor="let inst of uniqueInstructors" [value]="inst">{{ inst }}</option>
-        </select>
-      </div>
+        <!-- FILTER BAR -->
+        <div class="filter-bar">
+          <div class="filter-field">
+            <label class="filter-label"><i class="bi bi-people me-1"></i> Group</label>
+            <select class="sharp-input filter-select" [(ngModel)]="groupFilter" (change)="applyClassFilters()">
+              <option value="">All Groups</option>
+              <option *ngFor="let grp of uniqueGroups" [value]="grp">{{ grp }}</option>
+            </select>
+          </div>
+          <button class="btn-glass btn-sm filter-reset" (click)="resetClassFilters()" [disabled]="!instructorFilter && !groupFilter">
+            <i class="bi bi-arrow-counterclockwise"></i> Clear
+          </button>
+        </div>
 
-      <div class="filter-field">
-        <label class="filter-label"><i class="bi bi-people me-1"></i> Group</label>
-        <select
-          class="sharp-input filter-select"
-          [(ngModel)]="groupFilter"
-          (change)="applyClassFilters()"
-        >
-          <option value="">All Groups</option>
-          <option *ngFor="let grp of uniqueGroups" [value]="grp">{{ grp }}</option>
-        </select>
-      </div>
-
-      <button
-        class="btn-glass btn-sm filter-reset"
-        (click)="resetClassFilters()"
-        [disabled]="!instructorFilter && !groupFilter"
-      >
-        <i class="bi bi-arrow-counterclockwise"></i> Clear
-      </button>
-    </div>
         <table class="sharp-table">
           <thead>
             <tr>
@@ -90,35 +70,28 @@
               <td>
                 <div class="fw-bold">{{classItem.class_name}}</div>
                 <div class="muted-id">ID: #{{classItem.id}}</div>
-               </td>
+              </td>
               <td>
                 <div>{{classItem.class_date | date:'dd.MM.yy'}}</div>
                 <div class="muted-id">{{classItem.class_time}}</div>
-               </td>
+              </td>
               <td><span class="badge-sharp">{{ classItem.group_name || classItem.class_name || 'NONE' }}</span></td>
               <td>
                 <span class="status-pill" [ngClass]="getStatusClass(classItem.class_date)">
                   {{getStatusText(classItem.class_date)}}
                 </span>
-               </td>
+              </td>
               <td>
                 <div class="action-stack">
                   <button class="btn-sharp-sm" (click)="openAttendanceModal(classItem)">ATTENDANCE</button>
                   <button class="btn-sharp-sm outline" (click)="openSongModal(classItem)">SONG</button>
                   <div class="d-flex gap-2 mt-2">
-                    <button class="btn-sharp-sm" *ngIf="!tagStatusMap[classItem.id]?.tagged_in"
-                      (click)="tagIn(classItem.id)">
-                      TAG IN
-                    </button>
-                    <button class="btn-sharp-sm"
-                      *ngIf="tagStatusMap[classItem.id]?.tagged_in && !tagStatusMap[classItem.id]?.tagged_out"
-                      (click)="tagOut(classItem.id)">
-                      TAG OUT
-                    </button>
+                    <button class="btn-sharp-sm" *ngIf="!tagStatusMap[classItem.id]?.tagged_in" (click)="tagIn(classItem.id)">TAG IN</button>
+                    <button class="btn-sharp-sm" *ngIf="tagStatusMap[classItem.id]?.tagged_in && !tagStatusMap[classItem.id]?.tagged_out" (click)="tagOut(classItem.id)">TAG OUT</button>
                     <span *ngIf="tagStatusMap[classItem.id]?.tagged_out" class="text-success">✓ COMPLETED</span>
                   </div>
                 </div>
-               </td>
+              </td>
             </tr>
           </tbody>
         </table>
@@ -129,56 +102,88 @@
     </div>
   </section>
 
-  <!-- ALL ANNOUNCEMENTS SECTION -->
-  <div class="announcements-section">
-    <div class="section-header">
-      <label class="section-label">📢 ANNOUNCEMENTS & EVENTS</label>
-    </div>
-    <div class="announcement-grid">
-      <div *ngFor="let ann of announcements" class="announcement-card">
-        <div class="media-preview">
-          <img *ngIf="ann.media_type === 'IMAGE'" [src]="ann.image_storage || ann.media_url" alt="ann.title">
-          <iframe *ngIf="ann.media_type === 'VIDEO'" [src]="sanitizeUrl(ann.media_url)" frameborder="0" allowfullscreen></iframe>
-        </div>
-        <div class="announcement-content">
-          <span class="category-badge">{{ann.category}}</span>
-          <h4>{{ann.title}}</h4>
-          <p>{{ann.description}}</p>
-          <div *ngIf="ann.registration_enabled" class="register-area">
-            <button *ngIf="!ann.user_registered" class="btn-sharp-small" (click)="registerForAnnouncement(ann.id)">REGISTER</button>
-            <span *ngIf="ann.user_registered" class="registered-badge">✓ REGISTERED</span>
-            <span *ngIf="ann.registration_type === 'PAID'" class="price-badge">€{{ann.price}}</span>
-          </div>
-        </div>
-      </div>
-      <div *ngIf="announcements.length === 0" class="empty-state">No announcements at the moment.</div>
-    </div>
+ <!-- ALL UPCOMING ANNOUNCEMENTS (paginated) -->
+<div class="announcements-section">
+  <div class="section-header">
+    <label class="section-label">📢 UPCOMING ANNOUNCEMENTS & EVENTS</label>
+    <span class="text-muted small">
+      Showing {{(announcementPage-1)*pageSize + 1}}–
+      {{Math.min(announcementPage*pageSize, upcomingAnnouncements.length)}} of {{upcomingAnnouncements.length}}
+    </span>
   </div>
 
-  <!-- MY REGISTERED EVENTS / WORKSHOPS -->
-  <div class="my-registrations-section">
-    <div class="section-header">
-      <label class="section-label">📌 MY REGISTRATIONS</label>
-    </div>
-    <div class="announcement-grid" *ngIf="registeredAnnouncements.length > 0; else noRegs">
-      <div *ngFor="let reg of registeredAnnouncements" class="announcement-card">
-        <div class="media-preview">
-          <img *ngIf="reg.media_type === 'IMAGE'" [src]="reg.image_storage || reg.media_url" alt="reg.title">
-          <iframe *ngIf="reg.media_type === 'VIDEO'" [src]="sanitizeUrl(reg.media_url)" frameborder="0" allowfullscreen></iframe>
+  <div class="announcement-grid">
+    <div *ngFor="let ann of paginatedUpcomingAnnouncements" class="announcement-card">
+      <!-- Media: hidden on mobile via CSS class "d-none d-md-block" -->
+      <div class="media-preview d-none d-md-block">
+        <img *ngIf="ann.media_type === 'IMAGE'" [src]="ann.fullImageUrl" [alt]="ann.title" />
+        <iframe *ngIf="ann.media_type === 'VIDEO'" [src]="ann.safeVideoUrl" frameborder="0" allowfullscreen loading="lazy"></iframe>
+      </div>
+      <div class="announcement-content">
+        <span class="category-badge">{{ann.category}}</span>
+        <h4>{{ann.title}}</h4>
+        <p>{{ann.description}}</p>
+        <!-- Event date + time (if available) -->
+        <div class="event-datetime" *ngIf="ann.event_date">
+          📅 {{ann.event_date | date:'mediumDate'}}
+          <span *ngIf="ann.event_start_time"> • {{ann.event_start_time}}</span>
         </div>
-        <div class="announcement-content">
-          <span class="category-badge">{{reg.category}}</span>
-          <h4>{{reg.title}}</h4>
-          <p>{{reg.description}}</p>
-          <div class="registered-badge">✓ YOU ARE REGISTERED</div>
-          <div *ngIf="reg.registration_type === 'PAID'" class="price-badge">€{{reg.price}} ({{reg.payment_status}})</div>
+        <div *ngIf="ann.registration_enabled" class="register-area">
+          <button *ngIf="!ann.user_registered" class="btn-sharp-small" (click)="registerForAnnouncement(ann.id)">REGISTER</button>
+          <span *ngIf="ann.user_registered" class="registered-badge">✓ REGISTERED</span>
+          <span *ngIf="ann.registration_type === 'PAID'" class="price-badge">€{{ann.price}}</span>
         </div>
       </div>
     </div>
-    <ng-template #noRegs>
-      <div class="empty-state">You haven't registered for any event or workshop yet.</div>
-    </ng-template>
+    <div *ngIf="upcomingAnnouncements.length === 0" class="empty-state">No upcoming announcements.</div>
   </div>
+
+  <!-- Pagination controls (only if more than one page) -->
+  <div class="pagination-bar" *ngIf="totalUpcomingPages > 1">
+    <button class="btn-glass btn-sm" (click)="prevPage()" [disabled]="announcementPage === 1">← Prev</button>
+    <span class="page-numbers">
+      <button *ngFor="let p of [].constructor(totalUpcomingPages); let i = index"
+              class="page-dot"
+              [class.active]="i+1 === announcementPage"
+              (click)="goToPage(i+1)">{{i+1}}</button>
+    </span>
+    <button class="btn-glass btn-sm" (click)="nextPage()" [disabled]="announcementPage === totalUpcomingPages">Next →</button>
+  </div>
+</div>
+
+<!-- MY REGISTRATIONS (dynamic status) -->
+<div class="my-registrations-section">
+  <div class="section-header">
+    <label class="section-label">📌 MY REGISTRATIONS</label>
+  </div>
+  <div class="announcement-grid" *ngIf="registeredAnnouncements.length > 0; else noRegs">
+    <div *ngFor="let reg of registeredAnnouncements" class="announcement-card">
+      <!-- Media hidden on mobile -->
+      <div class="media-preview d-none d-md-block" *ngIf="reg.media_type">
+        <img *ngIf="reg.media_type === 'IMAGE'" [src]="reg.fullImageUrl" [alt]="reg.title" />
+        <iframe *ngIf="reg.media_type === 'VIDEO'" [src]="reg.safeVideoUrl" frameborder="0" allowfullscreen loading="lazy"></iframe>
+      </div>
+      <div class="announcement-content">
+        <span class="category-badge">{{reg.category}}</span>
+        <h4>{{reg.title}}</h4>
+        <p>{{reg.description}}</p>
+        <!-- Show date and status -->
+        <div class="event-datetime" *ngIf="reg.event_date">
+          📅 {{reg.event_date | date:'mediumDate'}}
+          <span *ngIf="reg.event_start_time"> • {{reg.event_start_time}}</span>
+        </div>
+        <div class="mt-2">
+          <span *ngIf="isEventPast(reg.event_date)" class="badge attended-badge">✔ ATTENDED</span>
+          <span *ngIf="!isEventPast(reg.event_date)" class="registered-badge">✓ YOU ARE REGISTERED</span>
+        </div>
+        <div *ngIf="reg.registration_type === 'PAID'" class="price-badge">€{{reg.price}} ({{reg.payment_status}})</div>
+      </div>
+    </div>
+  </div>
+  <ng-template #noRegs>
+    <div class="empty-state">You haven't registered for any event or workshop yet.</div>
+  </ng-template>
+</div>
 
   <!-- Monthly Performance Table -->
   <section class="mb-5">
@@ -209,7 +214,6 @@
       </div>
     </div>
   </section>
-
   <!-- SONG LINK MODAL -->
   <div class="modal fade" id="songModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
@@ -281,7 +285,7 @@
                         <input class="form-check-input" type="checkbox"
                           [formControl]="getAttendanceControl(student.student_id)" [id]="'present_'+student.student_id">
                         <label class="form-check-label" [for]="'present_'+student.student_id">
-                          {{ getAttendanceControl(student.student_id)?.value ? 'PRESENT' : 'ABSENT' }}
+                          {{ getAttendanceControl(student.student_id).value ? 'PRESENT' : 'ABSENT' }}
                         </label>
                       </div>
                     </td>

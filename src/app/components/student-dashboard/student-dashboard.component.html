@@ -162,7 +162,7 @@
   <div class="posts-feed">
     <div *ngFor="let post of posts" class="post-card">
       <div class="video-container">
-        <iframe [src]="sanitizeUrl(post.video_url)" frameborder="0" allowfullscreen></iframe>
+        <iframe [src]="sanitizeUrl(post.video_url)"frameborder="0" allowfullscreen loading="lazy"></iframe>
       </div>
       <h4>{{post.title}}</h4>
       <p>{{post.description}}</p>
@@ -180,7 +180,7 @@
     <div *ngFor="let ann of announcements" class="announcement-card">
       <div class="announcement-media">
         <img *ngIf="ann.media_type === 'IMAGE'" [src]="ann.image_storage || ann.media_url" style="max-width:100%">
-        <iframe *ngIf="ann.media_type === 'VIDEO'" [src]="sanitizeUrl(ann.media_url)" frameborder="0" allowfullscreen></iframe>
+        <iframe *ngIf="ann.media_type === 'VIDEO'" [src]="sanitizeUrl(ann.media_url)" frameborder="0" allowfullscreen loading="lazy"></iframe>
       </div>
       <div class="announcement-content">
         <span class="badge-sharp">{{ann.category}}</span>
