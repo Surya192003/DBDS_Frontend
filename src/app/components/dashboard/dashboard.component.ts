@@ -9,16 +9,15 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { AnnouncementService } from '../../services/announcement.service';
 import { PostService } from '../../services/post.service';
 import { trigger, transition, style, animate, query, stagger } from '@angular/animations';
-import {environment} from '../../../environments/environment';
+import { environment } from '../../../environments/environment';
 import { firstValueFrom } from 'rxjs';
-
 
 @Component({
   selector: 'app-dashboard',
   standalone: false,
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css'],
- animations: [
+  animations: [
     trigger('fadeSlide', [
       transition(':enter', [
         style({ opacity: 0, transform: 'translateY(20px)' }),
@@ -43,7 +42,6 @@ import { firstValueFrom } from 'rxjs';
     ])
   ]
 })
-
 export class DashboardComponent implements OnInit, OnDestroy {
   user: any = null;
   showEditModal = false;
@@ -59,6 +57,17 @@ export class DashboardComponent implements OnInit, OnDestroy {
   filteredAnnouncements: any[] = [];
   categories = ['EVENTS', 'WORKSHOPS', 'PERFORMANCES'];
   selectedCategory = 'EVENTS';
+
+  // ---------- Payment Modal ----------
+  showPaymentModal = false;
+  selectedAnnouncement: any = null;
+  paymentDetails = {
+    transaction_id: '',
+    payment_date: '',
+    payment_time: '',
+    payment_type: ''
+  };
+
   private destroy$ = new Subject<void>();
 
   constructor(
@@ -79,15 +88,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    
     this.authService.currentUser$
       .pipe(takeUntil(this.destroy$))
       .subscribe(user => {
         if (user) {
           this.user = user;
           this.isPublic = false;
-          this.loadAnnouncements();
-          
         } else {
           this.user = null;
           this.isPublic = true;
@@ -99,45 +105,93 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   loadAnnouncements() {
-  this.announcementService.getAll().subscribe((data: any[]) => {
-    this.announcements = data.map(ann => ({
-      ...ann,
-      // full image URL (using an absolute path)
-      fullImageUrl: this.getFullImageUrl(ann.image_storage || ann.media_url),
-      // pre‑sanitized video URL for iframes
-      safeVideoUrl: ann.media_type === 'VIDEO'
-        ? this.sanitizeUrl(ann.media_url)
-        : null,
-    }));
-    this.filterAnnouncements(this.selectedCategory); // re‑apply filter if needed
-  });
-}
+    this.announcementService.getAll().subscribe((data: any[]) => {
+      this.announcements = data.map(ann => ({
+        ...ann,
+        fullImageUrl: this.getFullImageUrl(ann.image_storage || ann.media_url),
+        safeVideoUrl: ann.media_type === 'VIDEO'
+          ? this.sanitizeUrl(ann.media_url)
+          : null,
+      }));
+      this.filterAnnouncements(this.selectedCategory);
+    });
+  }
 
   filterAnnouncements(category: string) {
     this.selectedCategory = category;
     this.filteredAnnouncements = this.announcements.filter(a => a.category === category);
   }
 
- loadPosts() {
-  this.postService.getAll().subscribe((data: any[]) => {
-    this.posts = data.map(post => ({
-      ...post,
-      safeVideoUrl: this.sanitizeUrl(post.video_url),
-    }));
-  });
-}
-  registerForAnnouncement(id: number) {
+  loadPosts() {
+    this.postService.getAll().subscribe((data: any[]) => {
+      this.posts = data.map(post => ({
+        ...post,
+        safeVideoUrl: this.sanitizeUrl(post.video_url),
+      }));
+    });
+  }
+
+  // ---------- Registration (handles both free & paid) ----------
+  registerForAnnouncement(annId: number) {
     if (!this.user) return;
-    this.announcementService.register(id).subscribe({
+    const ann = this.announcements.find(a => a.id === annId);
+    if (!ann) return;
+
+    if (ann.registration_type === 'PAID') {
+      // Open payment modal instead of direct registration
+      this.selectedAnnouncement = ann;
+      this.paymentDetails = {
+        transaction_id: '',
+        payment_date: '',
+        payment_time: '',
+        payment_type: ''
+      };
+      this.showPaymentModal = true;
+    } else {
+      // Free registration
+      this.doRegister(ann.id, {});
+    }
+  }
+
+  closePaymentModal() {
+    this.showPaymentModal = false;
+    this.selectedAnnouncement = null;
+  }
+
+  closePaymentModalOnOverlay(event: MouseEvent) {
+    if ((event.target as HTMLElement).classList.contains('modal-overlay')) {
+      this.closePaymentModal();
+    }
+  }
+
+  submitPaymentAndRegister() {
+    const d = this.paymentDetails;
+    if (!d.transaction_id || !d.payment_date || !d.payment_time || !d.payment_type) {
+      alert('Please fill all payment details');
+      return;
+    }
+    if (!this.selectedAnnouncement) return;
+
+    this.doRegister(this.selectedAnnouncement.id, {
+      transaction_id: d.transaction_id,
+      payment_date: d.payment_date,
+      payment_time: d.payment_time,
+      payment_type: d.payment_type
+    });
+    this.showPaymentModal = false;
+  }
+
+  private doRegister(annId: number, paymentData: any) {
+    this.announcementService.register(annId, paymentData).subscribe({
       next: () => {
-        alert('Registration successful!');
-        this.loadAnnouncements(); // refresh flags
+        alert('Registered successfully!');
+        this.loadAnnouncements(); // refresh registration flags
       },
       error: (err) => alert(err.error?.error || 'Registration failed')
     });
   }
+
   sanitizeUrl(url: string): SafeResourceUrl {
-    // YouTube embed conversion if needed
     let embedUrl = url;
     if (url.includes('youtube.com/watch?v=')) {
       const videoId = url.split('v=')[1].split('&')[0];
@@ -221,44 +275,38 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   async updateProfile() {
-  if (this.profileForm.invalid) return;
-  this.isSubmitting = true;
+    if (this.profileForm.invalid) return;
+    this.isSubmitting = true;
 
-  try {
-    // Upload photo if selected
-    if (this.selectedFile) {
-      await firstValueFrom(this.apiService.uploadProfilePhoto(this.selectedFile));
-      // After upload, refresh user data to get updated photo_url
-      const refreshed = await firstValueFrom(this.authService.refreshUserData());
-      this.user = refreshed;
+    try {
+      if (this.selectedFile) {
+        await firstValueFrom(this.apiService.uploadProfilePhoto(this.selectedFile));
+        const refreshed = await firstValueFrom(this.authService.refreshUserData());
+        this.user = refreshed;
+      }
+
+      const profileData = this.profileForm.value;
+      await firstValueFrom(this.apiService.updateUserProfile(profileData));
+
+      const refreshedUser = await firstValueFrom(this.authService.refreshUserData());
+      this.user = refreshedUser;
+
+      this.closeEditModal();
+      alert('Profile updated successfully');
+    } catch (err: any) {
+      console.error(err);
+      alert('Update failed: ' + (err.message || 'Unknown error'));
+    } finally {
+      this.isSubmitting = false;
     }
-
-    // Update profile data (name, email, phone, address)
-    const profileData = this.profileForm.value;
-    await firstValueFrom(this.apiService.updateUserProfile(profileData));
-
-    // Refresh user data again to get latest changes
-    const refreshedUser = await firstValueFrom(this.authService.refreshUserData());
-    this.user = refreshedUser;
-
-    this.closeEditModal();
-    alert('Profile updated successfully');
-  } catch (err: any) {
-    console.error(err);
-    alert('Update failed: ' + (err.message || 'Unknown error'));
-  } finally {
-    this.isSubmitting = false;
   }
-}
 
   navigateToClass(danceClass: any) {
     const url = danceClass.link;
-    // If user not logged in, redirect to login with return URL
     if (!this.user) {
       this.router.navigate(['/login'], { queryParams: { returnUrl: '/dashboard' } });
       return;
     }
-
     if (url.startsWith('http://') || url.startsWith('https://')) {
       window.open(url, '_blank');
     } else {
@@ -267,18 +315,17 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   getFullImageUrl(relativePath: string): string {
-  if (!relativePath) return '';
-  if (relativePath.startsWith('http')) return relativePath; // already full
-  return environment.apiBaseUrl + relativePath;
-}
+    if (!relativePath) return '';
+    if (relativePath.startsWith('http')) return relativePath;
+    return environment.apiBaseUrl + relativePath;
+  }
+
+  formatTime(time: string): string {
+    return time ? time.substring(0, 5) : '';
+  }
+
   ngOnDestroy() {
     this.destroy$.next();
     this.destroy$.complete();
   }
-  toggleDarkLight() {
-  document.body.classList.toggle('light-mode');
-}
-formatTime(time: string): string {
-  return time ? time.substring(0, 5) : '';   // "HH:MM"
-}
 }

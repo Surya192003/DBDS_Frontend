@@ -115,15 +115,15 @@ resetHistoryFilters() {
 
   // Registration is not normally needed in student dashboard because they are already registered,
   // but if you want to allow registration from here (e.g., for new events), you can keep it.
-  registerForAnnouncement(id: number) {
-    this.announcementService.register(id).subscribe({
-      next: () => {
-        alert('Registered! Refresh to see it in your list.');
-        this.loadStudentData(); // reload to show newly registered announcement
-      },
-      error: (err) => alert('Error: ' + err.error?.error)
-    });
-  }
+registerForAnnouncement(id: number) {
+  this.announcementService.register(id, {}).subscribe({
+    next: () => {
+      alert('Registered! Refresh to see it in your list.');
+      this.loadStudentData();
+    },
+    error: (err) => alert('Error: ' + err.error?.error)
+  });
+}
 
   sanitizeUrl(url: string): SafeResourceUrl {
     let embedUrl = url;

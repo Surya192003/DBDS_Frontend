@@ -121,15 +121,16 @@ export class InstructorDashboardComponent implements OnInit, OnDestroy {
   }
 
   registerForAnnouncement(id: number) {
-    this.announcementService.register(id).subscribe({
-      next: () => {
-        alert('Registered successfully!');
-        this.loadAnnouncementsAndPosts();
-        this.loadMyRegisteredEvents();
-      },
-      error: (err) => alert('Error: ' + err.error?.error)
-    });
-  }
+  // For now, free registration – pass empty payment data
+  this.announcementService.register(id, {}).subscribe({
+    next: () => {
+      alert('Registered successfully!');
+      this.loadAnnouncementsAndPosts();
+      this.loadMyRegisteredEvents();
+    },
+    error: (err) => alert('Error: ' + err.error?.error)
+  });
+}
 
   sanitizeUrl(url: string): SafeResourceUrl {
     let embedUrl = url;

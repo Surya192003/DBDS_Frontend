@@ -112,6 +112,47 @@
   </div>
 </div>
 
+<!-- Payment Details Modal -->
+<div class="modal-overlay" *ngIf="showPaymentModal" (click)="closePaymentModalOnOverlay($event)">
+  <div class="sharp-modal glass-panel" [@modalEnter]>
+    <div class="modal-header-sharp">
+      <h3>Payment Details</h3>
+      <button class="modal-close" (click)="closePaymentModal()">×</button>
+    </div>
+    <div class="modal-body-sharp">
+      <div class="form-row-sharp">
+        <label>Amount</label>
+        <input type="text" class="sharp-input" [value]="'€' + (selectedAnnouncement?.price || 0)" disabled />
+      </div>
+      <div class="form-row-sharp">
+        <label>Transaction ID *</label>
+        <input type="text" class="sharp-input" [(ngModel)]="paymentDetails.transaction_id" placeholder="e.g., TID123456" />
+      </div>
+      <div class="form-row-sharp">
+        <label>Payment Date *</label>
+        <input type="date" class="sharp-input" [(ngModel)]="paymentDetails.payment_date" />
+      </div>
+      <div class="form-row-sharp">
+        <label>Payment Time *</label>
+        <input type="time" class="sharp-input" [(ngModel)]="paymentDetails.payment_time" />
+      </div>
+      <div class="form-row-sharp">
+        <label>Payment Type *</label>
+        <select class="sharp-input" [(ngModel)]="paymentDetails.payment_type">
+          <option value="">Select type...</option>
+          <option value="bank_transfer">Bank Transfer</option>
+          <option value="cash">Cash</option>
+          <option value="online">Online (UPI/Card)</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer-sharp">
+      <button type="button" class="btn-sharp outline" (click)="closePaymentModal()">Cancel</button>
+      <button type="submit" class="btn-sharp" (click)="submitPaymentAndRegister()">Submit &amp; Register</button>
+    </div>
+  </div>
+</div>
+
 <!-- Edit Profile Modal -->
 <div class="modal-overlay" *ngIf="showEditModal" (click)="closeModalOnOverlay($event)" [@modalEnter]>
   <div class="sharp-modal glass-panel">

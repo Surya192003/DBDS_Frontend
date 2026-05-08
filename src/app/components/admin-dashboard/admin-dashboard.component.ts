@@ -87,6 +87,9 @@ export class AdminDashboardComponent implements OnInit {
   loadingPayments: boolean = false;
   calculatingPayments: boolean = false;
 
+  selectedAnnouncement: any = null;
+registrations: any[] = [];
+
   errorMessage: string = '';
   successMessage: string = '';
   markingAttendance: boolean = false;
@@ -104,6 +107,7 @@ export class AdminDashboardComponent implements OnInit {
 
   classForm: FormGroup;
   payRateForm: FormGroup;
+loading: any;
 
   constructor(
     private apiService: ApiService,
@@ -202,16 +206,30 @@ export class AdminDashboardComponent implements OnInit {
     });
   }
 
+  viewRegistrations(ann: any) {
+  this.selectedAnnouncement = ann;
+  this.announcementService.getRegistrations(ann.id).subscribe(regs => {
+    this.registrations = regs;
+    this.modalService.openModal('registrationsModal');
+  });
+}
+
+closeRegistrationsModal() {
+  this.modalService.closeModal('registrationsModal');
+}
+
+markRegistrationPaid(regId: number) {
+  this.announcementService.markRegistrationPaid(regId).subscribe(() => {
+    this.viewRegistrations(this.selectedAnnouncement);   // refresh the list
+  });
+}
+
   loadClasses() {
     this.loadingClasses = true;
     this.apiService.getAllClassesForAdmin().subscribe({
       next: (data: any) => {
-        console.log('Classes response:', data);           // ← add
         this.classes = data;
         this.filteredClasses = [...this.classes];
-        // this.filteredClasses = [{ id: 1, class_date: new Date(), class_time: '10:00', instructor_name: 'Test', group_name: 'Test' }];
-        console.log('Loaded classes:', this.classes.length); // ← add
-        this.loadingClasses = false;
       },
       error: (error) => {
         console.error('Error loading classes:', error);
@@ -225,14 +243,11 @@ export class AdminDashboardComponent implements OnInit {
   loadActiveInstructors() {
     this.apiService.getUsers().subscribe({
       next: (data: any) => {
-        console.log('All users data:', data);
 
         // Filter instructors
         const instructors = data.filter((user: any) =>
           user.role === 'INSTRUCTOR' && user.is_active
         );
-
-        console.log('Instructors found:', instructors);
 
         // For instructors without instructor_id, we need to create the record
         const instructorsNeedingFix = instructors.filter((instructor: any) =>
@@ -241,10 +256,7 @@ export class AdminDashboardComponent implements OnInit {
 
         if (instructorsNeedingFix.length > 0) {
           console.warn('Found instructors without instructor records:', instructorsNeedingFix);
-
-          // You could call an API here to fix these records
           instructorsNeedingFix.forEach((instructor: any) => {
-            console.log(`Instructor ${instructor.name} needs instructor record created`);
           });
         }
 
@@ -337,8 +349,6 @@ export class AdminDashboardComponent implements OnInit {
 
   // Class Management
   createClass() {
-    console.log('createClass called, form valid?', this.classForm.valid);
-    console.log('Form value:', this.classForm.value);
     if (this.classForm.valid) {
       this.creatingClass = true;
       this.setFormDisabled(true);
@@ -504,6 +514,7 @@ export class AdminDashboardComponent implements OnInit {
   filterStudents() {
     if (!this.studentSearchTerm) {
       this.filteredStudentStats = [...this.studentStats];
+      this.studentPage = 1;
       return;
     }
 
@@ -544,8 +555,16 @@ export class AdminDashboardComponent implements OnInit {
     this.announcementService.getAll().subscribe(data => this.announcements = data);
   }
   loadPosts() {
-    this.postService.getAll().subscribe(data => this.posts = data);
-  }
+  this.postService.getAll().subscribe(data => {
+    this.posts = data.map((post: any) => ({
+      ...post,
+      safeVideoUrl: this.sanitizeUrl(post.video_url)
+    }));
+  });
+}
+trackById(index: number, item: any): number {
+  return item.id;
+}
   openAnnouncementModal(announcement?: any) {
     if (announcement) {
       this.editingAnnouncementId = announcement.id;
@@ -599,11 +618,11 @@ export class AdminDashboardComponent implements OnInit {
     }
   }
 
-  viewRegistrations(ann: any) {
-    this.announcementService.getRegistrations(ann.id).subscribe(regs => {
-      alert(regs.map(r => `${r.name} (${r.role})`).join('\n') || 'No registrations');
-    });
-  }
+  // viewRegistrations(ann: any) {
+  //   this.announcementService.getRegistrations(ann.id).subscribe(regs => {
+  //     alert(regs.map(r => `${r.name} (${r.role})`).join('\n') || 'No registrations');
+  //   });
+  // }
 
   // ------------------------------
   // Posts CRUD
@@ -658,7 +677,6 @@ export class AdminDashboardComponent implements OnInit {
     this.loadingStudents = true;
     this.apiService.getActiveStudents().subscribe({
       next: (data: any) => {
-        console.log('Active students data:', data); // Debug log
 
         if (data && data.length > 0) {
           this.activeStudents = data;
@@ -719,8 +737,6 @@ export class AdminDashboardComponent implements OnInit {
           name: student.name,
           email: student.email
         }));
-
-        console.log('Students from users list:', this.activeStudents);
       },
       error: (error) => {
         console.error('Error loading students from users:', error);

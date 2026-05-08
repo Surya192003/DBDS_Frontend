@@ -12,7 +12,7 @@
         <span class="system-date">{{ today | date:'dd.MM.yyyy' }}</span>
       </div>
     </header>
-    
+
 
     <section class="mb-5">
       <label class="section-label">ATTENDANCE_SNAPSHOT</label>
@@ -32,169 +32,171 @@
       </div>
     </section>
 
-<section class="mb-5">
-  <label class="section-label">UPCOMING_SCHEDULE</label>
-  <div class="sharp-card">
-    <div class="table-container" *ngIf="paginatedUpcoming.length > 0; else noUpcoming">
-      <table class="sharp-table">
-        <thead>
-          <tr>
-            <th>CLASS_DETAILS</th>
-            <th>DATE_&_TIME</th>
-            <th>INSTRUCTOR</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let classItem of paginatedUpcoming">
-            <td class="fw-bold">{{classItem.class_name}}</td>
-            <td>{{classItem.class_date | date:'EEE, MMM d'}} @ {{formatTime(classItem.class_time)}}</td>
-            <td>{{classItem.instructor_name}}</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    <ng-template #noUpcoming>
-      <div class="empty-state">[NO_CLASSES_SCHEDULED]</div>
-    </ng-template>
+    <section class="mb-5">
+      <label class="section-label">UPCOMING_SCHEDULE</label>
+      <div class="sharp-card">
+        <div class="table-container" *ngIf="paginatedUpcoming.length > 0; else noUpcoming">
+          <table class="sharp-table">
+            <thead>
+              <tr>
+                <th>CLASS_DETAILS</th>
+                <th>DATE_&_TIME</th>
+                <th>INSTRUCTOR</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let classItem of paginatedUpcoming">
+                <td class="fw-bold">{{classItem.class_name}}</td>
+                <td>{{classItem.class_date | date:'EEE, MMM d'}} @ {{formatTime(classItem.class_time)}}</td>
+                <td>{{classItem.instructor_name}}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <ng-template #noUpcoming>
+          <div class="empty-state">[NO_CLASSES_SCHEDULED]</div>
+        </ng-template>
 
-    <!-- Pagination -->
-    <div class="pagination-bar" *ngIf="totalUpcomingPages > 1">
-      <button class="btn-glass btn-sm" (click)="prevUpcomingPage()" [disabled]="upcomingPage === 1">← Prev</button>
-      <span class="page-info">{{upcomingPage}} / {{totalUpcomingPages}}</span>
-      <button class="btn-glass btn-sm" (click)="nextUpcomingPage()" [disabled]="upcomingPage === totalUpcomingPages">Next →</button>
-    </div>
-  </div>
-</section>
-
-   <section class="mb-5">
-  <label class="section-label">HISTORY_LOG</label>
-  <div class="sharp-card">
-    <!-- Filter Bar (unchanged) -->
-    <div class="filter-bar">
-      <div class="filter-field">
-        <label class="filter-label"><i class="bi bi-search me-1"></i> Search Class</label>
-        <input type="text" class="sharp-input filter-select" placeholder="Class name..."
-               [(ngModel)]="historySearchTerm" (input)="applyHistoryFilters()">
-      </div>
-      <div class="filter-field">
-        <label class="filter-label"><i class="bi bi-funnel me-1"></i> Status</label>
-        <select class="sharp-input filter-select" [(ngModel)]="historyStatusFilter" (change)="applyHistoryFilters()">
-          <option value="ALL">All</option>
-          <option value="PRESENT">Present</option>
-          <option value="ABSENT">Absent</option>
-        </select>
-      </div>
-      <button class="btn-glass btn-sm filter-reset" (click)="resetHistoryFilters()"
-              [disabled]="!historySearchTerm && historyStatusFilter === 'ALL'">
-        <i class="bi bi-arrow-counterclockwise"></i> Clear
-      </button>
-    </div>
-
-    <!-- Table (paginated) -->
-    <div class="table-container">
-      <table class="sharp-table" *ngIf="paginatedHistory.length > 0; else noHistory">
-        <thead>
-          <tr>
-            <th>CLASS</th>
-            <th>DATE</th>
-            <th>STATUS</th>
-            <th>RESOURCES</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let record of paginatedHistory">
-            <td>{{getClassName(record.class_id)}}</td>
-            <td>{{record.class_date | date:'dd/MM/yy'}}</td>
-            <td>
-              <span class="status-pill" [ngClass]="record.is_present ? 'pill-green' : 'pill-red'">
-                {{record.is_present ? 'PRESENT' : 'ABSENT'}}
-              </span>
-            </td>
-            <td>
-              <a *ngIf="record.song_link && record.is_present" [href]="record.song_link" target="_blank" class="link-sharp">LISTEN_TRACK</a>
-              <span *ngIf="!record.song_link || !record.is_present" class="muted-text">--</span>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-      <ng-template #noHistory>
-        <div class="empty-state">No attendance records match your filters.</div>
-      </ng-template>
-    </div>
-
-    <!-- Pagination -->
-    <div class="pagination-bar" *ngIf="totalHistoryPages > 1">
-      <button class="btn-glass btn-sm" (click)="prevHistoryPage()" [disabled]="historyPage === 1">← Prev</button>
-      <span class="page-info">{{historyPage}} / {{totalHistoryPages}}</span>
-      <button class="btn-glass btn-sm" (click)="nextHistoryPage()" [disabled]="historyPage === totalHistoryPages">Next →</button>
-    </div>
-  </div>
-</section>
-    <!-- ANNOUNCEMENTS -->
-<section class="mb-5">
-  <label class="section-label">LATEST_ANNOUNCEMENTS</label>
-  <div class="announcement-grid">
-    <div *ngFor="let ann of announcements" class="announcement-card">
-      <div class="announcement-media">
-        <img *ngIf="ann.media_type === 'IMAGE'" [src]="ann.image_storage || ann.media_url" style="max-width:100%">
-        <iframe *ngIf="ann.media_type === 'VIDEO'" [src]="sanitizeUrl(ann.media_url)" frameborder="0" allowfullscreen></iframe>
-      </div>
-      <div class="announcement-content">
-        <span class="badge-sharp">{{ann.category}}</span>
-        <h4>{{ann.title}}</h4>
-        <p>{{ann.description}}</p>
-        <div *ngIf="ann.registration_enabled" class="register-area">
-          <button *ngIf="!ann.user_registered" class="btn-sharp-sm" (click)="registerForAnnouncement(ann.id)">REGISTER</button>
-          <span *ngIf="ann.user_registered" class="text-success">✓ REGISTERED</span>
-          <span *ngIf="ann.registration_type === 'PAID'" class="price">€{{ann.price}}</span>
+        <!-- Pagination -->
+        <div class="pagination-bar" *ngIf="totalUpcomingPages > 1">
+          <button class="btn-glass btn-sm" (click)="prevUpcomingPage()" [disabled]="upcomingPage === 1">← Prev</button>
+          <span class="page-info">{{upcomingPage}} / {{totalUpcomingPages}}</span>
+          <button class="btn-glass btn-sm" (click)="nextUpcomingPage()"
+            [disabled]="upcomingPage === totalUpcomingPages">Next →</button>
         </div>
       </div>
-    </div>
-  </div>
-</section>
+    </section>
 
-<!-- POSTS FEED -->
-<section class="mb-5">
-  <label class="section-label">DANCE_VIDEOS_FEED</label>
-  <div class="posts-feed">
-    <div *ngFor="let post of posts" class="post-card">
-      <div class="video-container">
-        <iframe [src]="sanitizeUrl(post.video_url)"frameborder="0" allowfullscreen loading="lazy"></iframe>
-      </div>
-      <h4>{{post.title}}</h4>
-      <p>{{post.description}}</p>
-      <div class="post-meta">
-        <span>{{post.created_at | date}}</span> • <span>{{post.author_name}}</span>
-      </div>
-    </div>
-  </div>
-</section>
+    <section class="mb-5">
+      <label class="section-label">HISTORY_LOG</label>
+      <div class="sharp-card">
+        <!-- Filter Bar (unchanged) -->
+        <div class="filter-bar">
+          <div class="filter-field">
+            <label class="filter-label"><i class="bi bi-search me-1"></i> Search Class</label>
+            <input type="text" class="sharp-input filter-select" placeholder="Class name..."
+              [(ngModel)]="historySearchTerm" (input)="applyHistoryFilters()">
+          </div>
+          <div class="filter-field">
+            <label class="filter-label"><i class="bi bi-funnel me-1"></i> Status</label>
+            <select class="sharp-input filter-select" [(ngModel)]="historyStatusFilter"
+              (change)="applyHistoryFilters()">
+              <option value="ALL">All</option>
+              <option value="PRESENT">Present</option>
+              <option value="ABSENT">Absent</option>
+            </select>
+          </div>
+          <button class="btn-glass btn-sm filter-reset" (click)="resetHistoryFilters()"
+            [disabled]="!historySearchTerm && historyStatusFilter === 'ALL'">
+            <i class="bi bi-arrow-counterclockwise"></i> Clear
+          </button>
+        </div>
 
-<!-- MY REGISTERED ANNOUNCEMENTS -->
-<section class="mb-5" *ngIf="announcements.length > 0">
-  <label class="section-label">MY_REGISTERED_EVENTS</label>
-  <div class="announcement-grid">
-    <div *ngFor="let ann of announcements" class="announcement-card">
-      <div class="announcement-media">
-        <img *ngIf="ann.media_type === 'IMAGE'" [src]="ann.image_storage || ann.media_url" style="max-width:100%">
-        <iframe *ngIf="ann.media_type === 'VIDEO'" [src]="sanitizeUrl(ann.media_url)" frameborder="0" allowfullscreen loading="lazy"></iframe>
-      </div>
-      <div class="announcement-content">
-        <span class="badge-sharp">{{ann.category}}</span>
-        <h4>{{ann.title}}</h4>
-        <p>{{ann.description}}</p>
-        <div *ngIf="ann.registration_type === 'PAID'" class="price-badge">€{{ann.price}}</div>
-        <span class="registered-badge">✓ REGISTERED</span>
-      </div>
-    </div>
-  </div>
-</section>
+        <!-- Table (paginated) -->
+        <div class="table-container">
+          <table class="sharp-table" *ngIf="paginatedHistory.length > 0; else noHistory">
+            <thead>
+              <tr>
+                <th>CLASS</th>
+                <th>DATE</th>
+                <th>STATUS</th>
+                <th>RESOURCES</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let record of paginatedHistory">
+                <td>{{getClassName(record.class_id)}}</td>
+                <td>{{record.class_date | date:'dd/MM/yy'}}</td>
+                <td>
+                  <span class="status-pill" [ngClass]="record.is_present ? 'pill-green' : 'pill-red'">
+                    {{record.is_present ? 'PRESENT' : 'ABSENT'}}
+                  </span>
+                </td>
+                <td>
+                  <a *ngIf="record.song_link && record.is_present" [href]="record.song_link" target="_blank"
+                    class="link-sharp">LISTEN_TRACK</a>
+                  <span *ngIf="!record.song_link || !record.is_present" class="muted-text">--</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <ng-template #noHistory>
+            <div class="empty-state">No attendance records match your filters.</div>
+          </ng-template>
+        </div>
 
-<!-- POSTS FEED (same as before) -->
-<section class="mb-5">
-  <label class="section-label">DANCE_VIDEOS_FEED</label>
-  <div class="posts-feed">...</div>
-</section>
+        <!-- Pagination -->
+        <div class="pagination-bar" *ngIf="totalHistoryPages > 1">
+          <button class="btn-glass btn-sm" (click)="prevHistoryPage()" [disabled]="historyPage === 1">← Prev</button>
+          <span class="page-info">{{historyPage}} / {{totalHistoryPages}}</span>
+          <button class="btn-glass btn-sm" (click)="nextHistoryPage()"
+            [disabled]="historyPage === totalHistoryPages">Next →</button>
+        </div>
+      </div>
+    </section>
+    <!-- ANNOUNCEMENTS -->
+    <section class="mb-5">
+      <label class="section-label">LATEST_ANNOUNCEMENTS</label>
+      <div class="announcement-grid">
+        <div *ngFor="let ann of announcements" class="announcement-card">
+          <div class="announcement-media">
+            <img *ngIf="ann.media_type === 'IMAGE'" [src]="ann.image_storage || ann.media_url" style="max-width:100%">
+            <iframe *ngIf="ann.media_type === 'VIDEO'" [src]="sanitizeUrl(ann.media_url)" frameborder="0"
+              allowfullscreen></iframe>
+          </div>
+          <div class="announcement-content">
+            <span class="badge-sharp">{{ann.category}}</span>
+            <h4>{{ann.title}}</h4>
+            <p>{{ann.description}}</p>
+            <div *ngIf="ann.registration_enabled" class="register-area">
+              <button *ngIf="!ann.user_registered" class="btn-sharp-sm"
+                (click)="registerForAnnouncement(ann.id)">REGISTER</button>
+              <span *ngIf="ann.user_registered" class="text-success">✓ REGISTERED</span>
+              <span *ngIf="ann.registration_type === 'PAID'" class="price">€{{ann.price}}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- POSTS FEED -->
+    <section class="mb-5">
+      <label class="section-label">DANCE_VIDEOS_FEED</label>
+      <div class="posts-feed">
+        <div *ngFor="let post of posts" class="post-card">
+          <div class="video-container">
+            <iframe [src]="sanitizeUrl(post.video_url)" frameborder="0" allowfullscreen loading="lazy"></iframe>
+          </div>
+          <h4>{{post.title}}</h4>
+          <p>{{post.description}}</p>
+          <div class="post-meta">
+            <span>{{post.created_at | date}}</span> • <span>{{post.author_name}}</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MY REGISTERED ANNOUNCEMENTS -->
+    <section class="mb-5" *ngIf="announcements.length > 0">
+      <label class="section-label">MY_REGISTERED_EVENTS</label>
+      <div class="announcement-grid">
+        <div *ngFor="let ann of announcements" class="announcement-card">
+          <div class="announcement-media">
+            <img *ngIf="ann.media_type === 'IMAGE'" [src]="ann.image_storage || ann.media_url" style="max-width:100%">
+            <iframe *ngIf="ann.media_type === 'VIDEO'" [src]="sanitizeUrl(ann.media_url)" frameborder="0"
+              allowfullscreen loading="lazy"></iframe>
+          </div>
+          <div class="announcement-content">
+            <span class="badge-sharp">{{ann.category}}</span>
+            <h4>{{ann.title}}</h4>
+            <p>{{ann.description}}</p>
+            <div *ngIf="ann.registration_type === 'PAID'" class="price-badge">€{{ann.price}}</div>
+            <span class="registered-badge">✓ REGISTERED</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
 
     <footer class="footer-note">
       <p>SAFEGUARDING_COMPLIANT // GARD_VETTED_STAFF</p>

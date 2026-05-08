@@ -5,8 +5,8 @@ import { Announcement } from '../models/announcement.model';
 
 @Injectable({ providedIn: 'root' })
 export class AnnouncementService {
-  private apiUrl = 'https://dbds-backend.onrender.com/api/announcements';
-  // private apiUrl = 'http://localhost:5010/api/announcements';
+  // private apiUrl = 'https://dbds-backend.onrender.com/api/announcements';
+  private apiUrl = 'http://localhost:5010/api/announcements';
 
   constructor(private http: HttpClient) {}
 
@@ -32,7 +32,7 @@ export class AnnouncementService {
     return this.http.delete(`${this.apiUrl}/${id}`);
   }
 
-  register(id: number): Observable<any> {
+  register(id: number, paymentData: any): Observable<any> {
     return this.http.post(`${this.apiUrl}/${id}/register`, {});
   }
 
@@ -42,7 +42,9 @@ export class AnnouncementService {
   getMyRegistrations(): Observable<Announcement[]> {
   return this.http.get<Announcement[]>(`${this.apiUrl}/my-registrations`);
 }
-
+markRegistrationPaid(registrationId: number) {
+  return this.http.put(`${this.apiUrl}/registrations/${registrationId}/complete`, {});
+}
 
 
 }

@@ -196,6 +196,12 @@ body {
   border-color: transparent;
 }
 .d-none { display: none !important; }
+.performance-mobile-card .class-mobile-body .d-flex {
+  margin-top: 0.5rem;
+}
+.performance-mobile-card .class-mobile-header {
+  align-items: center;
+}
 
 @media (min-width: 768px) {
   .d-md-block { display: block !important; }
