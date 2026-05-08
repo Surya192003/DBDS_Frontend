@@ -26,7 +26,7 @@ filteredAttendanceHistory: any[] = [];
   today: string|number|Date|null = new Date()
   upcomingPage = 1;
 pageSize = 6;;
-
+academicYear: { start: string; end: string } = { start: '', end: '' };
   constructor(
     private apiService: ApiService,
     private authService: AuthService,
@@ -39,35 +39,47 @@ pageSize = 6;;
 
   ngOnInit() {
     this.loadStudentData();
+    this.apiService.getSettings().subscribe((range: any) => {
+      this.academicYear = range;
+      this.loadStudentData();
+    });
   }
 
   loadStudentData() {
-    this.loading = true;
-    const studentId = this.currentUser?.student_data?.student_id;
+  this.loading = true;
+  const studentId = this.currentUser?.student_data?.student_id;
 
-    forkJoin({
-      allClasses: this.apiService.getClasses(),
-      upcoming: this.apiService.getUpcomingClasses(),
-      attendance: studentId ? this.apiService.getStudentAttendance(studentId) : [],
-      myAnnouncements: this.announcementService.getMyRegistrations(), // ✅ only registered
-      posts: this.postService.getAll()
-    }).subscribe({
-      next: (results) => {
-        this.allClasses = results.allClasses;
-        this.upcomingClasses = results.upcoming;
-        this.attendanceHistory = results.attendance;
-        this.filteredAttendanceHistory = [...this.attendanceHistory];
-        this.announcements = results.myAnnouncements;
-        this.posts = results.posts;
-        this.calculateSummary();
-        this.loading = false;
-      },
-      error: (err) => {
-        console.error(err);
-        this.loading = false;
-      }
-    });
-  }
+  forkJoin({
+    allClasses: this.apiService.getClasses(),
+    upcoming: this.apiService.getUpcomingClasses(),
+    attendance: studentId ? this.apiService.getStudentAttendance(studentId) : [],
+    myAnnouncements: this.announcementService.getMyRegistrations(),
+    posts: this.postService.getAll()
+  }).subscribe({
+    next: (results) => {
+      // Filter function
+      const inRange = (dateStr: string) => {
+        if (!this.academicYear.start || !this.academicYear.end) return true;
+        const d = new Date(dateStr);
+        return d >= new Date(this.academicYear.start) && d <= new Date(this.academicYear.end);
+      };
+
+      this.allClasses = (results.allClasses || []).filter((c: any) => inRange(c.class_date));
+      this.upcomingClasses = (results.upcoming || []).filter((c: any) => inRange(c.class_date));
+
+      this.attendanceHistory = results.attendance || [];
+      this.filteredAttendanceHistory = [...this.attendanceHistory];
+      this.announcements = results.myAnnouncements || [];
+      this.posts = results.posts || [];
+      this.calculateSummary();
+      this.loading = false;
+    },
+    error: (err) => {
+      console.error(err);
+      this.loading = false;
+    }
+  });
+}
 
   calculateSummary() {
     this.attendanceSummary.totalClasses = this.allClasses.length;

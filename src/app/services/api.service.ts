@@ -349,4 +349,7 @@ getTagStatus(classId: number): Observable<any> {
   return this.http.get(`${this.apiUrl}/instructor/tag-status/${classId}`, { headers: this.getHeaders() });
 }
 
+getSettings() { return this.http.get(`${this.apiUrl}/settings`); }
+updateSettings(data: any) { return this.http.put(`${this.apiUrl}/settings`, data); }
+
 }

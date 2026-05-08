@@ -76,6 +76,8 @@ export class AdminDashboardComponent implements OnInit {
   editingPostId: number | null = null;
   selectedFile: File | null = null;
 
+  academicYear = { start: '', end: '' };
+
 
   selectedMonth: string = new Date().toISOString().slice(0, 7);
   selectedInstructor: any = null;
@@ -305,6 +307,23 @@ markRegistrationPaid(regId: number) {
       }
     });
   }
+
+  loadSettings() {
+  this.apiService.getSettings().subscribe((settings: any) => {
+    this.academicYear.start = settings.academic_year_start || '';
+    this.academicYear.end = settings.academic_year_end || '';
+  });
+}
+
+saveAcademicYear() {
+  this.apiService.updateSettings({
+    academic_year_start: this.academicYear.start,
+    academic_year_end: this.academicYear.end
+  }).subscribe(() => {
+    alert('Academic year updated!');
+  });
+}
+
 
   loadInstructorStats() {
     this.apiService.getInstructorTagSummary().subscribe({

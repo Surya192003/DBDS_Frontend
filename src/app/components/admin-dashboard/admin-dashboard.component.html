@@ -56,9 +56,9 @@
       <div class="d-flex justify-content-between align-items-center">
         <h3 class="page-title">Admin Dashboard</h3>
         <div class="btn-group">
-          <button class="btn-glass btn-sm" (click)="loadAllData()">
+          <!-- <button class="btn-glass btn-sm" (click)="loadAllData()">
             <i class="bi bi-arrow-clockwise"></i> Refresh
-          </button>
+          </button> -->
           <button class="btn-glass btn-sm" routerLink="/admin/groups">
             <i class="bi bi-people"></i> Manage Groups
           </button>
@@ -870,6 +870,33 @@
       </div>
     </div>
   </div>
+
+  <!-- Academic Year Settings -->
+<div class="glass-panel mb-4">
+  <div class="panel-header">
+    <h5 class="panel-title"><i class="bi bi-gear accent me-2"></i>Academic Year Settings</h5>
+  </div>
+  <div class="panel-body">
+    <div class="row g-3">
+      <div class="col-md-5">
+        <label class="form-label">Start Date</label>
+        <input type="date" class="sharp-input" [(ngModel)]="academicYear.start">
+      </div>
+      <div class="col-md-5">
+        <label class="form-label">End Date</label>
+        <input type="date" class="sharp-input" [(ngModel)]="academicYear.end">
+      </div>
+      <div class="col-md-2 d-flex align-items-end">
+        <button class="btn-glass w-100" (click)="saveAcademicYear()">
+          <i class="bi bi-check-circle me-1"></i> Save
+        </button>
+      </div>
+    </div>
+    <small class="text-muted mt-2 d-block">
+      Instructors & students will only see data within these dates.
+    </small>
+  </div>
+</div>
 
   <!-- ==================== MODALS ==================== -->
   <!-- Create Class Modal -->

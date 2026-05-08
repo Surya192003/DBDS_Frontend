@@ -37,6 +37,8 @@ export class InstructorDashboardComponent implements OnInit, OnDestroy {
   upcomingClasses: number = 0;
   totalStudents: number = 0;
   attendanceRate: number = 0;
+  
+academicYearRange = { start: '', end: '' };
 
   // Attendance form
   attendanceForm: FormGroup = new FormGroup({});
@@ -178,39 +180,50 @@ export class InstructorDashboardComponent implements OnInit, OnDestroy {
     this.filteredClasses = [...this.classes];
     this.classPage = 1;
   }
+  loadAcademicYearRange() {
+  this.apiService.getSettings().subscribe((range: any) => {
+    this.academicYearRange = range;
+  });
+}
 
 
   // ---------- Classes ----------
-  loadClasses() {
-    this.loading = true;
-    const sub = this.apiService.getClasses().subscribe({
-      next: (data: any) => {
-        if (Array.isArray(data)) {
-          this.classes = data;
-          this.filteredClasses = [...this.classes];
-        } else if (data?.rows && Array.isArray(data.rows)) {
-          this.classes = data.rows;
-          this.filteredClasses = [...this.classes];
-        } else if (data?.data && Array.isArray(data.data)) {
-          this.classes = data.data;
-          this.filteredClasses = [...this.classes];
-        } else {
-          this.classes = [];
-          this.filteredClasses = [];
-        }
-        this.classes.forEach(cls => this.loadTagStatus(cls.id));
-        this.calculateStatistics();
-        this.loading = false;
-      },
-      error: (error) => {
-        console.error('Error loading classes:', error);
-        this.classes = [];
-        this.filteredClasses = [];
-        this.loading = false;
+loadClasses() {
+  this.loading = true;
+  const sub = this.apiService.getClasses().subscribe({
+    next: (data: any) => {
+      // Parse the response as before
+      let parsed: any[] = [];
+      if (Array.isArray(data)) parsed = data;
+      else if (data?.rows) parsed = data.rows;
+      else if (data?.data) parsed = data.data;
+      else parsed = [];
+
+      // Filter by academic year if we have dates
+      if (this.academicYearRange.start && this.academicYearRange.end) {
+        const start = new Date(this.academicYearRange.start);
+        const end = new Date(this.academicYearRange.end);
+        parsed = parsed.filter(c => {
+          const d = new Date(c.class_date);
+          return d >= start && d <= end;
+        });
       }
-    });
-    this.subscriptions.push(sub);
-  }
+
+      this.classes = parsed;
+      this.filteredClasses = [...this.classes];
+      this.classes.forEach(cls => this.loadTagStatus(cls.id));
+      this.calculateStatistics();
+      this.loading = false;
+    },
+    error: (error) => {
+      console.error('Error loading classes:', error);
+      this.classes = [];
+      this.filteredClasses = [];
+      this.loading = false;
+    }
+  });
+  this.subscriptions.push(sub);
+}
 
   calculateStatistics() {
     this.totalClasses = this.classes.length;
