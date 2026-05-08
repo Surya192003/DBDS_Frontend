@@ -95,6 +95,8 @@ export class AdminDashboardComponent implements OnInit {
   selectedStudent: any = null;
   selectedClass: any = null;
   loadingStudents: boolean = false;
+  pageSize = 6;
+  classPage = 1;
 
 
 
@@ -404,6 +406,7 @@ export class AdminDashboardComponent implements OnInit {
       result = result.filter(c => c.group_name === this.groupFilter);
     }
     this.filteredClasses = result;
+    this.classPage = 1;
   }
 
   resetClassFilters() {
@@ -486,6 +489,7 @@ export class AdminDashboardComponent implements OnInit {
   filterUsers() {
     if (!this.userSearchTerm) {
       this.filteredUsers = [...this.users];
+      this.userPage = 1;
       return;
     }
 
@@ -740,4 +744,87 @@ export class AdminDashboardComponent implements OnInit {
       });
     }
   }
+  get totalClassPages(): number {
+  return Math.ceil(this.filteredClasses.length / this.pageSize);
+}
+get paginatedClasses(): any[] {
+  const start = (this.classPage - 1) * this.pageSize;
+  return this.filteredClasses.slice(start, start + this.pageSize);
+}
+prevClassPage() { if (this.classPage > 1) this.classPage--; }
+nextClassPage() { if (this.classPage < this.totalClassPages) this.classPage++; }
+goToClassPage(p: number) { if (p >= 1 && p <= this.totalClassPages) this.classPage = p; }
+
+// ---- Users ----
+userPage = 1;
+get totalUserPages(): number {
+  return Math.ceil(this.filteredUsers.length / this.pageSize);
+}
+get paginatedUsers(): any[] {
+  const start = (this.userPage - 1) * this.pageSize;
+  return this.filteredUsers.slice(start, start + this.pageSize);
+}
+prevUserPage() { if (this.userPage > 1) this.userPage--; }
+nextUserPage() { if (this.userPage < this.totalUserPages) this.userPage++; }
+
+// ---- Student Stats ----
+studentPage = 1;
+get totalStudentPages(): number {
+  return Math.ceil(this.filteredStudentStats.length / this.pageSize);
+}
+get paginatedStudentStats(): any[] {
+  const start = (this.studentPage - 1) * this.pageSize;
+  return this.filteredStudentStats.slice(start, start + this.pageSize);
+}
+prevStudentPage() { if (this.studentPage > 1) this.studentPage--; }
+nextStudentPage() { if (this.studentPage < this.totalStudentPages) this.studentPage++; }
+
+// ---- Instructor Stats ----
+instructorPage = 1;
+get totalInstructorPages(): number {
+  return Math.ceil(this.instructorStats.length / this.pageSize);
+}
+get paginatedInstructorStats(): any[] {
+  const start = (this.instructorPage - 1) * this.pageSize;
+  return this.instructorStats.slice(start, start + this.pageSize);
+}
+prevInstructorPage() { if (this.instructorPage > 1) this.instructorPage--; }
+nextInstructorPage() { if (this.instructorPage < this.totalInstructorPages) this.instructorPage++; }
+
+// ---- Payments ----
+paymentPage = 1;
+get totalPaymentPages(): number {
+  return Math.ceil(this.payments.length / this.pageSize);
+}
+get paginatedPayments(): any[] {
+  const start = (this.paymentPage - 1) * this.pageSize;
+  return this.payments.slice(start, start + this.pageSize);
+}
+prevPaymentPage() { if (this.paymentPage > 1) this.paymentPage--; }
+nextPaymentPage() { if (this.paymentPage < this.totalPaymentPages) this.paymentPage++; }
+
+// ---- Announcements ----
+announcementPage = 1;
+get totalAnnouncementPages(): number {
+  return Math.ceil(this.announcements.length / this.pageSize);
+}
+get paginatedAnnouncements(): any[] {
+  const start = (this.announcementPage - 1) * this.pageSize;
+  return this.announcements.slice(start, start + this.pageSize);
+}
+prevAnnouncementPage() { if (this.announcementPage > 1) this.announcementPage--; }
+nextAnnouncementPage() { if (this.announcementPage < this.totalAnnouncementPages) this.announcementPage++; }
+
+// ---- Posts ----
+postPage = 1;
+get totalPostPages(): number {
+  return Math.ceil(this.posts.length / this.pageSize);
+}
+get paginatedPosts(): any[] {
+  const start = (this.postPage - 1) * this.pageSize;
+  return this.posts.slice(start, start + this.pageSize);
+}
+prevPostPage() { if (this.postPage > 1) this.postPage--; }
+nextPostPage() { if (this.postPage < this.totalPostPages) this.postPage++; }
+
 }

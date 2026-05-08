@@ -1,63 +1,10 @@
+/* ===== instructor-dashboard.component.css ===== */
 :host {
   display: block;
-  background-color: var(--color-surface);
+  background: var(--color-surface);
   min-height: 100vh;
   font-family: var(--font-family-primary);
-  padding: 2rem 1.5rem;
-}
-
-/* ---------- Filter Bar (light, matching theme) ---------- */
-.filter-bar {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-end;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
-  padding: 1rem;
-  background: #fafafa;
-  border-radius: var(--radius-card);
-  border: var(--border-light);
-}
-
-.filter-field {
-  flex: 1 1 180px;
-  min-width: 150px;
-}
-
-.filter-label {
-  display: block;
-  font-weight: 700;
-  font-size: 0.7rem;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--color-text-soft);
-  margin-bottom: 0.3rem;
-}
-
-.filter-select {
-  width: 100%;
-  padding: 0.6rem 2rem 0.6rem 0.8rem;
-  border: 2px solid #eaeaea;
-  border-radius: 14px;
-  font-family: inherit;
-  font-size: 0.85rem;
-  background: white;
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%235a5a5a' d='M5 7L0 2h10z'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 0.7rem center;
-  transition: border-color 0.2s, box-shadow 0.2s;
-}
-
-.filter-select:focus {
-  outline: none;
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(253, 101, 133, 0.1);
-}
-
-.filter-reset {
-  align-self: flex-end;
-  height: 38px;
+  padding: clamp(1.5rem, 4vw, 2.5rem);
 }
 
 .dashboard-wrapper {
@@ -68,15 +15,14 @@
 /* ---------- Header ---------- */
 .dashboard-header .title-text {
   font-weight: 900;
-  font-size: 2rem;
+  font-size: clamp(1.8rem, 7vw, 2.5rem);
   background: var(--gradient-1);
   background-clip: text;
   -webkit-background-clip: text;
   color: transparent;
-  margin-bottom: 0.2rem;
 }
 .tagline {
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   color: var(--color-text-soft);
   font-weight: 600;
   letter-spacing: 0.04em;
@@ -85,11 +31,10 @@
 /* ---------- Summary Cards ---------- */
 .summary-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: 1.5rem;
-  margin-bottom: 3rem;
+  margin-bottom: 2.5rem;
 }
-
 .summary-card {
   background: var(--color-white);
   border-radius: var(--radius-card);
@@ -97,28 +42,20 @@
   box-shadow: var(--shadow-sm);
   border: var(--border-light);
   text-align: center;
-  transition: transform 0.2s;
-}
-.summary-card:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-md);
 }
 .summary-card label {
-  display: block;
   font-size: 0.75rem;
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: var(--color-text-soft);
-  margin-bottom: 0.5rem;
 }
 .summary-card .value {
   font-size: 2.2rem;
   font-weight: 900;
   line-height: 1;
+  margin-top: 0.5rem;
 }
-
-/* Accent colours for the cards (reuse global gradient hues) */
 .summary-card.color-blue .value { color: var(--color-primary); }
 .summary-card.color-green .value { color: #10b981; }
 .summary-card.color-yellow .value { color: var(--color-accent); }
@@ -126,7 +63,6 @@
 
 /* ---------- Section Labels ---------- */
 .section-label {
-  display: block;
   font-size: 1.1rem;
   font-weight: 900;
   color: var(--color-text);
@@ -134,17 +70,17 @@
   letter-spacing: -0.02em;
 }
 
-/* ---------- Sharp Card (white panel) ---------- */
+/* ---------- Sharp Card ---------- */
 .sharp-card {
   background: var(--color-white);
   border-radius: var(--radius-card);
-  padding: 2rem;
+  padding: 1.5rem;
   box-shadow: var(--shadow-sm);
   border: var(--border-light);
   overflow-x: auto;
 }
 
-/* ---------- Sharp Table ---------- */
+/* ---------- Table ---------- */
 .sharp-table {
   width: 100%;
   border-collapse: collapse;
@@ -159,16 +95,14 @@
   color: var(--color-text-soft);
   padding: 0.8rem 1rem;
   border-bottom: 2px solid #f0f0f0;
-  text-align: left;
 }
 .sharp-table td {
   padding: 0.9rem 1rem;
   border-bottom: 1px solid #f5f5f5;
-  color: var(--color-text);
   vertical-align: middle;
 }
 .sharp-table tbody tr:hover {
-  background: #fef8f6;   /* subtle warm hover */
+  background: #fef8f6;
 }
 
 .muted-id {
@@ -176,7 +110,7 @@
   color: var(--color-text-soft);
 }
 
-/* ---------- Badge & Status Pills ---------- */
+/* ---------- Badges & Status Pills ---------- */
 .badge-sharp {
   display: inline-block;
   padding: 0.25em 0.75em;
@@ -184,11 +118,9 @@
   font-size: 0.72rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.03em;
   background: var(--gradient-1);
   color: white;
 }
-
 .status-pill {
   display: inline-block;
   padding: 0.25em 0.9em;
@@ -197,22 +129,19 @@
   font-weight: 800;
   text-transform: uppercase;
 }
-
-/* Preserve any dynamic status classes you might use */
 .status-pill.completed { background: #d1fae5; color: #065f46; }
 .status-pill.upcoming { background: #fef3c7; color: #92400e; }
-.status-pill.ongoing { background: #dbeafe; color: #1e40af; }
+.status-pill.today { background: #dbeafe; color: #1e40af; }
 
-/* ---------- Buttons (instructor specific, but reusing global gradients) ---------- */
+/* ---------- Buttons ---------- */
 .btn-sharp-sm {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.3rem;
-  padding: 0.4rem 1rem;
+  padding: 0.45rem 1rem;
   border: none;
   border-radius: var(--radius-button);
-  font-family: var(--font-family-primary);
   font-weight: 700;
   font-size: 0.75rem;
   text-transform: uppercase;
@@ -237,153 +166,7 @@
   color: white;
 }
 
-/* Mobile icon‑only refresh button */
-.btn-sharp-outline {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 1.2rem;
-  border: 2px solid var(--color-primary);
-  border-radius: var(--radius-button);
-  background: transparent;
-  color: var(--color-primary);
-  font-weight: 700;
-  font-size: 0.85rem;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: 0.2s;
-}
-.btn-sharp-outline:hover {
-  background: var(--gradient-1);
-  color: white;
-  border-color: transparent;
-}
-
-/* ---------- Announcements Cards ---------- */
-.announcement-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 1.8rem;
-  margin: 1.5rem 0 2.5rem;
-}
-
-.announcement-card {
-  background: var(--color-white);
-  border-radius: var(--radius-card);
-  overflow: hidden;
-  box-shadow: var(--shadow-sm);
-  border: var(--border-light);
-  transition: transform 0.2s, box-shadow 0.2s;
-  display: flex;
-  flex-direction: column;
-}
-.announcement-card:hover {
-  transform: translateY(-6px);
-  box-shadow: var(--shadow-lg);
-}
-
-.media-preview {
-  width: 100%;
-  aspect-ratio: 16 / 10;
-  background: #f0f0f0;
-  overflow: hidden;
-}
-.media-preview img,
-.media-preview iframe {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border: none;
-}
-
-.announcement-content {
-  padding: 1.2rem 1.4rem;
-  flex: 1;
-}
-.announcement-content h4 {
-  font-size: 1rem;
-  font-weight: 800;
-  margin: 0.5rem 0 0.3rem;
-}
-.announcement-content p {
-  font-size: 0.85rem;
-  color: var(--color-text-soft);
-  line-height: 1.5;
-  margin-bottom: 1rem;
-}
-
-.category-badge {
-  display: inline-block;
-  padding: 0.2em 0.8em;
-  border-radius: 999px;
-  font-size: 0.7rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  background: var(--gradient-3);
-  color: #2c2c2c;
-}
-
-.registered-badge,
-.price-badge {
-  display: inline-block;
-  padding: 0.3em 0.9em;
-  border-radius: 999px;
-  font-size: 0.7rem;
-  font-weight: 800;
-  text-transform: uppercase;
-  margin-top: 0.5rem;
-}
-.registered-badge {
-  background: #d1fae5;
-  color: #065f46;
-}
-.price-badge {
-  background: #fef3c7;
-  color: #92400e;
-}
-
-/* ---------- Empty state ---------- */
-.empty-state {
-  text-align: center;
-  padding: 3rem 1rem;
-  color: var(--color-text-soft);
-  border: 2px dashed #e5e7eb;
-  border-radius: 1rem;
-}
-
-/* ---------- Spinner ---------- */
-.spinner-square {
-  display: inline-block;
-  width: 2rem;
-  height: 2rem;
-  border: 3px solid rgba(253, 101, 133, 0.2);
-  border-top-color: var(--color-primary);
-  border-radius: 50%;
-  animation: spin 0.7s linear infinite;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
-
-/* ---------- Modal styling (light, matching the admin) ---------- */
-.modal-content.sharp-card {
-  padding: 0;
-}
-.modal-header {
-  border-bottom: 1px solid #f0f0f0;
-  padding: 1.5rem 1.5rem 0.5rem;
-}
-.modal-body {
-  padding: 1.5rem;
-}
-.modal-footer {
-  border-top: 1px solid #f0f0f0;
-  padding: 1.5rem;
-}
-
-/* ---------- Filter Bar (add later if you want filtering for classes) ---------- */
-/*
- * If you add the filter bar HTML (like the admin Class Management) inside a .filter-bar div,
- * the following styles will make it look consistent.
- */
+/* ---------- Filter Bar (consolidated) ---------- */
 .filter-bar {
   display: flex;
   flex-wrap: wrap;
@@ -397,11 +180,11 @@
 }
 .filter-field {
   flex: 1 1 180px;
+  min-width: 140px;
 }
 .filter-label {
-  display: block;
+  font-size: 0.72rem;
   font-weight: 700;
-  font-size: 0.7rem;
   text-transform: uppercase;
   letter-spacing: 0.04em;
   color: var(--color-text-soft);
@@ -412,7 +195,6 @@
   padding: 0.5rem 2rem 0.5rem 0.8rem;
   border: 2px solid #eaeaea;
   border-radius: 14px;
-  font-family: inherit;
   font-size: 0.85rem;
   background: white;
   appearance: none;
@@ -426,15 +208,194 @@
   box-shadow: 0 0 0 3px rgba(253,101,133,0.1);
 }
 
+/* ---------- Announcements ---------- */
+.announcement-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.8rem;
+  margin: 1.5rem 0;
+}
+.announcement-card {
+  background: var(--color-white);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  border: var(--border-light);
+}
+.announcement-content {
+  padding: 1.2rem;
+}
+.announcement-content h4 {
+  font-size: 1rem;
+  font-weight: 800;
+  margin: 0.5rem 0 0.3rem;
+}
+.announcement-content p {
+  font-size: 0.85rem;
+  color: var(--color-text-soft);
+  line-height: 1.5;
+}
+.media-preview {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  background: #f0f0f0;
+  overflow: hidden;
+}
+.media-preview img,
+.media-preview iframe {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.category-badge {
+  background: var(--gradient-3);
+  color: #2c2c2c;
+  padding: 0.2em 0.8em;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+.registered-badge {
+  background: #d1fae5;
+  color: #065f46;
+  padding: 0.3em 0.9em;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 800;
+}
+.price-badge {
+  background: #fef3c7;
+  color: #92400e;
+  padding: 0.3em 0.9em;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 800;
+}
+
+/* ---------- Mobile Class Cards ---------- */
+.mobile-class-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.class-mobile-card {
+  background: var(--color-white);
+  border-radius: var(--radius-card);
+  padding: 1.2rem;
+  box-shadow: var(--shadow-sm);
+  border: var(--border-light);
+}
+.class-mobile-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.class-date-mobile {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--color-text);
+}
+.class-mobile-body h4 {
+  font-size: 1rem;
+  font-weight: 900;
+  margin: 0 0 0.5rem;
+}
+.class-meta {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-size: 0.8rem;
+  color: var(--color-text-soft);
+  margin-bottom: 0.8rem;
+}
+.class-mobile-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-top: 0.5rem;
+}
+.tag-area {
+  margin-top: 0.75rem;
+}
+.tag-complete {
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+/* ---------- Pagination ---------- */
+.pagination-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+}
+.page-numbers {
+  display: flex;
+  gap: 0.3rem;
+  flex-wrap: wrap;
+}
+.page-dot {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 1px solid #e0e0e0;
+  background: var(--color-white);
+  font-weight: 700;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.page-dot.active {
+  background: var(--gradient-1);
+  color: white;
+  border-color: transparent;
+}
+.page-info {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--color-text);
+}
+
 /* ---------- Responsive ---------- */
 @media (max-width: 768px) {
+  :host {
+    padding: 1rem;
+  }
+  .sharp-card {
+    padding: 1rem;
+  }
   .summary-grid {
     grid-template-columns: repeat(2, 1fr);
   }
   .announcement-grid {
     grid-template-columns: 1fr;
   }
-  .sharp-table {
-    font-size: 0.8rem;
+  .filter-bar {
+    flex-direction: column;
+    align-items: stretch;
   }
+  .filter-field {
+    min-width: 100%;
+  }
+  .btn-sharp-outline {
+    width: 100%;
+    justify-content: center;
+  }
+  /* Mobile class cards already styled */
+  .class-mobile-actions .btn-sharp-sm {
+    flex: 1;
+  }
+}
+
+/* Show/hide utility */
+@media (min-width: 768px) {
+  .d-md-none { display: none !important; }
+  .d-md-block { display: block !important; }
 }

@@ -130,3 +130,74 @@ body {
   background: var(--gradient-1);
   color: white;
 }
+
+/* ---- Secondary glass button (used for pagination, reset, filters) ---- */
+.btn-glass {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: var(--radius-full);            /* pill shape */
+  padding: 10px 18px;
+  font-family: var(--font-family-primary);
+  font-weight: 700;
+  font-size: 0.85rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+  background: var(--color-white);
+  color: var(--color-text);
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s;
+}
+.btn-glass:hover {
+  background: var(--gradient-1);
+  color: white;
+  border-color: transparent;
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+.btn-glass:active {
+  transform: translateY(0) scale(0.98);
+}
+.btn-glass:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+.btn-glass.btn-sm {
+  padding: 6px 14px;
+  font-size: 0.75rem;
+}
+
+/* ---- Outline refresh button (header) ---- */
+.btn-sharp-outline {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1.2rem;
+  border: 2px solid var(--color-primary);
+  border-radius: var(--radius-button);
+  background: transparent;
+  color: var(--color-primary);
+  font-family: var(--font-family-primary);
+  font-weight: 700;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: none;
+  transition: 0.2s;
+}
+.btn-sharp-outline:hover {
+  background: var(--gradient-1);
+  color: white;
+  border-color: transparent;
+}
+.d-none { display: none !important; }
+
+@media (min-width: 768px) {
+  .d-md-block { display: block !important; }
+  .d-md-none { display: none !important; }
+}

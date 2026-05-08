@@ -413,3 +413,126 @@
     gap: 0.5rem;
   }
 }
+/* Prevent any overflow on small screens */
+.table-responsive {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Mobile class cards (reuse from instructor) */
+.mobile-class-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.class-mobile-card {
+  background: var(--color-white);
+  border-radius: var(--radius-card);
+  padding: 1rem;
+  box-shadow: var(--shadow-sm);
+  border: var(--border-light);
+}
+.class-mobile-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+.class-mobile-body h4 {
+  font-size: 1rem;
+  font-weight: 800;
+  margin: 0 0 0.3rem;
+}
+.class-mobile-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+/* Pagination bar */
+.pagination-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+}
+.page-info {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--color-text);
+}
+
+/* Ensure no horizontal scroll on mobile panels */
+@media (max-width: 767px) {
+  .glass-panel {
+    padding: 1rem;
+  }
+  .sharp-modal-content {
+    padding: 1rem;
+  }
+}
+/* Prevent horizontal overflow on any screen */
+.table-responsive {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Mobile class cards (same friendly look as instructor) */
+.mobile-class-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.class-mobile-card {
+  background: var(--color-white);
+  border-radius: var(--radius-card);
+  padding: 1rem;
+  box-shadow: var(--shadow-sm);
+  border: var(--border-light);
+}
+
+.class-mobile-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.class-mobile-body h4 {
+  font-size: 1rem;
+  font-weight: 800;
+  margin: 0 0 0.3rem;
+}
+
+.class-mobile-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-top: 0.5rem;
+}
+
+/* Pagination bar (already used in instructor) */
+.pagination-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+}
+
+.page-info {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--color-text);
+}
+
+/* Tighten panels on mobile */
+@media (max-width: 767px) {
+  .glass-panel {
+    padding: 1rem !important;
+  }
+}

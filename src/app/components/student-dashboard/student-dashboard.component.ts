@@ -23,7 +23,9 @@ export class StudentDashboardComponent implements OnInit {
   historySearchTerm: string = '';
 historyStatusFilter: string = 'ALL';
 filteredAttendanceHistory: any[] = [];
-  today: string|number|Date|null = new Date();
+  today: string|number|Date|null = new Date()
+  upcomingPage = 1;
+pageSize = 6;;
 
   constructor(
     private apiService: ApiService,
@@ -92,12 +94,14 @@ filteredAttendanceHistory: any[] = [];
   }
 
   this.filteredAttendanceHistory = result;
+  this.historyPage = 1;  // back to first page
 }
 
 resetHistoryFilters() {
   this.historySearchTerm = '';
   this.historyStatusFilter = 'ALL';
   this.filteredAttendanceHistory = [...this.attendanceHistory];
+  this.historyPage = 1;
 }
 
   getClassName(classId: number): string {
@@ -132,4 +136,27 @@ resetHistoryFilters() {
     }
     return this.sanitizer.bypassSecurityTrustResourceUrl(embedUrl);
   }
+get totalUpcomingPages(): number {
+  return Math.ceil(this.upcomingClasses.length / this.pageSize);
+}
+get paginatedUpcoming(): any[] {
+  const start = (this.upcomingPage - 1) * this.pageSize;
+  return this.upcomingClasses.slice(start, start + this.pageSize);
+}
+prevUpcomingPage() { if (this.upcomingPage > 1) this.upcomingPage--; }
+nextUpcomingPage() { if (this.upcomingPage < this.totalUpcomingPages) this.upcomingPage++; }
+
+// Pagination for History
+historyPage = 1;
+get totalHistoryPages(): number {
+  return Math.ceil(this.filteredAttendanceHistory.length / this.pageSize);
+}
+get paginatedHistory(): any[] {
+  const start = (this.historyPage - 1) * this.pageSize;
+  return this.filteredAttendanceHistory.slice(start, start + this.pageSize);
+}
+prevHistoryPage() { if (this.historyPage > 1) this.historyPage--; }
+nextHistoryPage() { if (this.historyPage < this.totalHistoryPages) this.historyPage++; }
+
+
 }

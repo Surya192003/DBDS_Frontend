@@ -14,7 +14,7 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
   styleUrls: ['./instructor-dashboard.component.css']
 })
 export class InstructorDashboardComponent implements OnInit, OnDestroy {
-[x: string]: any;
+  [x: string]: any;
   classes: any[] = [];
   monthlyPerformance: any[] = [];
   activeStudents: any[] = [];
@@ -43,9 +43,11 @@ export class InstructorDashboardComponent implements OnInit, OnDestroy {
   markingAttendance: boolean = false;
   loading: boolean = false;
   loadingStudents: boolean = false;
-Math = Math;
+  Math = Math;
   announcementPage: number = 1;
-pageSize: number = 5;
+  pageSize: number = 5;
+  classPage: number = 1;
+  classPageSize: number = 6;
   private subscriptions: Subscription[] = [];
 
   tagStatusMap: { [classId: number]: { tagged_in: boolean, tagged_out: boolean } } = {};
@@ -73,6 +75,7 @@ pageSize: number = 5;
     this.subscriptions.forEach(sub => sub.unsubscribe());
   }
 
+
   loadDashboardData() {
     this.loadClasses();
     this.loadMonthlyPerformance();
@@ -96,7 +99,7 @@ pageSize: number = 5;
         this.posts = res.posts.map((post: any) => ({
           ...post,
           safeVideoUrl: this.sanitizeUrl(post.video_url)
-          
+
         }));
         this.announcementPage = 1
       },
@@ -165,13 +168,16 @@ pageSize: number = 5;
       result = result.filter(c => c.group_name === this.groupFilter);
     }
     this.filteredClasses = result;
+    this.classPage = 1;
   }
 
   resetClassFilters() {
     this.instructorFilter = '';
     this.groupFilter = '';
     this.filteredClasses = [...this.classes];
+    this.classPage = 1;
   }
+
 
   // ---------- Classes ----------
   loadClasses() {
@@ -180,7 +186,7 @@ pageSize: number = 5;
       next: (data: any) => {
         if (Array.isArray(data)) {
           this.classes = data;
-          this.filteredClasses = [...this.classes]; 
+          this.filteredClasses = [...this.classes];
         } else if (data?.rows && Array.isArray(data.rows)) {
           this.classes = data.rows;
           this.filteredClasses = [...this.classes];
@@ -267,7 +273,7 @@ pageSize: number = 5;
         else if (data?.rows) students = data.rows;
         else if (data?.data) students = data.data;
         else if (data?.students) students = data.students;
-        
+
         this.classStudents = students.map((s: any) => ({
           student_id: s.student_id ?? s.id ?? 0,
           name: s.name || s.student_name,
@@ -436,49 +442,104 @@ pageSize: number = 5;
   }
 
   get upcomingAnnouncements(): any[] {
-  return this.announcements.filter(ann => {
-    if (!ann.event_date) return true;                // no date → keep visible
-    const eventDate = new Date(ann.event_date);
-    eventDate.setHours(0, 0, 0, 0);
+    return this.announcements.filter(ann => {
+      if (!ann.event_date) return true;                // no date → keep visible
+      const eventDate = new Date(ann.event_date);
+      eventDate.setHours(0, 0, 0, 0);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      return eventDate >= today;
+    });
+  }
+  get paginatedUpcomingAnnouncements(): any[] {
+    const start = (this.announcementPage - 1) * this.pageSize;
+    return this.upcomingAnnouncements.slice(start, start + this.pageSize);
+  }
+
+  get totalUpcomingPages(): number {
+    return Math.ceil(this.upcomingAnnouncements.length / this.pageSize);
+  }
+
+  goToPage(page: number) {
+    if (page >= 1 && page <= this.totalUpcomingPages) {
+      this.announcementPage = page;
+    }
+  }
+
+  nextPage() {
+    if (this.announcementPage < this.totalUpcomingPages) {
+      this.announcementPage++;
+    }
+  }
+
+  prevPage() {
+    if (this.announcementPage > 1) {
+      this.announcementPage--;
+    }
+  }
+
+  // Check if event is past (for registered announcements)
+  isEventPast(eventDate: string): boolean {
+    if (!eventDate) return false;
+    const d = new Date(eventDate);
+    d.setHours(0, 0, 0, 0);
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    return eventDate >= today;
-  });
-}
-get paginatedUpcomingAnnouncements(): any[] {
-  const start = (this.announcementPage - 1) * this.pageSize;
-  return this.upcomingAnnouncements.slice(start, start + this.pageSize);
-}
-
-get totalUpcomingPages(): number {
-  return Math.ceil(this.upcomingAnnouncements.length / this.pageSize);
-}
-
-goToPage(page: number) {
-  if (page >= 1 && page <= this.totalUpcomingPages) {
-    this.announcementPage = page;
+    return d < today;
   }
-}
 
-nextPage() {
-  if (this.announcementPage < this.totalUpcomingPages) {
-    this.announcementPage++;
+  // Current‑month classes (filtered + sorted)
+  get currentMonthClasses(): any[] {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = today.getMonth(); // zero‑based
+    return this.filteredClasses.filter(c => {
+      const d = new Date(c.class_date);
+      return d.getFullYear() === year && d.getMonth() === month;
+    });
   }
-}
 
-prevPage() {
-  if (this.announcementPage > 1) {
-    this.announcementPage--;
+  // Sorted: ACTIVE_TODAY → UPCOMING → COMPLETED
+  get sortedCurrentMonthClasses(): any[] {
+    const sorted = [...this.currentMonthClasses];
+    sorted.sort((a, b) => {
+      const order: { [key: string]: number } = { 'today': 0, 'upcoming': 1, 'completed': 2 };
+      const statusA = this.getStatusClass(a.class_date);
+      const statusB = this.getStatusClass(b.class_date);
+      return (order[statusA] ?? 0) - (order[statusB] ?? 0);
+    });
+    return sorted;
   }
-}
 
-// Check if event is past (for registered announcements)
-isEventPast(eventDate: string): boolean {
-  if (!eventDate) return false;
-  const d = new Date(eventDate);
-  d.setHours(0, 0, 0, 0);
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  return d < today;
-}
+  get totalClassPages(): number {
+    return Math.ceil(this.sortedCurrentMonthClasses.length / this.classPageSize);
+  }
+
+  get paginatedClassesForDisplay(): any[] {
+    const start = (this.classPage - 1) * this.classPageSize;
+    return this.sortedCurrentMonthClasses.slice(start, start + this.classPageSize);
+  }
+
+  // Page navigation
+  goToClassPage(page: number) {
+    if (page >= 1 && page <= this.totalClassPages) {
+      this.classPage = page;
+    }
+  }
+
+  nextClassPage() {
+    if (this.classPage < this.totalClassPages) {
+      this.classPage++;
+    }
+  }
+
+  prevClassPage() {
+    if (this.classPage > 1) {
+      this.classPage--;
+    }
+  }
+
+  // Reset page when filters change
+
+
 }
