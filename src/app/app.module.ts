@@ -15,7 +15,6 @@ import { AuthInterceptor } from './interceptors/auth.interceptor';
 import { ReactiveFormsModule } from '@angular/forms';
 import { GroupsManagementComponent } from './components/groups-management/groups-management.component';
 import { ProfileComponent } from './components/profile/profile.component';
-// app.module.ts (or main.ts if standalone)
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ForgorPasswordComponent } from './components/forgor-password/forgor-password.component';
 import { ResetPasswordComponent } from './components/reset-password/reset-password.component';
