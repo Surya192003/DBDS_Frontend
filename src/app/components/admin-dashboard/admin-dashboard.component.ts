@@ -158,6 +158,7 @@ loading: any;
     this.loadGroups(); // Add this
     this.loadAnnouncements();
     this.loadPosts();
+    
   }
 
   loadGroups() {
@@ -232,6 +233,7 @@ markRegistrationPaid(regId: number) {
       next: (data: any) => {
         this.classes = data;
         this.filteredClasses = [...this.classes];
+        this.loadingClasses = false;
       },
       error: (error) => {
         console.error('Error loading classes:', error);
@@ -382,7 +384,8 @@ saveAcademicYear() {
           this.loadClasses();
           this.closeCreateClassModal();
           this.successMessage = 'Class created successfully!';
-          setTimeout(() => this.successMessage = '', 3000);
+          setTimeout(() => this.successMessage = '', 1000);
+          this.loadingClasses = false;
         },
         error: (error) => {
           this.creatingClass = false;

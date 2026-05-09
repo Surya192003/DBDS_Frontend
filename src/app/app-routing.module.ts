@@ -10,17 +10,51 @@ import { AuthGuard } from './guards/auth.guard';
 import { RoleGuard } from './guards/role.guard';
 import { GroupsManagementComponent } from './components/groups-management/groups-management.component';
 import { ProfileComponent } from './components/profile/profile.component';
+import { ForgorPasswordComponent } from './components/forgor-password/forgor-password.component';
+import { ResetPasswordComponent } from './components/reset-password/reset-password.component';
 
 const routes: Routes = [
-  { path: '', redirectTo: '/dashboard', pathMatch: 'full' },   // ← now dashboard is home
+  { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
+
+  // Auth (public)
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
-  { path: 'dashboard', component: DashboardComponent },        // public & private
+  { path: 'forgot-password', component: ForgorPasswordComponent },
+  { path: 'reset-password', component: ResetPasswordComponent },
+
+  // Dashboard (public + private)
+  { path: 'dashboard', component: DashboardComponent },
+
+  // Profile (requires auth)
   { path: 'profile', component: ProfileComponent, canActivate: [AuthGuard] },
-  { path: 'admin/groups', component: GroupsManagementComponent, canActivate: [AuthGuard, RoleGuard], data: { role: 'ADMIN' } },
-  { path: 'admin', component: AdminDashboardComponent, canActivate: [AuthGuard], data: { role: 'ADMIN' } },
-  { path: 'instructor', component: InstructorDashboardComponent, canActivate: [AuthGuard], data: { role: 'INSTRUCTOR' } },
-  { path: 'student', component: StudentDashboardComponent, canActivate: [AuthGuard], data: { role: 'STUDENT' } },
+
+  // Role‑based dashboards
+  {
+    path: 'admin',
+    component: AdminDashboardComponent,
+    canActivate: [AuthGuard],
+    data: { role: 'ADMIN' }
+  },
+  {
+    path: 'admin/groups',
+    component: GroupsManagementComponent,
+    canActivate: [AuthGuard, RoleGuard],
+    data: { role: 'ADMIN' }
+  },
+  {
+    path: 'instructor',
+    component: InstructorDashboardComponent,
+    canActivate: [AuthGuard],
+    data: { role: 'INSTRUCTOR' }
+  },
+  {
+    path: 'student',
+    component: StudentDashboardComponent,
+    canActivate: [AuthGuard],
+    data: { role: 'STUDENT' }
+  },
+
+  // Wildcard – ALWAYS last
   { path: '**', redirectTo: '/dashboard' }
 ];
 

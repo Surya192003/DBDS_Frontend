@@ -17,8 +17,8 @@ export interface User {
   providedIn: 'root'
 })
 export class AuthService {
-    private apiUrl = 'https://dbds-backend.onrender.com/api';
-  // private apiUrl = 'http://localhost:5010/api';
+    // private apiUrl = 'https://dbds-backend.onrender.com/api';
+  private apiUrl = 'http://localhost:5010/api';
   private currentUserSubject = new BehaviorSubject<User | null>(null);
   currentUser$ = this.currentUserSubject.asObservable();
 
@@ -200,4 +200,12 @@ export class AuthService {
   get isStudent(): boolean {
     return this.hasRole('STUDENT');
   }
+
+  forgotPassword(email: string) {
+  return this.http.post(`${this.apiUrl}/auth/forgot-password`, { email });
+}
+
+resetPassword(token: string, new_password: string, confirm_password: string) {
+  return this.http.post(`${this.apiUrl}/auth/reset-password`, { token, new_password, confirm_password });
+}
 }

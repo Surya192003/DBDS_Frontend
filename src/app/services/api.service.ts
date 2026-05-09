@@ -8,8 +8,8 @@ import { AuthService } from './auth.service';
   providedIn: 'root'
 })
 export class ApiService {
-  private apiUrl = 'https://dbds-backend.onrender.com/api';
-  // private apiUrl = 'http://localhost:5010/api';
+  // private apiUrl = 'https://dbds-backend.onrender.com/api';
+  private apiUrl = 'http://localhost:5010/api';
 
   constructor(private http: HttpClient, private authService: AuthService) { }
 
@@ -166,6 +166,8 @@ getUserProfile() {
   );
 }
 
+
+
   // ============ ATTENDANCE MANAGEMENT ============
 
   markAttendance(data: any): Observable<any> {
@@ -313,6 +315,9 @@ updateUserProfile(profileData: any): Observable<any> {
       catchError(this.handleHttpError.bind(this))
     );
 }
+changePassword(data: { currentPassword: string; newPassword: string; confirmPassword: string }) {
+  return this.http.post(`${this.apiUrl}/auth/change-password`, data);
+}
 
 // Delete user
 deleteUser(userId: number): Observable<any> {
@@ -351,5 +356,7 @@ getTagStatus(classId: number): Observable<any> {
 
 getSettings() { return this.http.get(`${this.apiUrl}/settings`); }
 updateSettings(data: any) { return this.http.put(`${this.apiUrl}/settings`, data); }
+
+
 
 }

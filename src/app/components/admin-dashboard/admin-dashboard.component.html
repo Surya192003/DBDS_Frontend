@@ -148,7 +148,7 @@
         <table class="glass-table">
           <thead>
             <tr>
-              <th>ID</th>
+              <!-- <th>ID</th> -->
               <th>Date</th>
               <th>Time</th>
               <th>Instructor</th>
@@ -159,7 +159,7 @@
           </thead>
           <tbody>
             <tr *ngFor="let classItem of paginatedClasses">
-              <td class="text-muted">#{{classItem.id}}</td>
+              <!-- <td class="text-muted">#{{classItem.id}}</td> -->
               <td><strong>{{classItem.class_date | date:'dd MMM yyyy'}}</strong></td>
               <td><span class="badge">{{classItem.class_time}}</span></td>
               <td>

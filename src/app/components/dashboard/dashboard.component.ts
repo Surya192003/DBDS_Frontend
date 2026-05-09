@@ -50,6 +50,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   selectedFile: File | null = null;
   previewUrl: string | null = null;
   uploadMessage = '';
+  showPasswordFields = false;
   isSubmitting = false;
   announcements: any[] = [];
   posts: any[] = [];
@@ -83,7 +84,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
       name: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
       phone: [''],
-      address: ['']
+      address: [''],
+      currentPassword: [''],
+    newPassword: [''],
+    confirmPassword: ['']
     });
   }
 
@@ -121,6 +125,16 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.selectedCategory = category;
     this.filteredAnnouncements = this.announcements.filter(a => a.category === category);
   }
+  togglePasswordChange() {
+  this.showPasswordFields = !this.showPasswordFields;
+  if (!this.showPasswordFields) {
+    this.profileForm.patchValue({
+      currentPassword: '',
+      newPassword: '',
+      confirmPassword: ''
+    });
+  }
+}
 
   loadPosts() {
     this.postService.getAll().subscribe((data: any[]) => {
@@ -287,6 +301,26 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
       const profileData = this.profileForm.value;
       await firstValueFrom(this.apiService.updateUserProfile(profileData));
+      if (this.showPasswordFields) {
+      const currentPassword = this.profileForm.get('currentPassword')?.value;
+      const newPassword = this.profileForm.get('newPassword')?.value;
+      const confirmPassword = this.profileForm.get('confirmPassword')?.value;
+
+      if (currentPassword && newPassword && confirmPassword) {
+        if (newPassword !== confirmPassword) {
+          alert('New passwords do not match');
+          this.isSubmitting = false;
+          return;
+        }
+        await firstValueFrom(this.apiService.changePassword({
+          currentPassword,
+          newPassword,
+          confirmPassword
+        }));
+        alert('Password updated successfully');
+        this.showPasswordFields = false;
+      }
+    }
 
       const refreshedUser = await firstValueFrom(this.authService.refreshUserData());
       this.user = refreshedUser;

@@ -161,21 +161,21 @@
       <button class="modal-close" (click)="closeEditModal()">×</button>
     </div>
     <form [formGroup]="profileForm" (ngSubmit)="updateProfile()" class="modal-body-sharp">
-      <!-- photo upload same as before but with light styling -->
+      <!-- photo upload (unchanged) -->
       <div class="photo-upload-section">
         <div class="current-photo">
-          <img *ngIf="previewUrl || user?.photo_url" [src]="previewUrl || getFullImageUrl(user?.photo_url)"
-            alt="Profile">
+          <img *ngIf="previewUrl || user?.photo_url" [src]="previewUrl || getFullImageUrl(user?.photo_url)" alt="Profile">
           <div *ngIf="!previewUrl && !user?.photo_url" class="photo-placeholder">{{ user?.name?.charAt(0) }}</div>
         </div>
         <div class="photo-actions">
           <input type="file" #fileInput accept="image/*" (change)="onFileSelected($event)" style="display:none">
           <button type="button" class="btn-sharp-small" (click)="fileInput.click()">UPLOAD</button>
-          <button type="button" class="btn-sharp-small" style="background: #ccc; color: #333;" (click)="deletePhoto()"
-            *ngIf="user?.photo_url">REMOVE</button>
+          <button type="button" class="btn-sharp-small" style="background: #ccc; color: #333;" (click)="deletePhoto()" *ngIf="user?.photo_url">REMOVE</button>
         </div>
         <div *ngIf="uploadMessage" class="upload-message">{{ uploadMessage }}</div>
       </div>
+
+      <!-- Profile fields -->
       <div class="form-row-sharp">
         <label>Full Name</label>
         <input type="text" formControlName="name" class="sharp-input">
@@ -192,6 +192,31 @@
         <label>Address</label>
         <textarea formControlName="address" class="sharp-input" rows="2"></textarea>
       </div>
+
+      <!-- Change Password toggle -->
+      <div class="form-row-sharp">
+        <button type="button" class="btn-sharp-small outline" (click)="togglePasswordChange()">
+          {{ showPasswordFields ? 'Cancel Password Change' : 'Change Password' }}
+        </button>
+      </div>
+
+      <!-- Password fields (conditionally shown) -->
+      <ng-container *ngIf="showPasswordFields">
+        <div class="form-row-sharp">
+          <label>Current Password</label>
+          <input type="password" formControlName="currentPassword" class="sharp-input" placeholder="••••••••">
+        </div>
+        <div class="form-row-sharp">
+          <label>New Password</label>
+          <input type="password" formControlName="newPassword" class="sharp-input" placeholder="••••••••">
+          <small class="text-muted">At least 8 characters, 1 uppercase &amp; 1 number</small>
+        </div>
+        <div class="form-row-sharp">
+          <label>Confirm New Password</label>
+          <input type="password" formControlName="confirmPassword" class="sharp-input" placeholder="••••••••">
+        </div>
+      </ng-container>
+
       <div class="modal-footer-sharp">
         <button type="button" class="btn-sharp outline" (click)="closeEditModal()">Cancel</button>
         <button type="submit" class="btn-sharp" [disabled]="isSubmitting">Save Changes</button>
