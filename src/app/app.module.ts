@@ -18,6 +18,9 @@ import { ProfileComponent } from './components/profile/profile.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ForgorPasswordComponent } from './components/forgor-password/forgor-password.component';
 import { ResetPasswordComponent } from './components/reset-password/reset-password.component';
+import { APP_INITIALIZER } from '@angular/core';
+import { AuthService } from './services/auth.service';
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -47,7 +50,13 @@ import { ResetPasswordComponent } from './components/reset-password/reset-passwo
       provide: HTTP_INTERCEPTORS,
       useClass: AuthInterceptor,
       multi: true
-    }
+    },
+    {
+  provide: APP_INITIALIZER,
+  useFactory: (authService: AuthService) => () => authService.initPromise,  // ✅ now returns a function
+  deps: [AuthService],
+  multi: true
+}
   ],
   bootstrap: [AppComponent]
 })

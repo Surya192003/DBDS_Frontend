@@ -1,71 +1,9 @@
+/* ===== student-dashboard.component.css ===== */
 :host {
   display: block;
-  background-color: var(--color-surface);
   min-height: 100vh;
-  font-family: var(--font-family-primary);
+  background: var(--color-surface);
   padding: 2rem 1.5rem;
-}
-
-/* Filter bar (light, matching the global theme) */
-.filter-bar {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-end;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
-  padding: 1rem;
-  background: #fafafa;
-  border-radius: var(--radius-card);
-  border: var(--border-light);
-}
-
-.filter-field {
-  flex: 1 1 180px;
-  min-width: 150px;
-}
-
-.filter-label {
-  display: block;
-  font-weight: 700;
-  font-size: 0.7rem;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--color-text-soft);
-  margin-bottom: 0.3rem;
-}
-
-.filter-select,
-.sharp-input {
-  width: 100%;
-  padding: 0.6rem 0.8rem;
-  border: 2px solid #eaeaea;
-  border-radius: 14px;
-  font-family: inherit;
-  font-size: 0.85rem;
-  background: white;
-  transition: border-color 0.2s, box-shadow 0.2s;
-}
-
-.filter-select:focus,
-.sharp-input:focus {
-  outline: none;
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(253, 101, 133, 0.1);
-}
-
-.filter-reset {
-  align-self: flex-end;
-  height: 38px;
-}
-
-/* Status pills */
-.status-pill.pill-green {
-  background: #d1fae5;
-  color: #065f46;
-}
-.status-pill.pill-red {
-  background: #fee2e2;
-  color: #991b1b;
 }
 
 .dashboard-wrapper {
@@ -110,14 +48,13 @@
   letter-spacing: -0.02em;
 }
 
-/* ---------- Summary Cards (like instructor) ---------- */
+/* ---------- Summary Cards ---------- */
 .summary-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
   gap: 1.5rem;
   margin-bottom: 3rem;
 }
-
 .summary-card {
   background: var(--color-white);
   border-radius: var(--radius-card);
@@ -149,7 +86,7 @@
 .color-green .value { color: #10b981; }
 .color-red .value { color: #f43f5e; }
 
-/* ---------- Sharp Card (white panel) ---------- */
+/* ---------- Sharp Card & Table ---------- */
 .sharp-card {
   background: var(--color-white);
   border-radius: var(--radius-card);
@@ -158,8 +95,6 @@
   border: var(--border-light);
   overflow-x: auto;
 }
-
-/* ---------- Sharp Table ---------- */
 .sharp-table {
   width: 100%;
   border-collapse: collapse;
@@ -195,63 +130,8 @@
   font-weight: 800;
   text-transform: uppercase;
 }
-.pill-green {
-  background: #d1fae5;
-  color: #065f46;
-}
-.pill-red {
-  background: #fee2e2;
-  color: #991b1b;
-}
-
-/* ---------- Badge ---------- */
-.badge-sharp {
-  display: inline-block;
-  padding: 0.25em 0.75em;
-  border-radius: 999px;
-  font-size: 0.72rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-  background: var(--gradient-1);
-  color: white;
-}
-
-/* ---------- Buttons ---------- */
-.btn-sharp-sm {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.3rem;
-  padding: 0.4rem 1rem;
-  border: none;
-  border-radius: var(--radius-button);
-  font-family: inherit;
-  font-weight: 700;
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  cursor: pointer;
-  background: var(--gradient-1);
-  color: white;
-  box-shadow: var(--shadow-sm);
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-.btn-sharp-sm:hover {
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-md);
-}
-
-.link-sharp {
-  color: var(--color-primary);
-  font-weight: 700;
-  text-decoration: none;
-  border-bottom: 2px solid rgba(253, 101, 133, 0.3);
-  transition: 0.2s;
-}
-.link-sharp:hover {
-  border-bottom-color: var(--color-primary);
-}
+.pill-green { background: #d1fae5; color: #065f46; }
+.pill-red   { background: #fee2e2; color: #991b1b; }
 
 /* ---------- Announcements Cards ---------- */
 .announcement-grid {
@@ -260,7 +140,6 @@
   gap: 1.8rem;
   margin-bottom: 2.5rem;
 }
-
 .announcement-card {
   background: var(--color-white);
   border-radius: var(--radius-card);
@@ -275,7 +154,6 @@
   transform: translateY(-6px);
   box-shadow: var(--shadow-lg);
 }
-
 .announcement-media {
   width: 100%;
   aspect-ratio: 16 / 10;
@@ -289,7 +167,6 @@
   object-fit: cover;
   border: none;
 }
-
 .announcement-content {
   padding: 1.2rem 1.4rem;
   flex: 1;
@@ -305,36 +182,12 @@
   line-height: 1.5;
   margin-bottom: 1rem;
 }
-
 .register-area {
   display: flex;
   align-items: center;
   gap: 0.5rem;
   flex-wrap: wrap;
   margin-top: 1rem;
-}
-
-.price,
-.price-badge {
-  display: inline-block;
-  padding: 0.15em 0.75em;
-  border-radius: 999px;
-  font-size: 0.7rem;
-  font-weight: 800;
-  background: #fef3c7;
-  color: #92400e;
-  text-transform: uppercase;
-}
-
-.registered-badge {
-  display: inline-block;
-  padding: 0.15em 0.75em;
-  border-radius: 999px;
-  font-size: 0.7rem;
-  font-weight: 800;
-  background: #d1fae5;
-  color: #065f46;
-  text-transform: uppercase;
 }
 
 /* ---------- Posts Feed ---------- */
@@ -344,7 +197,6 @@
   gap: 1.8rem;
   margin-bottom: 2.5rem;
 }
-
 .post-card {
   background: var(--color-white);
   border-radius: var(--radius-card);
@@ -359,7 +211,6 @@
   transform: translateY(-4px);
   box-shadow: var(--shadow-md);
 }
-
 .video-container {
   width: 100%;
   aspect-ratio: 16 / 9;
@@ -370,7 +221,6 @@
   height: 100%;
   border: none;
 }
-
 .post-card h4 {
   font-size: 1rem;
   font-weight: 800;
@@ -389,28 +239,6 @@
   border-top: 1px solid #f0f0f0;
   padding-top: 0.8rem;
 }
-
-/* ---------- Empty State ---------- */
-.empty-state {
-  text-align: center;
-  padding: 3rem 1rem;
-  color: var(--color-text-soft);
-  border: 2px dashed #e5e7eb;
-  border-radius: 1rem;
-  grid-column: 1 / -1;
-}
-
-/* ---------- Spinner ---------- */
-.spinner-square {
-  display: inline-block;
-  width: 2rem;
-  height: 2rem;
-  border: 3px solid rgba(253, 101, 133, 0.2);
-  border-top-color: var(--color-primary);
-  border-radius: 50%;
-  animation: spin 0.7s linear infinite;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
 
 /* ---------- Footer ---------- */
 .footer-note {

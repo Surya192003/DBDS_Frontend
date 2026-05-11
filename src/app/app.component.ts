@@ -54,5 +54,6 @@ export class AppComponent implements OnInit {
     this.isMenuOpen = false;
     this.isNavVisible = true;
     this.authService.logout();
+    localStorage.removeItem('token');       
   }
 }

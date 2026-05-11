@@ -8,7 +8,7 @@ export class AnnouncementService {
   private apiUrl = 'https://dbds-backend.onrender.com/api/announcements';
   // private apiUrl = 'http://localhost:5010/api/announcements';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   getAll(category?: string): Observable<Announcement[]> {
     let url = this.apiUrl;
@@ -40,11 +40,11 @@ export class AnnouncementService {
     return this.http.get<any[]>(`${this.apiUrl}/${id}/registrations`);
   }
   getMyRegistrations(): Observable<Announcement[]> {
-  return this.http.get<Announcement[]>(`${this.apiUrl}/my-registrations`);
-}
-markRegistrationPaid(registrationId: number) {
-  return this.http.put(`${this.apiUrl}/registrations/${registrationId}/complete`, {});
-}
+    return this.http.get<Announcement[]>(`${this.apiUrl}/my-registrations`);
+  }
+  markRegistrationPaid(registrationId: number) {
+    return this.http.put(`${this.apiUrl}/registrations/${registrationId}/complete`, {});
+  }
 
 
 }

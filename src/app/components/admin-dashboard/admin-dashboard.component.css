@@ -9,8 +9,39 @@
 .dashboard-admin {
   padding: 2rem;
 }
+/* ---------- Admin specific layout polish ---------- */
+.dashboard-admin .row {
+  margin-left: -0.75rem;
+  margin-right: -0.75rem;
+}
+.dashboard-admin .row > [class*="col-"] {
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
+}
 
-/* ---------- Stats cards ---------- */
+/* Make sure glass-panels fill their columns */
+.glass-panel.h-100 {
+  height: calc(100% - 1.5rem);   /* account for row margins */
+  display: flex;
+  flex-direction: column;
+}
+.glass-panel.h-100 .panel-body {
+  flex: 1;
+}
+
+/* Page header spacing */
+.page-header-row {
+  margin-bottom: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+.page-header-row .page-title {
+   margin-bottom: 0;
+}
+/* ---------- Stats cards (admin unique) ---------- */
 .stat-card {
   background: var(--color-white);
   border-radius: var(--radius-card);
@@ -51,8 +82,6 @@
   font-size: 2.2rem;
   opacity: 0.7;
 }
-
-/* Accent colours (soft) */
 .accent-primary .stat-icon { color: var(--color-primary); }
 .accent-success .stat-icon { color: #10b981; }
 .accent-info .stat-icon { color: var(--color-tertiary); }
@@ -66,39 +95,7 @@
   color: var(--color-text);
 }
 
-.btn-glass {
-  background: var(--color-white);
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  border-radius: 1.5rem;
-  padding: 0.5rem 1.2rem;
-  font-weight: 700;
-  font-size: 0.85rem;
-  color: var(--color-text);
-  transition: all 0.2s;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  cursor: pointer;
-  background: var(--color-white);
-}
-.btn-glass:hover {
-  background: var(--gradient-1);
-  color: white;
-  border-color: transparent;
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-sm);
-}
-
-/* ---------- Glass panels (override any dark) ---------- */
-.glass-panel {
-  background: var(--color-white);
-  border: var(--border-light);
-  border-radius: var(--radius-card);
-  padding: 1.8rem 2rem;
-  box-shadow: var(--shadow-sm);
-  margin-bottom: 1.5rem;
-}
-
+/* ---------- Panel header (specific to admin sections) ---------- */
 .panel-header {
   display: flex;
   justify-content: space-between;
@@ -115,7 +112,7 @@
   gap: 0.5rem;
 }
 
-/* ---------- Tables ---------- */
+/* ---------- Table (admin specific: glass-table) ---------- */
 .glass-table {
   width: 100%;
   border-collapse: collapse;
@@ -154,17 +151,7 @@
   background: #fafafa;
 }
 
-/* Badges */
-.badge {
-  background: var(--gradient-1);
-  color: white;
-  font-weight: 700;
-  font-size: 0.7rem;
-  padding: 0.25em 0.7em;
-  border-radius: 999px;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-}
+/* ---------- Badge extensions (base .badge in global) ---------- */
 .badge-success { background: #10b981; }
 .badge-danger { background: #ef4444; }
 .badge-info { background: var(--color-tertiary); }
@@ -177,7 +164,7 @@
 .badge-inst { background: var(--gradient-2); }
 .badge-stud { background: var(--gradient-3); color: #2c2c2c; }
 
-/* Progress bar */
+/* ---------- Progress bar ---------- */
 .progress-bar-wrap {
   display: flex;
   align-items: center;
@@ -190,11 +177,7 @@
   min-width: 60px;
   flex: 1;
 }
-.progress .progress[style*="width"] {
-  height: 100%;
-  border-radius: inherit;
-  background: var(--gradient-1);
-}
+/* The actual fill is applied via inline style, but we override for .progress-high etc. */
 .progress-high { background: linear-gradient(to right, #10b981, #34d399); }
 .progress-mid { background: linear-gradient(to right, var(--color-accent), var(--color-secondary)); }
 .progress-low { background: linear-gradient(to right, #f87171, #ef4444); }
@@ -205,7 +188,7 @@
   min-width: 40px;
 }
 
-/* ---------- Search / Input ---------- */
+/* ---------- Search box ---------- */
 .search-box {
   position: relative;
 }
@@ -216,24 +199,8 @@
   transform: translateY(-50%);
   color: var(--color-text-soft);
 }
-.sharp-input {
-  width: 100%;
-  padding: 0.7rem 1rem 0.7rem 2.5rem;
-  border: 2px solid #eaeaea;
-  border-radius: 14px;
-  font-family: inherit;
-  font-size: 0.9rem;
-  background: #fafafa;
-  transition: 0.2s;
-  outline: none;
-}
-.sharp-input:focus {
-  border-color: var(--color-primary);
-  background: white;
-  box-shadow: 0 0 0 3px rgba(253, 101, 133, 0.1);
-}
 
-/* ---------- Modals ---------- */
+/* ---------- Modals (admin specific tweaks) ---------- */
 .modal-content.sharp-modal-content {
   background: white;
   border: none;
@@ -250,17 +217,6 @@
   font-size: 1.2rem;
   color: var(--color-text);
 }
-.btn-close-custom {
-  background: none;
-  border: none;
-  font-size: 1.6rem;
-  color: var(--color-text-soft);
-  cursor: pointer;
-  transition: 0.2s;
-}
-.btn-close-custom:hover {
-  color: var(--color-primary);
-}
 .modal-body {
   padding: 0;
 }
@@ -272,24 +228,16 @@
   justify-content: flex-end;
   gap: 0.75rem;
 }
-
-/* ---------- Empty states ---------- */
-.empty-state {
-  text-align: center;
-  padding: 3rem 1rem;
+.btn-close-custom {
+  background: none;
+  border: none;
+  font-size: 1.6rem;
   color: var(--color-text-soft);
-  border: 2px dashed #e5e7eb;
-  border-radius: 1rem;
+  cursor: pointer;
+  transition: 0.2s;
 }
-.empty-icon {
-  font-size: 2.5rem;
-  margin-bottom: 1rem;
-  opacity: 0.6;
-}
-.empty-cell {
-  text-align: center;
-  padding: 2rem;
-  color: var(--color-text-soft);
+.btn-close-custom:hover {
+  color: var(--color-primary);
 }
 
 /* ---------- Alerts ---------- */
@@ -323,7 +271,7 @@
   opacity: 1;
 }
 
-/* ---------- Video card (admin) ---------- */
+/* ---------- Video card ---------- */
 .video-card {
   border-radius: var(--radius-card);
   overflow: hidden;
@@ -341,64 +289,43 @@
   border: none;
 }
 
-/* Filter bar (light, inline) */
-.filter-bar {
+/* ---------- Mobile class cards (admin list alternatives) ---------- */
+.mobile-class-cards {
   display: flex;
-  flex-wrap: wrap;
-  align-items: flex-end;
+  flex-direction: column;
   gap: 1rem;
-  margin-bottom: 1.8rem;
-  padding: 1rem 1.2rem;
-  background: #fafafa;
-  border-radius: 18px;
-  border: 1px solid rgba(0,0,0,0.04);
+}
+.class-mobile-card {
+  background: var(--color-white);
+  border-radius: var(--radius-card);
+  padding: 1rem;
+  box-shadow: var(--shadow-sm);
+  border: var(--border-light);
+}
+.class-mobile-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+.class-mobile-body h4 {
+  font-size: 1rem;
+  font-weight: 800;
+  margin: 0 0 0.3rem;
+}
+.class-mobile-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-top: 0.5rem;
+}
+.class-mobile-actions .btn-glass {
+  white-space: nowrap;
 }
 
-.filter-field {
-  flex: 1 1 180px;
-  min-width: 150px;
-}
-
-.filter-label {
-  display: block;
-  font-weight: 700;
-  font-size: 0.7rem;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--color-text-soft);
-  margin-bottom: 0.3rem;
-}
-
-.filter-select {
-  width: 100%;
-  padding: 0.6rem 2rem 0.6rem 1rem;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%235a5a5a' d='M5 7L0 2h10z'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 12px center;
-  appearance: none;
-}
-
-.filter-reset {
-  align-self: flex-end;
-  height: 38px;
-}
-
-/* ---------- Misc ---------- */
-.spinner {
-  display: inline-block;
-  width: 1.2rem;
-  height: 1.2rem;
-  border: 2px solid rgba(0,0,0,0.15);
-  border-top-color: var(--color-primary);
-  border-radius: 50%;
-  animation: spin 0.6s linear infinite;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
-
-.text-muted { color: var(--color-text-soft) !important; }
-.fw-bold { font-weight: 800; }
-.fw-medium { font-weight: 600; }
-
+/* ---------- Responsive ---------- */
 @media (max-width: 768px) {
   .dashboard-admin {
     padding: 1rem;
@@ -412,146 +339,15 @@
     align-items: flex-start;
     gap: 0.5rem;
   }
-}
-/* Prevent any overflow on small screens */
-.table-responsive {
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-}
-
-/* Mobile class cards (reuse from instructor) */
-.mobile-class-cards {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-.class-mobile-card {
-  background: var(--color-white);
-  border-radius: var(--radius-card);
-  padding: 1rem;
-  box-shadow: var(--shadow-sm);
-  border: var(--border-light);
-}
-.class-mobile-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 0.5rem;
-}
-.class-mobile-body h4 {
-  font-size: 1rem;
-  font-weight: 800;
-  margin: 0 0 0.3rem;
-}
-.class-mobile-actions {
-  display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-}
-
-/* Pagination bar */
-.pagination-bar {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  margin-top: 1.5rem;
-}
-.page-info {
-  font-weight: 700;
-  font-size: 0.9rem;
-  color: var(--color-text);
-}
-
-/* Ensure no horizontal scroll on mobile panels */
-@media (max-width: 767px) {
   .glass-panel {
-    padding: 1rem;
+    margin-bottom: 1.5rem !important;
+    padding: 1rem !important;   /* compact panels on mobile */
   }
   .sharp-modal-content {
     padding: 1rem;
   }
 }
-/* Prevent horizontal overflow on any screen */
 .table-responsive {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
-}
-
-/* Mobile class cards (same friendly look as instructor) */
-.mobile-class-cards {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.class-mobile-card {
-  background: var(--color-white);
-  border-radius: var(--radius-card);
-  padding: 1rem;
-  box-shadow: var(--shadow-sm);
-  border: var(--border-light);
-}
-
-.class-mobile-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 0.5rem;
-  flex-wrap: wrap;
-  gap: 0.3rem;
-}
-
-.class-mobile-body h4 {
-  font-size: 1rem;
-  font-weight: 800;
-  margin: 0 0 0.3rem;
-}
-
-.class-mobile-actions {
-  display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-  margin-top: 0.5rem;
-}
-
-/* Pagination bar (already used in instructor) */
-.pagination-bar {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  margin-top: 1.5rem;
-}
-
-.page-info {
-  font-weight: 700;
-  font-size: 0.9rem;
-  color: var(--color-text);
-}
-
-/* Tighten panels on mobile */
-@media (max-width: 767px) {
-  .glass-panel {
-    padding: 1rem !important;
-  }
-}
-.mobile-class-cards {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-.class-mobile-card {
-  padding: 1rem;
-  background: var(--color-white);
-  border-radius: var(--radius-card);
-  box-shadow: var(--shadow-sm);
-}
-.class-mobile-actions .btn-glass {
-  white-space: nowrap;
-}
-.d-none { display: none !important; }
-@media (min-width: 768px) {
-  .d-md-block { display: block !important; }
-  .d-md-none  { display: none !important; }
 }

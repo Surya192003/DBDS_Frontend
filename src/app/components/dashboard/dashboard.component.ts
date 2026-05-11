@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Subject } from 'rxjs';
-import { take, takeUntil } from 'rxjs/operators';
+import { takeUntil } from 'rxjs/operators';
 import { AuthService } from '../../services/auth.service';
 import { ApiService } from '../../services/api.service';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
@@ -11,6 +11,7 @@ import { PostService } from '../../services/post.service';
 import { trigger, transition, style, animate, query, stagger } from '@angular/animations';
 import { environment } from '../../../environments/environment';
 import { firstValueFrom } from 'rxjs';
+import { filter, switchMap, take } from 'rxjs/operators';
 
 @Component({
   selector: 'app-dashboard',
@@ -92,21 +93,28 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.authService.currentUser$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(user => {
-        if (user) {
-          this.user = user;
-          this.isPublic = false;
-        } else {
-          this.user = null;
-          this.isPublic = true;
-        }
-      });
-    this.loadAnnouncements();
-    this.loadPosts();
-    this.loadingInitial = false;
-  }
+  this.authService.isInitialized$
+    .pipe(
+      filter(initialized => initialized === true),
+      take(1),
+      switchMap(() => this.authService.currentUser$),
+      take(1)
+    )
+    .subscribe(user => {
+      if (user) {
+        this.user = user;
+        this.isPublic = false;
+      } else {
+        this.user = null;
+        this.isPublic = true;
+      }
+
+      // Now it's safe to load content – even if guest
+      this.loadAnnouncements();
+      this.loadPosts();
+      this.loadingInitial = false;    // hide global loading overlay
+    });
+}
 
   loadAnnouncements() {
     this.announcementService.getAll().subscribe((data: any[]) => {

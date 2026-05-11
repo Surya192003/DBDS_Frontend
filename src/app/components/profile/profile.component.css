@@ -1,151 +1,190 @@
+/* ===== profile.component.css ===== */
 :host {
-  --black: #000000;
-  --white: #ffffff;
-  --danger: #d00000;
-  --success: #008800;
+  /* Keep local sharp overrides – but use global variables where you want consistency */
+  --sharp-black: var(--color-text);              /* #2c2c2c – uses global text colour */
+  --sharp-white: var(--color-white);             /* #ffffff */
+  --sharp-danger: #d00000;
+  --sharp-success: #008800;
 }
 
-.dashboard-wrapper {
+.profile-wrapper {
   padding: 40px 20px;
-  background: var(--white);
+  background: var(--color-surface);
   min-height: 100vh;
-  font-family: 'Courier New', Courier, monospace;
+  font-family: 'Courier New', Courier, monospace; /* your brutalist choice */
 }
 
-.dashboard-grid {
+.profile-grid {
   display: grid;
   grid-template-columns: 320px 1fr;
   gap: 30px;
   max-width: 1200px;
   margin: 0 auto;
 }
-
 .full-width { grid-column: 1 / -1; }
 
+/* ---- Sharp Card (brutalist overrides) ---- */
 .sharp-card {
-  border: 4px solid var(--black);
-  background: var(--white);
+  border: 4px solid var(--sharp-black);
+  background: var(--sharp-white);
   padding: 25px;
-  box-shadow: 12px 12px 0px var(--black);
+  box-shadow: 12px 12px 0px var(--sharp-black);
   position: relative;
+  /* No border‑radius – stays sharp */
 }
-
 .card-header-sharp {
-  border-bottom: 4px solid var(--black);
+  border-bottom: 4px solid var(--sharp-black);
   margin-bottom: 25px;
   padding-bottom: 10px;
 }
+.title-text {
+  font-weight: 900;
+  letter-spacing: -1px;
+  margin: 0;
+  font-size: 1.5rem;
+  color: var(--sharp-black);
+}
 
-.title-text { font-weight: 900; letter-spacing: -1px; margin: 0; font-size: 1.5rem; }
-
-/* PHOTO SECTION */
+/* ---- Photo Frame ---- */
 .photo-frame {
   width: 220px;
   height: 220px;
-  border: 4px solid var(--black);
+  border: 4px solid var(--sharp-black);
   margin: 0 auto;
   overflow: hidden;
-  background: var(--black);
+  background: var(--sharp-black);
   display: flex;
   align-items: center;
   justify-content: center;
 }
-
 .photo-frame img { width: 100%; height: 100%; object-fit: cover; }
 .preview-img { filter: grayscale(1); opacity: 0.8; }
-.placeholder-icon { font-size: 5rem; color: var(--white); font-weight: 900; }
+.placeholder-icon {
+  font-size: 5rem;
+  color: var(--sharp-white);
+  font-weight: 900;
+}
 
-/* FORM ELEMENTS */
+/* ---- Form Elements (sharp, but using global input padding for familiarity) ---- */
 .section-label {
   display: block;
   font-weight: 900;
   font-size: 0.75rem;
   margin-bottom: 12px;
   letter-spacing: 2px;
-  color: #666;
+  color: var(--color-text-soft);   /* #5a5a5a */
 }
-
 .sharp-input {
   width: 100%;
-  border: 3px solid var(--black);
+  border: 3px solid var(--sharp-black);
   padding: 12px;
   font-weight: 700;
-  border-radius: 0;
+  border-radius: 0;                /* stays sharp */
   outline: none;
   margin-bottom: 15px;
+  background: var(--sharp-white);
+  color: var(--sharp-black);
+  font-family: inherit;
+}
+.sharp-input:focus {
+  background: #f0f0f0;
+}
+.sharp-input.is-invalid {
+  border-color: var(--sharp-danger);
 }
 
-.sharp-input:focus { background: #f0f0f0; }
-.sharp-input.is-invalid { border-color: var(--danger); }
-
-/* BUTTONS */
+/* ---- Buttons (brutalist) ---- */
 .btn-sharp {
-  background: var(--black);
-  color: var(--white);
+  background: var(--sharp-black);
+  color: var(--sharp-white);
   border: none;
   padding: 15px 25px;
   font-weight: 900;
   text-transform: uppercase;
   cursor: pointer;
   transition: 0.1s;
+  font-family: inherit;
+  letter-spacing: 0.08em;
+}
+.btn-sharp:hover:not(:disabled) {
+  transform: translate(-4px, -4px);
+  box-shadow: 4px 4px 0 #444;
+}
+.btn-sharp:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
-.btn-sharp:hover:not(:disabled) { transform: translate(-4px, -4px); box-shadow: 4px 4px 0 #444; }
-.btn-sharp:disabled { opacity: 0.5; cursor: not-allowed; }
-
 .btn-sharp-outline {
-  background: var(--white);
-  color: var(--black);
-  border: 3px solid var(--black);
+  background: var(--sharp-white);
+  color: var(--sharp-black);
+  border: 3px solid var(--sharp-black);
   padding: 10px 20px;
   font-weight: 900;
   cursor: pointer;
+  font-family: inherit;
 }
 
 .btn-danger-outline {
-  border: 3px solid var(--danger);
-  color: var(--danger);
+  border: 3px solid var(--sharp-danger);
+  color: var(--sharp-danger);
   background: transparent;
   font-weight: 900;
   padding: 8px;
+  cursor: pointer;
 }
 
-/* ALERTS/LOGS */
+/* ---- Messages / Alerts ---- */
 .msg-box {
   padding: 15px;
-  border: 4px solid var(--black);
+  border: 4px solid var(--sharp-black);
   margin-bottom: 20px;
   font-weight: 900;
   cursor: pointer;
 }
-.msg-box.error { background: #ff0000; color: white; }
-.msg-box.success { background: #00ff00; color: black; }
+.msg-box.error {
+  background: #ff0000;
+  color: white;
+}
+.msg-box.success {
+  background: #00ff00;
+  color: black;
+}
 
+/* ---- Meta & Role ---- */
 .role-display {
-  background: var(--black);
-  color: var(--white);
+  background: var(--sharp-black);
+  color: var(--sharp-white);
   padding: 10px;
   font-weight: 900;
   text-align: center;
 }
+.metadata-row {
+  display: flex;
+  gap: 20px;
+  border-top: 1px solid #ddd;
+  padding-top: 20px;
+}
+.static-val {
+  font-weight: 900;
+  font-size: 0.85rem;
+  color: var(--sharp-black);
+}
 
-.metadata-row { display: flex; gap: 20px; border-top: 1px solid #ddd; padding-top: 20px; }
-.static-val { font-weight: 900; font-size: 0.85rem; }
-
-/* LOADING SPINNER */
+/* ---- Spinner (brutalist square) ---- */
 .spinner-square {
-  width: 40px; height: 40px;
-  border: 4px solid var(--black);
+  width: 40px;
+  height: 40px;
+  border: 4px solid var(--sharp-black);
   border-top-color: transparent;
   animation: spin 0.6s linear infinite;
   margin: 0 auto;
 }
-
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* RESPONSIVE */
+/* ---- Responsive ---- */
 @media (max-width: 991px) {
-  .dashboard-grid { grid-template-columns: 1fr; }
+  .profile-grid { grid-template-columns: 1fr; }
   .side-panel { order: 2; }
   .main-panel { order: 1; }
 }

@@ -1,18 +1,18 @@
-<div class="dashboard-wrapper fade-in" [@fadeStagger]>
-  <header class="dashboard-header mb-5">
-    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end">
-      <div>
-        <h1 class="title-text">INSTRUCTOR_PORTAL</h1>
-        <p class="tagline">DBDS_IRELAND // ACCESS_LEVEL: {{currentUser?.role}}</p>
-      </div>
-      <button class="btn-sharp-outline mt-3 mt-md-0" (click)="loadDashboardData()">
-        <span class="d-none d-md-inline"> REFRESH_SYSTEM</span> 🔄
-      </button>
+<div class="instructor-wrapper" [@fadeStagger]>
+
+  <!-- ========== HEADER ========== -->
+  <header class="dash-header">
+    <div class="header-left">
+      <h1 class="title-text">INSTRUCTOR_PORTAL</h1>
+      <p class="tagline">DBDS_IRELAND // ACCESS_LEVEL: {{currentUser?.role}}</p>
     </div>
+    <button class="btn-sharp-outline" (click)="loadDashboardData()">
+      <span class="d-none d-md-inline">REFRESH_SYSTEM</span> 🔄
+    </button>
   </header>
 
-  <!-- Summary Cards -->
-  <section class="summary-grid mb-5">
+  <!-- ========== SUMMARY CARDS ========== -->
+  <section class="summary-grid">
     <div class="summary-card color-blue">
       <label>TOTAL_CLASSES</label>
       <div class="value">{{totalClasses}}</div>
@@ -31,20 +31,22 @@
     </div>
   </section>
 
-  <section class="mb-5">
+  <!-- ========== ASSIGNED CLASSES ========== -->
+  <section>
     <label class="section-label">ASSIGNED_CLASSES_MANIFEST</label>
     <div class="sharp-card">
-      <!-- Loading spinner -->
-      <div *ngIf="loading" class="text-center py-5">
+
+      <!-- Loading -->
+      <div *ngIf="loading" class="center-content py-5">
         <div class="spinner-square"></div>
         <p class="fw-bold mt-3">SYNCING_DATA...</p>
       </div>
 
-      <!-- Filter bar (always visible when not loading) -->
+      <!-- Filter Bar -->
       <div *ngIf="!loading" class="filter-bar">
         <div class="filter-field">
           <label class="filter-label"><i class="bi bi-people me-1"></i> Group</label>
-          <select class="sharp-input filter-select" [(ngModel)]="groupFilter" (change)="applyClassFilters()">
+          <select class="filter-select" [(ngModel)]="groupFilter" (change)="applyClassFilters()">
             <option value="">All Groups</option>
             <option *ngFor="let grp of uniqueGroups" [value]="grp">{{ grp }}</option>
           </select>
@@ -53,157 +55,148 @@
           [disabled]="!instructorFilter && !groupFilter">
           <i class="bi bi-arrow-counterclockwise"></i> Clear
         </button>
-        <span class="text-muted small ms-auto" *ngIf="sortedCurrentMonthClasses.length > 0">
+        <span class="text-muted small ms-auto" *ngIf="sortedCurrentMonthClasses.length">
           This month: {{sortedCurrentMonthClasses.length}} class(es)
         </span>
       </div>
 
-      <!-- Empty state -->
+      <!-- Empty -->
       <div *ngIf="!loading && classes.length === 0" class="text-center py-5">
         <p>No classes assigned yet.</p>
       </div>
 
-      <!-- Content: only if there are any classes (even if none this month, show message) -->
-      <div *ngIf="!loading && classes.length > 0">
-        <!-- If no classes this month, show a subtle message -->
-        <div *ngIf="sortedCurrentMonthClasses.length === 0" class="text-center py-4 text-muted">
-          No classes this month. Adjust filters or check back later.
-        </div>
+      <!-- No classes this month -->
+      <div *ngIf="!loading && classes.length > 0 && sortedCurrentMonthClasses.length === 0"
+        class="text-center py-4 text-muted">
+        No classes this month. Adjust filters or check back later.
+      </div>
 
-        <!-- ----- DESKTOP TABLE (hidden on mobile) ----- -->
-        <div class="table-container d-none d-md-block" *ngIf="sortedCurrentMonthClasses.length > 0">
-          <table class="sharp-table">
-            <thead>
-              <tr>
-                <th>CLASS_NAME</th>
-                <th>DATE_&_TIME</th>
-                <th>GROUP</th>
-                <th>STATUS</th>
-                <th>ACTIONS</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let classItem of paginatedClassesForDisplay">
-                <td>
-                  <div class="fw-bold">{{classItem.class_name}}</div>
-                  <div class="muted-id">ID: #{{classItem.id}}</div>
-                </td>
-                <td>
-                  <div>{{classItem.class_date | date:'dd.MM.yy'}}</div>
-                  <div class="muted-id">{{classItem.class_time}}</div>
-                </td>
-                <td><span class="badge-sharp">{{ classItem.group_name || classItem.class_name || 'NONE' }}</span></td>
-                <td>
-                  <span class="status-pill" [ngClass]="getStatusClass(classItem.class_date)">
-                    {{getStatusText(classItem.class_date)}}
-                  </span>
-                </td>
-                <td>
-                  <div class="action-stack">
-                    <button class="btn-sharp-sm" (click)="openAttendanceModal(classItem)">ATTENDANCE</button>
-                    <button class="btn-sharp-sm outline" (click)="openSongModal(classItem)">SONG</button>
-                    <div class="d-flex gap-2 mt-2">
-                      <button class="btn-sharp-sm" *ngIf="!tagStatusMap[classItem.id]?.tagged_in"
-                        (click)="tagIn(classItem.id)">TAG IN</button>
-                      <button class="btn-sharp-sm"
-                        *ngIf="tagStatusMap[classItem.id]?.tagged_in && !tagStatusMap[classItem.id]?.tagged_out"
-                        (click)="tagOut(classItem.id)">TAG OUT</button>
-                      <span *ngIf="tagStatusMap[classItem.id]?.tagged_out" class="text-success">✓ COMPLETED</span>
-                    </div>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-
-          <!-- Desktop pagination -->
-          <div class="pagination-bar mt-3" *ngIf="totalClassPages > 1">
-            <button class="btn-glass btn-sm" (click)="prevClassPage()" [disabled]="classPage === 1">← Prev</button>
-            <span class="page-numbers">
-              <button *ngFor="let p of [].constructor(totalClassPages); let i = index" class="page-dot"
-                [class.active]="i+1 === classPage" (click)="goToClassPage(i+1)">{{i+1}}</button>
-            </span>
-            <button class="btn-glass btn-sm" (click)="nextClassPage()" [disabled]="classPage === totalClassPages">Next
-              →</button>
-          </div>
-        </div>
-
-        <!-- ----- MOBILE CARDS (hidden on desktop) ----- -->
-        <div class="d-md-none mobile-class-cards" *ngIf="sortedCurrentMonthClasses.length > 0">
-          <div *ngFor="let classItem of paginatedClassesForDisplay" class="class-mobile-card glass-card">
-            <div class="class-mobile-header">
-              <span class="status-pill" [ngClass]="getStatusClass(classItem.class_date)">
-                {{getStatusText(classItem.class_date)}}
-              </span>
-              <span class="class-date-mobile">{{classItem.class_date | date:'dd.MM.yy'}} {{classItem.class_time}}</span>
-            </div>
-            <div class="class-mobile-body">
-              <h4>{{classItem.class_name}}</h4>
-              <div class="class-meta">
-                <span><i class="bi bi-people me-1"></i> {{classItem.group_name || 'No Group'}}</span>
-                <span *ngIf="classItem.attendance_count !== undefined">
-                  <i class="bi bi-person-check me-1"></i> {{classItem.attendance_count || 0}}
+      <!-- DESKTOP TABLE -->
+      <div class="table-container d-none d-md-block"
+        *ngIf="!loading && sortedCurrentMonthClasses.length">
+        <table class="sharp-table">
+          <thead>
+            <tr>
+              <th>CLASS_NAME</th>
+              <th>DATE_&_TIME</th>
+              <th>GROUP</th>
+              <th>STATUS</th>
+              <th>ACTIONS</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let classItem of paginatedClassesForDisplay">
+              <td>
+                <div class="fw-bold">{{classItem.class_name}}</div>
+                <div class="muted-id">ID: #{{classItem.id}}</div>
+              </td>
+              <td>
+                <div>{{classItem.class_date | date:'dd.MM.yy'}}</div>
+                <div class="muted-id">{{classItem.class_time}}</div>
+              </td>
+              <td>
+                <span class="badge-sharp">{{ classItem.group_name || classItem.class_name || 'NONE' }}</span>
+              </td>
+              <td>
+                <span class="status-pill" [ngClass]="getStatusClass(classItem.class_date)">
+                  {{getStatusText(classItem.class_date)}}
                 </span>
-              </div>
-            </div>
-            <div class="class-mobile-actions">
-              <button class="btn-sharp-sm" (click)="openAttendanceModal(classItem)">ATTENDANCE</button>
-              <button class="btn-sharp-sm outline" (click)="openSongModal(classItem)">SONG</button>
-            </div>
-            <div class="tag-area mt-2" *ngIf="!tagStatusMap[classItem.id]?.tagged_out">
-              <button class="btn-sharp-sm w-100" *ngIf="!tagStatusMap[classItem.id]?.tagged_in"
-                (click)="tagIn(classItem.id)">TAG IN</button>
-              <button class="btn-sharp-sm w-100"
-                *ngIf="tagStatusMap[classItem.id]?.tagged_in && !tagStatusMap[classItem.id]?.tagged_out"
-                (click)="tagOut(classItem.id)">TAG OUT</button>
-            </div>
-            <div class="tag-complete text-success mt-2" *ngIf="tagStatusMap[classItem.id]?.tagged_out">
-              <i class="bi bi-check-circle me-1"></i> COMPLETED
-            </div>
-          </div>
+              </td>
+              <td>
+                <div class="action-stack">
+                  <button class="btn-glass btn-sm" (click)="openAttendanceModal(classItem)">ATTENDANCE</button>
+                  <button class="btn-glass btn-sm" (click)="openSongModal(classItem)">SONG</button>
+                  <div class="d-flex gap-2 mt-2">
+                    <button class="btn-glass btn-sm" *ngIf="!tagStatusMap[classItem.id]?.tagged_in"
+                      (click)="tagIn(classItem.id)">TAG IN</button>
+                    <button class="btn-glass btn-sm" *ngIf="tagStatusMap[classItem.id]?.tagged_in && !tagStatusMap[classItem.id]?.tagged_out"
+                      (click)="tagOut(classItem.id)">TAG OUT</button>
+                    <span *ngIf="tagStatusMap[classItem.id]?.tagged_out" class="text-success fw-bold">✓ COMPLETED</span>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
 
-          <!-- Mobile pagination (horizontal compact) -->
-          <div class="pagination-bar mt-3" *ngIf="totalClassPages > 1">
-            <button class="btn-glass btn-sm" (click)="prevClassPage()" [disabled]="classPage === 1">←</button>
-            <span class="page-info">{{classPage}} / {{totalClassPages}}</span>
-            <button class="btn-glass btn-sm" (click)="nextClassPage()"
-              [disabled]="classPage === totalClassPages">→</button>
+        <!-- Desktop Pagination -->
+        <div class="pagination-bar" *ngIf="totalClassPages > 1">
+          <button class="btn-glass btn-sm" (click)="prevClassPage()" [disabled]="classPage === 1">← Prev</button>
+          <span class="page-info">{{classPage}} / {{totalClassPages}}</span>
+          <button class="btn-glass btn-sm" (click)="nextClassPage()" [disabled]="classPage === totalClassPages">Next →</button>
+        </div>
+      </div>
+
+      <!-- MOBILE CARDS -->
+      <div class="d-md-none mobile-class-cards"
+        *ngIf="!loading && sortedCurrentMonthClasses.length">
+        <div *ngFor="let classItem of paginatedClassesForDisplay" class="class-mobile-card glass-card">
+          <div class="class-mobile-header">
+            <span class="status-pill" [ngClass]="getStatusClass(classItem.class_date)">
+              {{getStatusText(classItem.class_date)}}
+            </span>
+            <span class="class-date-mobile">{{classItem.class_date | date:'dd.MM.yy'}} {{classItem.class_time}}</span>
           </div>
+          <div class="class-mobile-body">
+            <h4>{{classItem.class_name}}</h4>
+            <div class="class-meta">
+              <span><i class="bi bi-people me-1"></i> {{classItem.group_name || 'No Group'}}</span>
+              <span *ngIf="classItem.attendance_count !== undefined">
+                <i class="bi bi-person-check me-1"></i> {{classItem.attendance_count || 0}}
+              </span>
+            </div>
+          </div>
+          <div class="class-mobile-actions">
+            <button class="btn-glass btn-sm" (click)="openAttendanceModal(classItem)">ATTENDANCE</button>
+            <button class="btn-glass btn-sm" (click)="openSongModal(classItem)">SONG</button>
+          </div>
+          <div class="tag-area mt-2" *ngIf="!tagStatusMap[classItem.id]?.tagged_out">
+            <button class="btn-glass btn-sm w-100" *ngIf="!tagStatusMap[classItem.id]?.tagged_in"
+              (click)="tagIn(classItem.id)">TAG IN</button>
+            <button class="btn-glass btn-sm w-100" *ngIf="tagStatusMap[classItem.id]?.tagged_in && !tagStatusMap[classItem.id]?.tagged_out"
+              (click)="tagOut(classItem.id)">TAG OUT</button>
+          </div>
+          <div class="tag-complete text-success fw-bold mt-2" *ngIf="tagStatusMap[classItem.id]?.tagged_out">
+            <i class="bi bi-check-circle me-1"></i> COMPLETED
+          </div>
+        </div>
+
+        <!-- Mobile Pagination -->
+        <div class="pagination-bar" *ngIf="totalClassPages > 1">
+          <button class="btn-glass btn-sm" (click)="prevClassPage()" [disabled]="classPage === 1">←</button>
+          <span class="page-info">{{classPage}} / {{totalClassPages}}</span>
+          <button class="btn-glass btn-sm" (click)="nextClassPage()" [disabled]="classPage === totalClassPages">→</button>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- ALL UPCOMING ANNOUNCEMENTS (paginated) -->
-  <div class="announcements-section">
+  <!-- ========== UPCOMING ANNOUNCEMENTS ========== -->
+  <section>
     <div class="section-header">
       <label class="section-label">📢 UPCOMING ANNOUNCEMENTS & EVENTS</label>
-      <span class="text-muted small">
-        Showing {{(announcementPage-1)*pageSize + 1}}–
-        {{Math.min(announcementPage*pageSize, upcomingAnnouncements.length)}} of {{upcomingAnnouncements.length}}
+      <span class="text-muted small" *ngIf="upcomingAnnouncements.length">
+        {{(announcementPage-1)*pageSize + 1}}–{{Math.min(announcementPage*pageSize, upcomingAnnouncements.length)}}
+        of {{upcomingAnnouncements.length}}
       </span>
     </div>
 
     <div class="announcement-grid">
       <div *ngFor="let ann of paginatedUpcomingAnnouncements" class="announcement-card">
-        <!-- Media: hidden on mobile via CSS class "d-none d-md-block" -->
         <div class="media-preview d-none d-md-block">
           <img *ngIf="ann.media_type === 'IMAGE'" [src]="ann.fullImageUrl" [alt]="ann.title" />
-          <iframe *ngIf="ann.media_type === 'VIDEO'" [src]="ann.safeVideoUrl" frameborder="0" allowfullscreen
-            loading="lazy"></iframe>
+          <iframe *ngIf="ann.media_type === 'VIDEO'" [src]="ann.safeVideoUrl" frameborder="0" allowfullscreen loading="lazy"></iframe>
         </div>
         <div class="announcement-content">
           <span class="category-badge">{{ann.category}}</span>
           <h4>{{ann.title}}</h4>
           <p>{{ann.description}}</p>
-          <!-- Event date + time (if available) -->
           <div class="event-datetime" *ngIf="ann.event_date">
             📅 {{ann.event_date | date:'mediumDate'}}
             <span *ngIf="ann.event_start_time"> • {{ann.event_start_time}}</span>
           </div>
           <div *ngIf="ann.registration_enabled" class="register-area">
-            <button *ngIf="!ann.user_registered" class="btn-sharp-small"
-              (click)="registerForAnnouncement(ann.id)">REGISTER</button>
+            <button *ngIf="!ann.user_registered" class="btn-sharp-small" (click)="registerForAnnouncement(ann.id)">REGISTER</button>
             <span *ngIf="ann.user_registered" class="registered-badge">✓ REGISTERED</span>
             <span *ngIf="ann.registration_type === 'PAID'" class="price-badge">€{{ann.price}}</span>
           </div>
@@ -212,36 +205,30 @@
       <div *ngIf="upcomingAnnouncements.length === 0" class="empty-state">No upcoming announcements.</div>
     </div>
 
-    <!-- Pagination controls (only if more than one page) -->
     <div class="pagination-bar" *ngIf="totalUpcomingPages > 1">
       <button class="btn-glass btn-sm" (click)="prevPage()" [disabled]="announcementPage === 1">← Prev</button>
       <span class="page-numbers">
-        <button *ngFor="let p of [].constructor(totalUpcomingPages); let i = index" class="page-dot"
-          [class.active]="i+1 === announcementPage" (click)="goToPage(i+1)">{{i+1}}</button>
+        <button *ngFor="let p of [].constructor(totalUpcomingPages); let i = index"
+          class="page-dot" [class.active]="i+1 === announcementPage"
+          (click)="goToPage(i+1)">{{i+1}}</button>
       </span>
-      <button class="btn-glass btn-sm" (click)="nextPage()" [disabled]="announcementPage === totalUpcomingPages">Next
-        →</button>
+      <button class="btn-glass btn-sm" (click)="nextPage()" [disabled]="announcementPage === totalUpcomingPages">Next →</button>
     </div>
-  </div>
+  </section>
 
-  <!-- MY REGISTRATIONS (dynamic status) -->
-  <div class="my-registrations-section">
-    <div class="section-header">
-      <label class="section-label">📌 MY REGISTRATIONS</label>
-    </div>
-    <div class="announcement-grid" *ngIf="registeredAnnouncements.length > 0; else noRegs">
+  <!-- ========== MY REGISTRATIONS ========== -->
+  <section>
+    <label class="section-label">📌 MY REGISTRATIONS</label>
+    <div class="announcement-grid" *ngIf="registeredAnnouncements.length; else noRegs">
       <div *ngFor="let reg of registeredAnnouncements" class="announcement-card">
-        <!-- Media hidden on mobile -->
         <div class="media-preview d-none d-md-block" *ngIf="reg.media_type">
           <img *ngIf="reg.media_type === 'IMAGE'" [src]="reg.fullImageUrl" [alt]="reg.title" />
-          <iframe *ngIf="reg.media_type === 'VIDEO'" [src]="reg.safeVideoUrl" frameborder="0" allowfullscreen
-            loading="lazy"></iframe>
+          <iframe *ngIf="reg.media_type === 'VIDEO'" [src]="reg.safeVideoUrl" frameborder="0" allowfullscreen loading="lazy"></iframe>
         </div>
         <div class="announcement-content">
           <span class="category-badge">{{reg.category}}</span>
           <h4>{{reg.title}}</h4>
           <p>{{reg.description}}</p>
-          <!-- Show date and status -->
           <div class="event-datetime" *ngIf="reg.event_date">
             📅 {{reg.event_date | date:'mediumDate'}}
             <span *ngIf="reg.event_start_time"> • {{reg.event_start_time}}</span>
@@ -250,24 +237,21 @@
             <span *ngIf="isEventPast(reg.event_date)" class="badge attended-badge">✔ ATTENDED</span>
             <span *ngIf="!isEventPast(reg.event_date)" class="registered-badge">✓ YOU ARE REGISTERED</span>
           </div>
-          <div *ngIf="reg.registration_type === 'PAID'" class="price-badge">€{{reg.price}} ({{reg.payment_status}})
-          </div>
+          <div *ngIf="reg.registration_type === 'PAID'" class="price-badge">€{{reg.price}} ({{reg.payment_status}})</div>
         </div>
       </div>
     </div>
     <ng-template #noRegs>
       <div class="empty-state">You haven't registered for any event or workshop yet.</div>
     </ng-template>
-  </div>
+  </section>
 
-  <!-- Monthly Performance Table -->
-  <section class="mb-5">
+  <!-- ========== MONTHLY PERFORMANCE ========== -->
+  <section>
     <label class="section-label">MONTHLY_PERFORMANCE_METRICS</label>
     <div class="sharp-card">
-      <!-- Loading / empty state etc. remain as before -->
-
-      <!-- ========== DESKTOP TABLE (hidden on mobile) ========== -->
-      <div class="table-container d-none d-md-block" *ngIf="monthlyPerformance.length > 0">
+      <!-- DESKTOP TABLE -->
+      <div class="table-container d-none d-md-block" *ngIf="monthlyPerformance.length">
         <table class="sharp-table">
           <thead>
             <tr>
@@ -288,8 +272,8 @@
         </table>
       </div>
 
-      <!-- ========== MOBILE CARDS (shown only on small screens) ========== -->
-      <div class="d-md-none mobile-class-cards" *ngIf="monthlyPerformance.length > 0">
+      <!-- MOBILE CARDS -->
+      <div class="d-md-none mobile-class-cards" *ngIf="monthlyPerformance.length">
         <div *ngFor="let perf of monthlyPerformance" class="class-mobile-card performance-mobile-card">
           <div class="class-mobile-header">
             <strong>{{perf.month_year}}</strong>
@@ -310,8 +294,7 @@
         </div>
       </div>
 
-      <!-- Empty state -->
-      <div *ngIf="monthlyPerformance.length === 0" class="text-center py-4">
+      <div *ngIf="!monthlyPerformance.length" class="text-center py-4">
         <p>No performance data available.</p>
       </div>
     </div>

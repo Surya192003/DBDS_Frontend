@@ -84,6 +84,7 @@ academicYearRange = { start: '', end: '' };
     this.loadActiveStudents();
     this.loadAnnouncementsAndPosts();
     this.loadMyRegisteredEvents();
+    this.loading = false;
   }
 
   loadAnnouncementsAndPosts() {

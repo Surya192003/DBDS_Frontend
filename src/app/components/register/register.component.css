@@ -1,9 +1,9 @@
+/* ===== register.component.css ===== */
 :host {
   display: block;
   font-family: var(--font-family-primary);
 }
 
-/* ---- Page wrapper (light background) ---- */
 .auth-container {
   min-height: 100vh;
   background: var(--color-surface);
@@ -13,8 +13,8 @@
   padding: 24px;
 }
 
-/* ---- Card (white, soft rounded rectangle) ---- */
-.sharp-card.auth-card {
+/* Auth card – uses global .sharp-card? not present, so define */
+.auth-card {
   width: 100%;
   max-width: 560px;
   border-radius: var(--radius-card);
@@ -25,13 +25,12 @@
   color: var(--color-text);
 }
 
-/* ---- Header ---- */
+/* Header – unique gradient title */
 .auth-header {
   margin-bottom: 28px;
   padding-bottom: 16px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  border-bottom: 1px solid rgba(0,0,0,0.06);
 }
-
 .title-text {
   font-weight: 900;
   font-size: 1.75rem;
@@ -42,7 +41,6 @@
   color: transparent;
   letter-spacing: -0.02em;
 }
-
 .tagline {
   font-size: 0.8rem;
   color: var(--color-text-soft);
@@ -50,38 +48,32 @@
   letter-spacing: 0.04em;
 }
 
-/* ---- Messages (error & success) ---- */
+/* Messages – not in global */
+.msg-box.error,
+.msg-box.success {
+  border-radius: 14px;
+  padding: 14px 18px;
+  margin-bottom: 20px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
 .msg-box.error {
   background: #fff5f5;
   border: 1px solid #fecaca;
-  border-radius: 14px;
-  padding: 14px 18px;
-  margin-bottom: 20px;
   color: #b91c1c;
-  font-weight: 700;
-  font-size: 0.85rem;
-  cursor: pointer;
 }
-
 .msg-box.success {
   background: #f0fdf4;
   border: 1px solid #bbf7d0;
-  border-radius: 14px;
-  padding: 14px 18px;
-  margin-bottom: 20px;
   color: #15803d;
-  font-weight: 700;
-  font-size: 0.85rem;
-  cursor: pointer;
 }
 
-/* ---- Form fields ---- */
+/* Form fields – only the label font/padding specifics */
 .field {
   margin-bottom: 20px;
 }
-
 .field label {
-  display: block;
   font-weight: 700;
   font-size: 0.75rem;
   margin-bottom: 6px;
@@ -90,53 +82,11 @@
   letter-spacing: 0.06em;
 }
 
-.sharp-input {
-  width: 100%;
-  padding: 14px 18px;
-  border: 2px solid #eaeaea;
-  border-radius: 14px;
-  outline: none;
-  font-family: inherit;
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: var(--color-text);
-  background: #fafafa;
-  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
-}
-
-/* File input keeps the same styling */
-.sharp-input[type="file"] {
-  padding: 12px 18px;
-}
-
-.sharp-input::placeholder {
-  color: #b0b0b0;
-  font-weight: 500;
-}
-
-.sharp-input:focus {
-  background: #fff;
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(253, 101, 133, 0.15);
-}
-
-/* Select dropdown */
-select.sharp-input {
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%235a5a5a' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 18px center;
-  background-size: 12px;
-  padding-right: 42px;
-}
-
-/* ---- Terms box ---- */
+/* ---------- Terms box (register‑specific) ---------- */
 .terms-section {
   margin: 28px 0 20px;
 }
-
 .section-label {
-  display: block;
   font-weight: 800;
   font-size: 0.8rem;
   text-transform: uppercase;
@@ -144,7 +94,6 @@ select.sharp-input {
   color: var(--color-text-soft);
   margin-bottom: 12px;
 }
-
 .terms-box {
   background: #fafafa;
   border: 1px solid #f0f0f0;
@@ -154,21 +103,14 @@ select.sharp-input {
   color: var(--color-text-soft);
   line-height: 1.6;
 }
-
 .terms-box h6 {
   font-weight: 800;
   font-size: 0.8rem;
   margin: 12px 0 4px;
   color: var(--color-text);
 }
-
-.terms-box h6:first-child {
-  margin-top: 0;
-}
-
-.terms-box p {
-  margin: 0 0 8px;
-}
+.terms-box h6:first-child { margin-top: 0; }
+.terms-box p { margin: 0 0 8px; }
 
 .checkbox-container {
   display: flex;
@@ -180,7 +122,6 @@ select.sharp-input {
   color: var(--color-text);
   cursor: pointer;
 }
-
 .checkbox-container input[type="checkbox"] {
   width: 18px;
   height: 18px;
@@ -190,30 +131,24 @@ select.sharp-input {
   flex-shrink: 0;
 }
 
-/* ---- Button ---- */
-.btn-sharp {
-  width: 100%;
-}
-
-/* ---- Link ---- */
+/* Link – used only in auth pages */
 .link-text {
   display: inline-block;
   text-decoration: none;
   color: var(--color-primary);
   font-weight: 700;
   font-size: 0.9rem;
-  border-bottom: 2px solid rgba(253, 101, 133, 0.3);
+  border-bottom: 2px solid rgba(253,101,133,0.3);
   padding-bottom: 2px;
   transition: 0.2s;
 }
-
 .link-text:hover {
   border-bottom-color: var(--color-primary);
 }
 
-/* ---- Responsive ---- */
+/* Responsive */
 @media (max-width: 560px) {
-  .sharp-card.auth-card {
+  .auth-card {
     padding: 28px 20px;
   }
   .title-text {
