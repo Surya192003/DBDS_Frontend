@@ -31,7 +31,7 @@
         <div class="stat-body">
           <div class="stat-info">
             <h6 class="stat-label">Monthly Payments</h6>
-            <h3 class="stat-value">${{getTotalPayments()}}</h3>
+            <h3 class="stat-value">€{{getTotalPayments()}}</h3>
           </div>
           <i class="bi bi-cash-coin stat-icon"></i>
         </div>
@@ -425,8 +425,8 @@
                       <div class="fw-medium">{{payment.instructor_name}}</div>
                     </td>
                     <td class="text-center"><span class="badge">{{payment.total_classes}}</span></td>
-                    <td class="text-center"><small>${{payment.pay_per_class || 0}}</small></td>
-                    <td class="text-end fw-bold">${{payment.total_amount || 0}}</td>
+                    <td class="text-center"><small>€{{payment.pay_per_class || 0}}</small></td>
+                    <td class="text-end fw-bold">€{{payment.total_amount || 0}}</td>
                     <td class="text-center">
                       <span [class]="payment.is_paid ? 'badge badge-active' : 'badge badge-pending'">
                         {{payment.is_paid ? 'Paid' : 'Pending'}}
@@ -443,7 +443,7 @@
                 <tfoot>
                   <tr>
                     <td colspan="3" class="text-end fw-bold">Total:</td>
-                    <td class="text-end fw-bold accent">${{getTotalPayments()}}</td>
+                    <td class="text-end fw-bold accent">€{{getTotalPayments()}}</td>
                     <td colspan="2"></td>
                   </tr>
                 </tfoot>
@@ -468,8 +468,8 @@
                   </span>
                 </div>
                 <div class="class-mobile-body">
-                  <span>{{payment.total_classes}} classes • ${{payment.pay_per_class || 0}}/class</span>
-                  <div class="fw-bold accent">${{payment.total_amount || 0}}</div>
+                  <span>{{payment.total_classes}} classes • €{{payment.pay_per_class || 0}}/class</span>
+                  <div class="fw-bold accent">€{{payment.total_amount || 0}}</div>
                 </div>
                 <div class="class-mobile-actions mt-2">
                   <button class="btn-glass btn-sm success" *ngIf="!payment.is_paid"
@@ -633,14 +633,14 @@
                     <div class="fw-medium">{{instructor.instructor_name}}</div>
                     <small class="text-muted">{{instructor.email}}</small>
                   </td>
-                  <td class="text-center"><span class="badge">${{instructor.pay_per_class || 0}}/class</span></td>
+                  <td class="text-center"><span class="badge">€{{instructor.pay_per_class || 0}}/class</span></td>
                   <td class="text-center">{{instructor.total_classes_assigned || 0}}</td>
                   <td class="text-center"><span class="badge badge-info">{{instructor.completed_classes || 0}}</span>
                   </td>
                   <td class="text-center"><span class="badge badge-primary">{{instructor.classes_tagged_in || 0}}</span>
                   </td>
                   <td>{{instructor.last_tag_in ? (instructor.last_tag_in | date:'dd.MM.yy HH:mm') : '—'}}</td>
-                  <td class="text-end fw-bold text-success">${{instructor.potential_earnings || 0}}</td>
+                  <td class="text-end fw-bold text-success">€{{instructor.potential_earnings || 0}}</td>
                   <td class="text-center">
                     <span [class]="instructor.is_active ? 'badge badge-active' : 'badge badge-inactive'">
                       {{instructor.is_active ? 'Active' : 'Inactive'}}
@@ -675,11 +675,11 @@
               <div class="class-mobile-body">
                 <small class="text-muted">{{instructor.email}}</small>
                 <div class="d-flex flex-wrap gap-2 mt-1">
-                  <span class="badge">${{instructor.pay_per_class || 0}}/class</span>
+                  <span class="badge">€{{instructor.pay_per_class || 0}}/class</span>
                   <span>Total: {{instructor.total_classes_assigned || 0}}</span>
                   <span class="badge badge-info">{{instructor.completed_classes || 0}} done</span>
                 </div>
-                <div class="fw-bold text-success">${{instructor.potential_earnings || 0}}</div>
+                <div class="fw-bold text-success">€{{instructor.potential_earnings || 0}}</div>
               </div>
             </div>
 
@@ -1041,12 +1041,12 @@
         <div class="modal-body">
           <form [formGroup]="payRateForm" (ngSubmit)="updatePayRate()">
             <div class="mb-4">
-              <label class="form-label">Pay Per Class ($)</label>
+              <label class="form-label">Pay Per Class (€)</label>
               <div class="input-group-custom">
-                <span class="input-group-text">$</span>
+                <span class="input-group-text">€</span>
                 <input type="number" class="sharp-input" formControlName="payRate" step="0.01" min="0">
               </div>
-              <small>Current: <strong>${{selectedInstructor?.pay_per_class || 0}}</strong>/class</small>
+              <small>Current: <strong>€{{selectedInstructor?.pay_per_class || 0}}</strong>/class</small>
             </div>
             <div class="modal-footer">
               <button type="button" class="btn-glass" (click)="closePayRateModal()">Cancel</button>

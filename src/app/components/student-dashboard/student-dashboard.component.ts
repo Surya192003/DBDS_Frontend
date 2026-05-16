@@ -21,12 +21,12 @@ export class StudentDashboardComponent implements OnInit {
   loading = false;
   currentUser: any;
   historySearchTerm: string = '';
-historyStatusFilter: string = 'ALL';
-filteredAttendanceHistory: any[] = [];
-  today: string|number|Date|null = new Date()
+  historyStatusFilter: string = 'ALL';
+  filteredAttendanceHistory: any[] = [];
+  today: string | number | Date | null = new Date()
   upcomingPage = 1;
-pageSize = 6;;
-academicYear: { start: string; end: string } = { start: '', end: '' };
+  pageSize = 6;;
+  academicYear: { start: string; end: string } = { start: '', end: '' };
   constructor(
     private apiService: ApiService,
     private authService: AuthService,
@@ -39,47 +39,47 @@ academicYear: { start: string; end: string } = { start: '', end: '' };
 
   ngOnInit() {
     this.loadStudentData();
-    this.apiService.getSettings().subscribe((range: any) => {
+    this.apiService.getAcademicYear().subscribe((range: any) => {
       this.academicYear = range;
       this.loadStudentData();
     });
   }
 
   loadStudentData() {
-  this.loading = true;
-  const studentId = this.currentUser?.student_data?.student_id;
+    this.loading = true;
+    const studentId = this.currentUser?.student_data?.student_id;
 
-  forkJoin({
-    allClasses: this.apiService.getClasses(),
-    upcoming: this.apiService.getUpcomingClasses(),
-    attendance: studentId ? this.apiService.getStudentAttendance(studentId) : [],
-    myAnnouncements: this.announcementService.getMyRegistrations(),
-    posts: this.postService.getAll()
-  }).subscribe({
-    next: (results) => {
-      // Filter function
-      const inRange = (dateStr: string) => {
-        if (!this.academicYear.start || !this.academicYear.end) return true;
-        const d = new Date(dateStr);
-        return d >= new Date(this.academicYear.start) && d <= new Date(this.academicYear.end);
-      };
+    forkJoin({
+      allClasses: this.apiService.getClasses(),
+      upcoming: this.apiService.getUpcomingClasses(),
+      attendance: studentId ? this.apiService.getStudentAttendance(studentId) : [],
+      myAnnouncements: this.announcementService.getMyRegistrations(),
+      posts: this.postService.getAll()
+    }).subscribe({
+      next: (results) => {
+        // Filter function
+        const inRange = (dateStr: string) => {
+          if (!this.academicYear.start || !this.academicYear.end) return true;
+          const d = new Date(dateStr);
+          return d >= new Date(this.academicYear.start) && d <= new Date(this.academicYear.end);
+        };
 
-      this.allClasses = (results.allClasses || []).filter((c: any) => inRange(c.class_date));
-      this.upcomingClasses = (results.upcoming || []).filter((c: any) => inRange(c.class_date));
+        this.allClasses = (results.allClasses || []).filter((c: any) => inRange(c.class_date));
+        this.upcomingClasses = (results.upcoming || []).filter((c: any) => inRange(c.class_date));
 
-      this.attendanceHistory = results.attendance || [];
-      this.filteredAttendanceHistory = [...this.attendanceHistory];
-      this.announcements = results.myAnnouncements || [];
-      this.posts = results.posts || [];
-      this.calculateSummary();
-      this.loading = false;
-    },
-    error: (err) => {
-      console.error(err);
-      this.loading = false;
-    }
-  });
-}
+        this.attendanceHistory = results.attendance || [];
+        this.filteredAttendanceHistory = [...this.attendanceHistory];
+        this.announcements = results.myAnnouncements || [];
+        this.posts = results.posts || [];
+        this.calculateSummary();
+        this.loading = false;
+      },
+      error: (err) => {
+        console.error(err);
+        this.loading = false;
+      }
+    });
+  }
 
   calculateSummary() {
     this.attendanceSummary.totalClasses = this.allClasses.length;
@@ -87,34 +87,34 @@ academicYear: { start: string; end: string } = { start: '', end: '' };
     this.attendanceSummary.absent = this.attendanceSummary.totalClasses - this.attendanceSummary.present;
   }
   applyHistoryFilters() {
-  let result = this.attendanceHistory;
+    let result = this.attendanceHistory;
 
-  // Filter by search term
-  if (this.historySearchTerm?.trim()) {
-    const term = this.historySearchTerm.trim().toLowerCase();
-    result = result.filter(record => {
-      const className = this.getClassName(record.class_id).toLowerCase();
-      return className.includes(term);
-    });
+    // Filter by search term
+    if (this.historySearchTerm?.trim()) {
+      const term = this.historySearchTerm.trim().toLowerCase();
+      result = result.filter(record => {
+        const className = this.getClassName(record.class_id).toLowerCase();
+        return className.includes(term);
+      });
+    }
+
+    // Filter by status
+    if (this.historyStatusFilter === 'PRESENT') {
+      result = result.filter(record => record.is_present);
+    } else if (this.historyStatusFilter === 'ABSENT') {
+      result = result.filter(record => !record.is_present);
+    }
+
+    this.filteredAttendanceHistory = result;
+    this.historyPage = 1;  // back to first page
   }
 
-  // Filter by status
-  if (this.historyStatusFilter === 'PRESENT') {
-    result = result.filter(record => record.is_present);
-  } else if (this.historyStatusFilter === 'ABSENT') {
-    result = result.filter(record => !record.is_present);
+  resetHistoryFilters() {
+    this.historySearchTerm = '';
+    this.historyStatusFilter = 'ALL';
+    this.filteredAttendanceHistory = [...this.attendanceHistory];
+    this.historyPage = 1;
   }
-
-  this.filteredAttendanceHistory = result;
-  this.historyPage = 1;  // back to first page
-}
-
-resetHistoryFilters() {
-  this.historySearchTerm = '';
-  this.historyStatusFilter = 'ALL';
-  this.filteredAttendanceHistory = [...this.attendanceHistory];
-  this.historyPage = 1;
-}
 
   getClassName(classId: number): string {
     const classItem = this.allClasses.find(c => c.id === classId);
@@ -127,15 +127,15 @@ resetHistoryFilters() {
 
   // Registration is not normally needed in student dashboard because they are already registered,
   // but if you want to allow registration from here (e.g., for new events), you can keep it.
-registerForAnnouncement(id: number) {
-  this.announcementService.register(id, {}).subscribe({
-    next: () => {
-      alert('Registered! Refresh to see it in your list.');
-      this.loadStudentData();
-    },
-    error: (err) => alert('Error: ' + err.error?.error)
-  });
-}
+  registerForAnnouncement(id: number) {
+    this.announcementService.register(id, {}).subscribe({
+      next: () => {
+        alert('Registered! Refresh to see it in your list.');
+        this.loadStudentData();
+      },
+      error: (err) => alert('Error: ' + err.error?.error)
+    });
+  }
 
   sanitizeUrl(url: string): SafeResourceUrl {
     let embedUrl = url;
@@ -148,27 +148,27 @@ registerForAnnouncement(id: number) {
     }
     return this.sanitizer.bypassSecurityTrustResourceUrl(embedUrl);
   }
-get totalUpcomingPages(): number {
-  return Math.ceil(this.upcomingClasses.length / this.pageSize);
-}
-get paginatedUpcoming(): any[] {
-  const start = (this.upcomingPage - 1) * this.pageSize;
-  return this.upcomingClasses.slice(start, start + this.pageSize);
-}
-prevUpcomingPage() { if (this.upcomingPage > 1) this.upcomingPage--; }
-nextUpcomingPage() { if (this.upcomingPage < this.totalUpcomingPages) this.upcomingPage++; }
+  get totalUpcomingPages(): number {
+    return Math.ceil(this.upcomingClasses.length / this.pageSize);
+  }
+  get paginatedUpcoming(): any[] {
+    const start = (this.upcomingPage - 1) * this.pageSize;
+    return this.upcomingClasses.slice(start, start + this.pageSize);
+  }
+  prevUpcomingPage() { if (this.upcomingPage > 1) this.upcomingPage--; }
+  nextUpcomingPage() { if (this.upcomingPage < this.totalUpcomingPages) this.upcomingPage++; }
 
-// Pagination for History
-historyPage = 1;
-get totalHistoryPages(): number {
-  return Math.ceil(this.filteredAttendanceHistory.length / this.pageSize);
-}
-get paginatedHistory(): any[] {
-  const start = (this.historyPage - 1) * this.pageSize;
-  return this.filteredAttendanceHistory.slice(start, start + this.pageSize);
-}
-prevHistoryPage() { if (this.historyPage > 1) this.historyPage--; }
-nextHistoryPage() { if (this.historyPage < this.totalHistoryPages) this.historyPage++; }
+  // Pagination for History
+  historyPage = 1;
+  get totalHistoryPages(): number {
+    return Math.ceil(this.filteredAttendanceHistory.length / this.pageSize);
+  }
+  get paginatedHistory(): any[] {
+    const start = (this.historyPage - 1) * this.pageSize;
+    return this.filteredAttendanceHistory.slice(start, start + this.pageSize);
+  }
+  prevHistoryPage() { if (this.historyPage > 1) this.historyPage--; }
+  nextHistoryPage() { if (this.historyPage < this.totalHistoryPages) this.historyPage++; }
 
 
 }

@@ -1,7 +1,6 @@
 <div class="dashboard-wrapper">
   <div *ngIf="loading" class="center-content py-5">
-    <div class="spinner-square"></div>
-    <h3 class="title-text mt-4">INITIALIZING_SECURE_SESSION...</h3>
+    <app-loader></app-loader>
   </div>
 
   <div *ngIf="!loading" class="fade-in">
@@ -198,8 +197,7 @@
     </section>
 
 
-    <footer class="footer-note">
-      <p>SAFEGUARDING_COMPLIANT // GARD_VETTED_STAFF</p>
-    </footer>
+
   </div>
 </div>
+<app-footer></app-footer>

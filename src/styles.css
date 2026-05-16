@@ -237,6 +237,7 @@ body {
   color: var(--color-text-muted);
 }
 .sharp-input {
+  margin: 5px;
   width: 100%;
   padding: 12px 16px;
   border: 2px solid var(--color-border);
@@ -410,6 +411,7 @@ body {
 }
 /* ---------- Glass Button – Light, subtle, modern ---------- */
 .btn-glass {
+  margin: 10px;
   display: inline-flex;
   align-items: center;
   justify-content: center;

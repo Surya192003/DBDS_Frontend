@@ -1,14 +1,276 @@
-<div class="pl">
-	<div class="pl__dot"></div>
-	<div class="pl__dot"></div>
-	<div class="pl__dot"></div>
-	<div class="pl__dot"></div>
-	<div class="pl__dot"></div>
-	<div class="pl__dot"></div>
-	<div class="pl__dot"></div>
-	<div class="pl__dot"></div>
-	<div class="pl__dot"></div>
-	<div class="pl__dot"></div>
-	<div class="pl__dot"></div>
-	<div class="pl__dot"></div>
-</div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Full‑Screen Centered Loader | Always Stays in the Middle</title>
+  <style>
+    /* ----- RESET & BASE STYLES ----- */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    /* Body — normal document flow with scrollable content */
+    body {
+      background: #f7f9fc;
+      font-family: system-ui, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+      line-height: 1.5;
+      min-height: 55vh;
+    }
+
+    /* ----- MAIN PAGE CONTENT (DEMONSTRATES "OTHER CONTENT" BEHIND) ----- */
+    /* The content area uses a max-width, nice spacing and lives UNDER the fixed loader.
+       The fixed loader overlay stays centered at all times, no matter the amount of content. */
+    .page-content {
+      max-width: 880px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem 4rem;
+      background: transparent; /* content shines through, no box masking */
+      position: relative;
+      z-index: 1;       /* ensures text is selectable and below the fixed loader (loader has higher z-index) */
+    }
+
+    /* typography & decorative styles for demo content */
+    .page-content h1 {
+      font-size: 2.2rem;
+      font-weight: 600;
+      background: linear-gradient(135deg, #1f2b3c, #2c3e50);
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+      letter-spacing: -0.3px;
+      margin-bottom: 0.5rem;
+    }
+
+    .page-content .subhead {
+      font-size: 1.1rem;
+      color: #4a627a;
+      border-left: 4px solid #f08080;
+      padding-left: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .card-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.8rem;
+      margin: 2rem 0 2rem;
+    }
+
+    .demo-card {
+      background: white;
+      border-radius: 24px;
+      padding: 1.4rem 1.8rem;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.03), 0 2px 4px rgba(0,0,0,0.05);
+      flex: 1 1 240px;
+      transition: all 0.2s ease;
+      border: 1px solid rgba(240,128,128,0.15);
+    }
+
+    .demo-card h3 {
+      color: #2d3e50;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .demo-card p {
+      color: #4b5e77;
+      font-size: 0.9rem;
+    }
+
+    .badge {
+      background: #f0808010;
+      color: #c76e6e;
+      border-radius: 40px;
+      padding: 0.2rem 0.8rem;
+      font-size: 0.7rem;
+      font-weight: 500;
+      display: inline-block;
+    }
+
+    button {
+      background: white;
+      border: 1px solid #f08080;
+      padding: 0.5rem 1rem;
+      border-radius: 60px;
+      font-weight: 500;
+      color: #b95a5a;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    button:hover {
+      background: #f0808010;
+      border-color: #f08080;
+    }
+
+    footer {
+      margin-top: 3rem;
+      padding-top: 1.5rem;
+      text-align: center;
+      border-top: 1px solid rgba(128, 128, 128, 0.2);
+      font-size: 0.85rem;
+      color: #6c7c8f;
+    }
+
+    /* Responsive fine-tune */
+    @media (max-width: 600px) {
+      .page-content {
+        padding: 1.5rem 1rem 3rem;
+      }
+      .demo-card {
+        padding: 1rem 1.2rem;
+      }
+    }
+
+    /* ----- FIXED FULL-SCREEN LOADER CONTAINER ----- 
+       This wrapper ensures the loader is ALWAYS centered relative to viewport,
+       independent of scrolling or additional content. */
+    .fullscreen-loader-center {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;    /* so that underlying content remains clickable / selectable */
+      z-index: 9999;           /* stays above page content but doesn't block clicks */
+    }
+
+    /* ORIGINAL LOADER STYLES (preserved exactly as provided) */
+    .loader {
+      width: 48px;
+      height: 48px;
+      margin: auto;
+      position: relative;
+      /* no extra overrides — keep original behavior */
+    }
+
+    .loader:before {
+      content: '';
+      width: 48px;
+      height: 5px;
+      background: #f0808050;
+      position: absolute;
+      top: 60px;
+      left: 0;
+      border-radius: 50%;
+      animation: shadow324 0.5s linear infinite;
+    }
+
+    .loader:after {
+      content: '';
+      width: 100%;
+      height: 100%;
+      background: #f08080;
+      position: absolute;
+      top: 0;
+      left: 0;
+      border-radius: 4px;
+      animation: jump7456 0.5s linear infinite;
+    }
+
+    /* Keyframes — original from Uiverse */
+    @keyframes jump7456 {
+      15% {
+        border-bottom-right-radius: 3px;
+      }
+      25% {
+        transform: translateY(9px) rotate(22.5deg);
+      }
+      50% {
+        transform: translateY(18px) scale(1, .9) rotate(45deg);
+        border-bottom-right-radius: 40px;
+      }
+      75% {
+        transform: translateY(9px) rotate(67.5deg);
+      }
+      100% {
+        transform: translateY(0) rotate(90deg);
+      }
+    }
+
+    @keyframes shadow324 {
+      0%, 100% {
+        transform: scale(1, 1);
+      }
+      50% {
+        transform: scale(1.2, 1);
+      }
+    }
+
+    /* optional: small extra lift for the loader to keep it crisp on any background */
+    .fullscreen-loader-center .loader {
+      filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.05));
+    }
+  </style>
+</head>
+<body>
+<!-- FULL-SCREEN LOADER CENTER (fixed, interactive-friendly) -->
+  <div class="fullscreen-loader-center">
+    <div class="loader" aria-label="Loading animation, centered on screen"></div>
+  </div>
+
+  <script>
+    // Simple interactive demo to prove that even with dynamic content added,
+    // the loader remains perfectly centered (no drift, no layout shift).
+    // This showcases the robustness of the fixed+flex centering approach.
+    (function() {
+      const addBtn = document.getElementById('addContentBtn');
+      const toggleBtn = document.getElementById('toggleVisibilityBtn');
+      const dynamicArea = document.getElementById('dynamicContentArea');
+      const loaderOverlay = document.querySelector('.fullscreen-loader-center');
+      
+      let paragraphCounter = 1;
+
+      // Function to add new paragraphs dynamically
+      if (addBtn) {
+        addBtn.addEventListener('click', () => {
+          const newPara = document.createElement('p');
+          newPara.style.marginTop = '1rem';
+          newPara.style.padding = '0.75rem 0';
+          newPara.style.borderBottom = '1px dashed #f0808050';
+          newPara.innerHTML = `✨ New dynamic block #${paragraphCounter}: This extra content does NOT affect the loader position — it stays fixed at the exact center of your screen. The loader remains visible, centered, and fully animated.`;
+          dynamicArea.appendChild(newPara);
+          paragraphCounter++;
+          
+          // smooth auto-scroll optional: just to demonstrate scrolling doesn't move loader
+          newPara.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        });
+      }
+
+      // toggle loader visibility (without breaking centering)
+      // This shows that loader can be hidden/shown but always stays centered
+      if (toggleBtn) {
+        let visible = true;
+        toggleBtn.addEventListener('click', () => {
+          if (loaderOverlay) {
+            visible = !visible;
+            loaderOverlay.style.opacity = visible ? '1' : '0';
+            loaderOverlay.style.transition = 'opacity 0.2s ease';
+            toggleBtn.textContent = visible ? '👁️ Hide loader overlay' : '🔍 Show loader overlay';
+          }
+        });
+      }
+
+      // Extra: log to console that the loader centering is fixed regardless of content.
+      console.log('Full-screen loader active — always centered, no matter content size or interaction.');
+    })();
+  </script>
+
+  <!-- explanation of the design:
+       1. The .fullscreen-loader-center uses position: fixed, top/left/width/height:100% and flex centering.
+       2. pointer-events: none ensures that the underlying text, buttons, and interactive elements remain usable.
+       3. The .loader itself stays visually on top (z-index 9999) but doesn't capture mouse events.
+       4. The original loader's CSS (including pseudo-elements and keyframes) is untouched, preserving the exact animation and style.
+       5. Even when you scroll, resize the window, or inject huge amounts of new content, the loader remains perfectly centered both horizontally and vertically.
+  -->
+</body>
+</html>

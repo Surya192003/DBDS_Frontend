@@ -78,7 +78,13 @@ export class InstructorDashboardComponent implements OnInit, OnDestroy {
   ngOnInit() {
   const today = new Date();
   this.selectedReportMonth = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`;
-  this.loadDashboardData();
+  
+  // 1. Fetch academic year first
+  this.apiService.getAcademicYear().subscribe((range: any) => {
+    this.academicYearRange = range;
+    // 2. Now load all dashboard data (filters will be applied inside loadClasses)
+    this.loadDashboardData();
+  });
 }
 
   ngOnDestroy() {

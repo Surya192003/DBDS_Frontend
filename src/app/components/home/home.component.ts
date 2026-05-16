@@ -1,6 +1,7 @@
-import { Component, AfterViewInit, OnDestroy } from '@angular/core';
+import { Component, AfterViewInit, OnDestroy, OnInit } from '@angular/core';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { AuthService } from '../../services/auth.service';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -9,7 +10,7 @@ gsap.registerPlugin(ScrollTrigger);
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css']
 })
-export class HomeComponen implements AfterViewInit, OnDestroy {
+export class HomeComponen implements AfterViewInit, OnDestroy, OnInit {
   private ctx!: gsap.Context;
 
   features = [
@@ -27,6 +28,12 @@ export class HomeComponen implements AfterViewInit, OnDestroy {
   };
 
   danceStyles = ['Bollywood', 'Kathak', 'Bharatanatyam', 'Hip Hop', 'Western', 'Free Style', 'Kuthu', 'Semi Classical'];
+
+  constructor(private authService: AuthService) {}
+
+  ngOnInit() {
+    document.title = 'DBDS - Dance Classes in Dublin | Bollywood, Kathak & More';
+  }
 
   ngAfterViewInit() {
     // Add brief timeout to guarantee DOM is settled and variables are ready

@@ -9,10 +9,10 @@ import { AuthService } from './auth.service';
 })
 export class ApiService {
   // ------ CONFIGURATION ------
-  private apiUrl = 'https://dbds-backend.onrender.com/api';
-  // private apiUrl = 'http://localhost:5010/api';   
+  // private apiUrl = 'https://dbds-backend.onrender.com/api';
+  private apiUrl = 'http://localhost:5010/api';
 
-  constructor(private http: HttpClient, private authService: AuthService) {}
+  constructor(private http: HttpClient, private authService: AuthService) { }
 
   // =============================================
   //  PRIVATE HELPERS (headers & error handling)
@@ -358,6 +358,9 @@ export class ApiService {
   getSettings(): Observable<any> {
     return this.http.get(`${this.apiUrl}/settings`);
   }
+  getAcademicYear(): Observable<{ start: string; end: string }> {
+    return this.http.get<{ start: string; end: string }>(`${this.apiUrl}/settings/academic-year`);
+  }
 
   updateSettings(data: any): Observable<any> {
     return this.http.put(`${this.apiUrl}/settings`, data);
@@ -374,9 +377,9 @@ export class ApiService {
 
   // REPORTS
   sendMonthlyReport(month: string, instructorId?: number): Observable<any> {
-  let url = `${this.apiUrl}/eachreports/instructor-monthly?month=${month}`;
-  if (instructorId) url += `&instructor_id=${instructorId}`;
-  return this.http.get(url, { headers: this.getHeaders() })
-    .pipe(catchError(this.handleHttpError.bind(this)));
-}
+    let url = `${this.apiUrl}/eachreports/instructor-monthly?month=${month}`;
+    if (instructorId) url += `&instructor_id=${instructorId}`;
+    return this.http.get(url, { headers: this.getHeaders() })
+      .pipe(catchError(this.handleHttpError.bind(this)));
+  }
 }
