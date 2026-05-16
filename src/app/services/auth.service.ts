@@ -26,8 +26,8 @@ export class AuthService {
   /* ================================================================ */
 
   // Use environment.ts in a real project – hardcoded here for brevity
-  // private apiUrl = 'https://dbds-backend.onrender.com/api';
-  private apiUrl = 'http://localhost:5010/api'; 
+  private apiUrl = 'https://dbds-backend.onrender.com/api';
+  // private apiUrl = 'http://localhost:5010/api'; 
 
   /* ================================================================ */
   /*  State                                                            */
