@@ -1,0 +1,92 @@
+<!-- Hero section -->
+<header class="hero">
+  <div class="hero-content">
+    <h1>Ireland’s Biggest<br><span>Bollywood Dance School</span></h1>
+    <p class="hero-subtitle">Join our crew – classes across Dublin for all ages and levels.</p>
+    <div class="hero-actions">
+      <a [href]="social.instagram" target="_blank" class="btn-social insta">
+        <i class="bi bi-instagram"></i> @dbdsireland
+      </a>
+      <a [href]="social.facebook" target="_blank" class="btn-social fb">
+        <i class="bi bi-facebook"></i> Facebook
+      </a>
+    </div>
+  </div>
+</header>
+
+<!-- Sticky animated cards section -->
+<section class="sticker-section">
+  <div class="sticker-wrapper">
+    <div class="panel-container">
+      <div class="panel-track">
+        <div class="panel__row" *ngFor="let feature of features; let i = index">
+          <div class="card" [ngClass]="'card--' + getCardModifier(i)">
+            
+            <div class="card__column card__column--left">
+              <div class="card__avatar">
+                <i class="bi {{ feature.icon }}" [style.color]="feature.color"></i>
+              </div>
+            </div>
+            
+            <div class="card__content">
+              <div class="card__details">
+                <div class="card__visual-badge" [style.backgroundColor]="feature.color">
+                  <i class="bi {{ feature.icon }}"></i>
+                </div>
+                <div class="card__text-block">
+                  <h4 class="card__title">{{ feature.title }}</h4>
+                  <p class="card__desc">{{ feature.desc }}</p>
+                </div>
+              </div>
+            </div>
+            
+            <div class="card__column card__column--right">
+              <div class="card__company">
+                <span [style.color]="feature.color">DBDS</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Additional sections -->
+<main class="main-content">
+  <section class="why-us">
+    <h2>Why Choose Us</h2>
+    <div class="cards-grid">
+      <div class="card-static" *ngFor="let feature of features">
+        <div class="icon-wrap" [style.backgroundColor]="feature.color + '20'">
+          <i class="bi {{ feature.icon }}" [style.color]="feature.color"></i>
+        </div>
+        <h3>{{ feature.title }}</h3>
+        <p>{{ feature.desc }}</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="dance-styles">
+    <h2>Styles We Teach</h2>
+    <div class="styles-cloud">
+      <span class="style-badge" *ngFor="let style of danceStyles">{{ style }}</span>
+    </div>
+  </section>
+
+  <section class="locations">
+    <h2>Find Us Near You</h2>
+    <div class="map-wrapper">
+      <div class="map-bg">
+        <i class="bi bi-geo-alt-fill map-pulse"></i>
+        <span>Dublin Wide Coverage</span>
+      </div>
+    </div>
+    <p class="location-note">
+      <i class="bi bi-check-circle-fill"></i> 
+      Classes in Tyrrelstown, Adamstown, Lucan, Finglas, Swords, City Centre &amp; more!
+    </p>
+  </section>
+</main>
+<app-footer></app-footer>

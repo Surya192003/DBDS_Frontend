@@ -1,7 +1,7 @@
 <nav class="light-nav" [class.nav-hidden]="!isNavVisible">
   <div class="nav-inner">
     <!-- Brand -->
-    <a class="nav-brand" routerLink="/dashboard" (click)="isMenuOpen = false">
+    <a class="nav-brand" routerLink="/home" (click)="isMenuOpen = false">
       <img src="assets/images/dbds-logo.png" alt="DBDS Logo" class="logo" />
       <span class="brand-text">
         <span class="brand-main">DBDS</span>
@@ -19,60 +19,34 @@
     <!-- Navigation content (shows on desktop, toggles on mobile) -->
     <div class="nav-content" [class.mobile-open]="isMenuOpen">
       <div class="nav-links">
-        <a
-          class="nav-link"
-          routerLink="/dashboard"
-          routerLinkActive="active"
-          (click)="isMenuOpen = false"
-        >
-          <span>🏠</span> Dashboard
+        <a class="nav-link" routerLink="/home" routerLinkActive="active" (click)="isMenuOpen = false">
+          Home
+        </a>
+        <a class="nav-link" routerLink="/dashboard" routerLinkActive="active" (click)="isMenuOpen = false">
+          Dashboard
         </a>
 
         <ng-container *ngIf="!isAuthenticated">
-          <a
-            class="nav-link"
-            routerLink="/login"
-            routerLinkActive="active"
-            (click)="isMenuOpen = false"
-          >
-            <span>🔑</span> Login
+          <a class="nav-link" routerLink="/login" routerLinkActive="active" (click)="isMenuOpen = false">
+            Login
           </a>
-          <a
-            class="nav-link nav-link--cta"
-            routerLink="/register"
-            routerLinkActive="active"
-            (click)="isMenuOpen = false"
-          >
+          <a class="nav-link nav-link--cta" routerLink="/register" routerLinkActive="active"
+            (click)="isMenuOpen = false">
             <span>✨</span> Join Now
           </a>
         </ng-container>
 
         <ng-container *ngIf="isAuthenticated">
-          <a
-            *ngIf="user?.role === 'ADMIN'"
-            class="nav-link"
-            routerLink="/admin"
-            routerLinkActive="active"
-            (click)="isMenuOpen = false"
-          >
+          <a *ngIf="user?.role === 'ADMIN'" class="nav-link" routerLink="/admin" routerLinkActive="active"
+            (click)="isMenuOpen = false">
             <span>⚙️</span> Admin
           </a>
-          <a
-            *ngIf="user?.role === 'INSTRUCTOR'"
-            class="nav-link"
-            routerLink="/instructor"
-            routerLinkActive="active"
-            (click)="isMenuOpen = false"
-          >
+          <a *ngIf="user?.role === 'INSTRUCTOR'" class="nav-link" routerLink="/instructor" routerLinkActive="active"
+            (click)="isMenuOpen = false">
             <span>🎓</span> Instructor
           </a>
-          <a
-            *ngIf="user?.role === 'STUDENT'"
-            class="nav-link"
-            routerLink="/student"
-            routerLinkActive="active"
-            (click)="isMenuOpen = false"
-          >
+          <a *ngIf="user?.role === 'STUDENT'" class="nav-link" routerLink="/student" routerLinkActive="active"
+            (click)="isMenuOpen = false">
             <span>📚</span> Learning
           </a>
         </ng-container>

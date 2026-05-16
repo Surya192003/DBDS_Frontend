@@ -5,7 +5,7 @@ import { CommonModule } from '@angular/common';
 import { AppRoutingModule } from './app-routing.module';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { AppComponent } from './app.component';
-import { LoginComponent } from './components/login/login.component';
+import { LoginComponent } from './components/Helpers/login/login.component';
 import { RegisterComponent } from './components/register/register.component';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { AdminDashboardComponent } from './components/admin-dashboard/admin-dashboard.component';
@@ -17,9 +17,12 @@ import { GroupsManagementComponent } from './components/groups-management/groups
 import { ProfileComponent } from './components/profile/profile.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ForgorPasswordComponent } from './components/forgor-password/forgor-password.component';
-import { ResetPasswordComponent } from './components/reset-password/reset-password.component';
+import { ResetPasswordComponent } from './components/Helpers/reset-password/reset-password.component';
 import { APP_INITIALIZER } from '@angular/core';
 import { AuthService } from './services/auth.service';
+import { LoaderComponent } from './components/Helpers/loader/loader.component';
+import { FooterComponent } from './components/Helpers/footer/footer.component';
+import { HomeComponen } from './components/home/home.component';
 
 @NgModule({
   declarations: [
@@ -34,6 +37,9 @@ import { AuthService } from './services/auth.service';
     ProfileComponent,
     ForgorPasswordComponent,
     ResetPasswordComponent,
+    LoaderComponent,
+    FooterComponent,
+    HomeComponen,
     
   ],
   imports: [

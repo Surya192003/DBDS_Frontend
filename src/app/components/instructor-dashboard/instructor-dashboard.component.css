@@ -265,6 +265,133 @@
   font-size: 0.85rem;
 }
 
+/* Filter bar styles (used in classes section) */
+.filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 16px;
+  margin-bottom: 24px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--color-border);
+}
+.filter-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.filter-label {
+  font-size: 0.7rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-muted);
+}
+.filter-select {
+  padding: 8px 32px 8px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-button);
+  background: white;
+  font-family: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+.filter-reset:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Pagination bar – make it consistent */
+.pagination-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid var(--color-border);
+}
+.page-info {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+.page-numbers {
+  display: flex;
+  gap: 6px;
+}
+.page-dot {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-full);
+  background: transparent;
+  border: none;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.page-dot.active,
+.page-dot:hover {
+  background: var(--color-primary);
+  color: white;
+}
+
+/* Make .btn-sharp-small consistent with global buttons */
+.btn-sharp-small {
+  padding: 8px 16px;
+  font-size: 0.75rem;
+  background: var(--color-primary);
+  color: white;
+  border-radius: var(--radius-button);
+  text-transform: uppercase;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+.btn-sharp-small.outline {
+  background: transparent;
+  border: 2px solid var(--color-primary);
+  color: var(--color-primary);
+}
+.btn-sharp-small.danger {
+  background: #f43f5e;
+}
+
+/* Ensure .btn-close (Bootstrap modal close) has a fallback if Bootstrap is missing */
+.btn-close {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  color: var(--color-text-muted);
+  padding: 4px;
+}
+
+/* Ensure modal backdrop is sharp black */
+.modal-backdrop {
+  background-color: black;
+  opacity: 0.8;
+}
+
+/* Modal dialog centering */
+.modal-dialog {
+  max-width: 800px;
+}
+
+/* Spinner (already exists, but ensure consistency) */
+.spinner-square {
+  width: 40px;
+  height: 40px;
+  border: 3px solid black;
+  border-top-color: #ccc;
+  margin: 0 auto;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
 /* ---- Responsive ---- */
 @media (max-width: 768px) {
   .instructor-wrapper {

@@ -24,7 +24,7 @@
 
   <!-- Loading State -->
   <div *ngIf="loading" class="text-center py-5">
-    <div class="spinner accent"></div>
+    <div class="spinner-square mx-auto"></div>
     <p class="mt-2 text-muted">Loading groups...</p>
   </div>
 
@@ -32,11 +32,11 @@
   <div *ngIf="!loading" class="row">
     <!-- No Groups Message -->
     <div *ngIf="groups.length === 0" class="col-12">
-      <div class="glass-panel empty-state">
-        <i class="bi bi-people empty-icon"></i>
-        <h4>No Groups Yet</h4>
+      <div class="glass-panel empty-state text-center">
+        <i class="bi bi-people empty-icon fs-1"></i>
+        <h4 class="mt-3">No Groups Yet</h4>
         <p>Create your first student group to organize classes</p>
-        <button class="btn-glass" (click)="openCreateGroupModal()">
+        <button class="btn-glass mt-2" (click)="openCreateGroupModal()">
           <i class="bi bi-plus-circle me-1"></i> Create First Group
         </button>
       </div>
@@ -44,7 +44,7 @@
 
     <!-- Groups Cards -->
     <div *ngFor="let group of groups" class="col-md-6 col-lg-4 mb-4">
-      <div class="glass-panel group-card h-100">
+      <div class="glass-panel group-card h-100" (click)="openGroupDetailsModal(group)">
         <div class="d-flex justify-content-between align-items-start mb-3">
           <div>
             <h5 class="group-name">
@@ -54,7 +54,7 @@
               Created by: {{group.created_by_name || 'Admin'}}
             </small>
           </div>
-          <span class="badge badge-count">
+          <span class="badge-sharp">
             {{group.student_count || 0}} <i class="bi bi-person ms-1"></i>
           </span>
         </div>
@@ -71,7 +71,7 @@
             <i class="bi bi-calendar me-1"></i>
             {{group.created_at | date:'mediumDate'}}
           </small>
-          <button class="btn-glass btn-sm" (click)="openGroupDetailsModal(group)">
+          <button class="btn-glass btn-sm" (click)="$event.stopPropagation(); openGroupDetailsModal(group)">
             <i class="bi bi-eye me-1"></i> View Details
           </button>
         </div>
@@ -79,208 +79,183 @@
     </div>
   </div>
 
-  <!-- Create Group Modal -->
-  <div class="modal fade" id="createGroupModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content sharp-modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">
-            <i class="bi bi-plus-circle accent me-2"></i>Create New Student Group
-          </h5>
-          <button type="button" class="btn-close-custom" (click)="closeCreateGroupModal()"
-            [disabled]="creatingGroup">×</button>
-        </div>
-        <div class="modal-body">
-          <form [formGroup]="groupForm" (ngSubmit)="createGroup()">
-            <div class="mb-3">
-              <label class="form-label">Group Name <span class="text-danger">*</span></label>
-              <input type="text" class="sharp-input" formControlName="group_name"
-                placeholder="e.g., Beginner Level, Advanced Ballet, Kids Class"
-                [class.is-invalid]="groupForm.get('group_name')?.invalid && groupForm.get('group_name')?.touched">
-              <div *ngIf="groupForm.get('group_name')?.invalid && groupForm.get('group_name')?.touched"
-                class="invalid-feedback">
-                Group name is required
-              </div>
+  <!-- ========== CREATE GROUP MODAL ========== -->
+  <div class="modal-overlay" *ngIf="showCreateModal" (click)="closeModalOnOverlay($event)">
+    <div class="sharp-modal">
+      <div class="modal-header-sharp">
+        <h3><i class="bi bi-plus-circle accent me-2"></i>Create New Student Group</h3>
+        <button class="modal-close" (click)="closeCreateGroupModal()">✕</button>
+      </div>
+      <div class="modal-body-sharp">
+        <form [formGroup]="groupForm" (ngSubmit)="createGroup()">
+          <div class="form-row-sharp mb-3">
+            <label>Group Name <span class="text-danger">*</span></label>
+            <input type="text" class="sharp-input" formControlName="group_name"
+              placeholder="e.g., Beginner Level, Advanced Ballet, Kids Class"
+              [class.is-invalid]="groupForm.get('group_name')?.invalid && groupForm.get('group_name')?.touched">
+            <div *ngIf="groupForm.get('group_name')?.invalid && groupForm.get('group_name')?.touched" class="invalid-feedback">
+              Group name is required
             </div>
+          </div>
 
-            <div class="mb-3">
-              <label class="form-label">Description (Optional)</label>
-              <textarea class="sharp-input" formControlName="description" rows="3"
-                placeholder="Describe this group (e.g., 'Beginner students with 0-6 months experience')"></textarea>
-            </div>
+          <div class="form-row-sharp mb-3">
+            <label>Description (Optional)</label>
+            <textarea class="sharp-input" formControlName="description" rows="3"
+              placeholder="Describe this group (e.g., 'Beginner students with 0-6 months experience')"></textarea>
+          </div>
 
-            <div class="alert-box info">
-              <i class="bi bi-info-circle"></i>
-              <small>Create groups based on skill level, age group, or class type.<br>You can add students after creation.</small>
-            </div>
+          <div class="alert-box info">
+            <i class="bi bi-info-circle"></i>
+            <small>Create groups based on skill level, age group, or class type.<br>You can add students after creation.</small>
+          </div>
 
-            <div class="modal-footer">
-              <button type="button" class="btn-glass" (click)="closeCreateGroupModal()" [disabled]="creatingGroup">Cancel</button>
-              <button type="submit" class="btn-glass primary" [disabled]="groupForm.invalid || creatingGroup">
-                <span *ngIf="creatingGroup" class="spinner spinner-sm me-2"></span>
-                <i *ngIf="!creatingGroup" class="bi bi-check-circle me-1"></i>
-                {{creatingGroup ? 'Creating...' : 'Create Group'}}
-              </button>
-            </div>
-          </form>
-        </div>
+          <div class="modal-footer-sharp">
+            <button type="button" class="btn-glass" (click)="closeCreateGroupModal()" [disabled]="creatingGroup">Cancel</button>
+            <button type="submit" class="btn-glass primary" [disabled]="groupForm.invalid || creatingGroup">
+              <span *ngIf="creatingGroup" class="spinner-square spinner-sm me-2"></span>
+              <i *ngIf="!creatingGroup" class="bi bi-check-circle me-1"></i>
+              {{creatingGroup ? 'Creating...' : 'Create Group'}}
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   </div>
 
-  <!-- Group Details Modal -->
-  <div class="modal fade" id="groupDetailsModal" tabindex="-1">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-      <div class="modal-content sharp-modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">
-            <i class="bi bi-collection accent me-2"></i>{{selectedGroup?.group_name}}
-          </h5>
-          <button type="button" class="btn-close-custom" (click)="closeGroupDetailsModal()">×</button>
-        </div>
-        <div class="modal-body">
-          <!-- Group Info -->
-          <div class="glass-panel mb-4">
-            <div class="row">
-              <div class="col-md-8">
-                <h6 class="text-muted mb-2">Group Information</h6>
-                <p *ngIf="selectedGroup?.description">{{selectedGroup.description}}</p>
-                <p *ngIf="!selectedGroup?.description" class="text-muted"><i>No description provided</i></p>
-                <div class="d-flex gap-3 text-muted">
-                  <small><i class="bi bi-person me-1"></i>Created by: {{selectedGroup?.created_by_name || 'Admin'}}</small>
-                  <small><i class="bi bi-calendar me-1"></i>Created: {{selectedGroup?.created_at | date:'mediumDate'}}</small>
-                </div>
-              </div>
-              <div class="col-md-4 text-end">
-                <div class="display-4 accent fw-bold">{{groupStudents.length}}</div>
-                <small class="text-muted">Students in Group</small>
+  <!-- ========== GROUP DETAILS MODAL ========== -->
+  <div class="modal-overlay" *ngIf="showDetailsModal" (click)="closeModalOnOverlay($event)">
+    <div class="sharp-modal modal-lg">
+      <div class="modal-header-sharp">
+        <h3><i class="bi bi-collection accent me-2"></i>{{selectedGroup?.group_name}}</h3>
+        <button class="modal-close" (click)="closeGroupDetailsModal()">✕</button>
+      </div>
+      <div class="modal-body-sharp">
+        <!-- Group Info -->
+        <div class="glass-panel mb-4">
+          <div class="row">
+            <div class="col-md-8">
+              <h6 class="text-muted mb-2">Group Information</h6>
+              <p *ngIf="selectedGroup?.description">{{selectedGroup.description}}</p>
+              <p *ngIf="!selectedGroup?.description" class="text-muted"><i>No description provided</i></p>
+              <div class="d-flex gap-3 text-muted">
+                <small><i class="bi bi-person me-1"></i>Created by: {{selectedGroup?.created_by_name || 'Admin'}}</small>
+                <small><i class="bi bi-calendar me-1"></i>Created: {{selectedGroup?.created_at | date:'mediumDate'}}</small>
               </div>
             </div>
-          </div>
-
-          <!-- Students Section -->
-          <div class="glass-panel">
-            <div class="panel-header">
-              <h6 class="mb-0"><i class="bi bi-people accent me-2"></i>Students in this Group</h6>
-              <button class="btn-glass btn-sm" (click)="modalService.openModal('addStudentModal')">
-                <i class="bi bi-person-plus me-1"></i> Add Student
-              </button>
-            </div>
-            <div>
-              <!-- No Students -->
-              <div *ngIf="groupStudents.length === 0" class="empty-state">
-                <i class="bi bi-person-x empty-icon"></i>
-                <h6>No Students Yet</h6>
-                <p>Add students to this group to organize classes</p>
-                <button class="btn-glass btn-sm" (click)="modalService.openModal('addStudentModal')">
-                  <i class="bi bi-person-plus me-1"></i> Add First Student
-                </button>
-              </div>
-
-              <!-- Students Table -->
-              <div *ngIf="groupStudents.length > 0" class="table-responsive">
-                <table class="glass-table compact">
-                  <thead>
-                    <tr>
-                      <th>Student Name</th>
-                      <th>Email</th>
-                      <th>Added On</th>
-                      <th class="text-end">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr *ngFor="let student of groupStudents">
-                      <td>
-                        <div class="user-avatar-cell">
-                          <div class="avatar-sm">{{student.name?.charAt(0) || 'S'}}</div>
-                          {{student.name}}
-                        </div>
-                      </td>
-                      <td>{{student.email}}</td>
-                      <td><small class="text-muted">{{student.added_at || 'Recently' | date:'shortDate'}}</small></td>
-                      <td class="text-end">
-                        <button class="btn-glass btn-sm danger" (click)="removeStudentFromGroup(student.student_id)" title="Remove">
-                          <i class="bi bi-person-dash"></i>
-                        </button>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
+            <div class="col-md-4 text-end">
+              <div class="display-4 fw-bold text-primary">{{groupStudents.length}}</div>
+              <small class="text-muted">Students in Group</small>
             </div>
           </div>
         </div>
-        <div class="modal-footer">
-          <button type="button" class="btn-glass danger" (click)="deleteGroup(selectedGroup?.id)">
-            <i class="bi bi-trash me-1"></i> Delete Group
-          </button>
-          <button type="button" class="btn-glass" (click)="closeGroupDetailsModal()">Close</button>
+
+        <!-- Students Section -->
+        <div class="glass-panel">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h6 class="mb-0"><i class="bi bi-people accent me-2"></i>Students in this Group</h6>
+            <button class="btn-glass btn-sm" (click)="openAddStudentModal()">
+              <i class="bi bi-person-plus me-1"></i> Add Student
+            </button>
+          </div>
+
+          <div *ngIf="groupStudents.length === 0" class="empty-state text-center py-4">
+            <i class="bi bi-person-x empty-icon fs-1"></i>
+            <h6 class="mt-2">No Students Yet</h6>
+            <p>Add students to this group to organize classes</p>
+            <button class="btn-glass btn-sm" (click)="openAddStudentModal()">
+              <i class="bi bi-person-plus me-1"></i> Add First Student
+            </button>
+          </div>
+
+          <div *ngIf="groupStudents.length > 0" class="table-responsive">
+            <table class="sharp-table">
+              <thead>
+                <tr>
+                  <th>Student Name</th>
+                  <th>Email</th>
+                  <th>Added On</th>
+                  <th class="text-end">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let student of groupStudents">
+                  <td>
+                    <div class="user-avatar-cell">
+                      <div class="avatar-sm">{{student.name?.charAt(0) || 'S'}}</div>
+                      {{student.name}}
+                    </div>
+                  </td>
+                  <td>{{student.email}}</td>
+                  <td><small class="text-muted">{{student.added_at || 'Recently' | date:'shortDate'}}</small></td>
+                  <td class="text-end">
+                    <button class="btn-glass btn-sm danger" (click)="removeStudentFromGroup(student.student_id)" title="Remove">
+                      <i class="bi bi-person-dash"></i>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
+      </div>
+      <div class="modal-footer-sharp">
+        <button type="button" class="btn-glass danger" (click)="deleteGroup(selectedGroup?.id)">
+          <i class="bi bi-trash me-1"></i> Delete Group
+        </button>
+        <button type="button" class="btn-glass" (click)="closeGroupDetailsModal()">Close</button>
       </div>
     </div>
   </div>
 
-  <!-- Add Student Modal -->
-  <div class="modal fade" id="addStudentModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content sharp-modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">
-            <i class="bi bi-person-plus accent me-2"></i>Add Student to Group
-          </h5>
-          <button type="button" class="btn-close-custom" (click)="modalService.closeModal('addStudentModal')">
-            ×
-          </button>
+  <!-- ========== ADD STUDENT MODAL ========== -->
+  <div class="modal-overlay" *ngIf="showAddStudentModal" (click)="closeModalOnOverlay($event)">
+    <div class="sharp-modal">
+      <div class="modal-header-sharp">
+        <h3><i class="bi bi-person-plus accent me-2"></i>Add Student to Group</h3>
+        <button class="modal-close" (click)="closeAddStudentModal()">✕</button>
+      </div>
+      <div class="modal-body-sharp">
+        <div *ngIf="activeStudents.length === 0" class="empty-state text-center py-4">
+          <i class="bi bi-people empty-icon fs-1"></i>
+          <h6>No Students Available</h6>
+          <p>All active students are already in this group or no students have registered yet.</p>
         </div>
-        <div class="modal-body">
-          <!-- No Students Available -->
-          <div *ngIf="activeStudents.length === 0" class="empty-state">
-            <i class="bi bi-people empty-icon"></i>
-            <h6>No Students Available</h6>
-            <p>All active students are already in this group or no students have registered yet.</p>
+
+        <div *ngIf="activeStudents.length > 0">
+          <p class="text-muted mb-3">
+            Select a student to add to <strong>{{selectedGroup?.group_name}}</strong>:
+          </p>
+
+          <div *ngIf="groupStudents.length > 0" class="alert-box warning mb-3">
+            <i class="bi bi-exclamation-triangle me-1"></i>
+            <small>{{groupStudents.length}} students already in this group</small>
           </div>
 
-          <!-- Students Available -->
-          <div *ngIf="activeStudents.length > 0">
-            <p class="text-muted mb-3">
-              Select a student to add to <strong>{{selectedGroup?.group_name}}</strong>:
-            </p>
-
-            <div *ngIf="groupStudents.length > 0" class="alert-box warning mb-3">
-              <i class="bi bi-exclamation-triangle me-1"></i>
-              <small>{{groupStudents.length}} students already in this group</small>
-            </div>
-
-            <div class="list-group-custom">
-              <a *ngFor="let student of activeStudents"
+          <div class="list-group-custom">
+            <div *ngFor="let student of activeStudents"
                  class="list-item d-flex justify-content-between align-items-center"
-                 (click)="addStudentToGroup(student)"
-                 [class.disabled-item]="isStudentInGroup(student.student_id)">
-                <div>
-                  <div class="fw-medium">{{ student.name }}</div>
-                  <small class="text-muted">{{ student.email }}</small>
-                </div>
-                <span *ngIf="isStudentInGroup(student.student_id)" class="badge badge-inactive">
-                  Already Added
-                </span>
-                <span *ngIf="!isStudentInGroup(student.student_id)" class="badge badge-active">
-                  Add
-                </span>
-              </a>
-            </div>
-
-            <div class="mt-3 text-muted">
-              <small>Showing {{activeStudents.length}} active students</small>
+                 (click)="!isStudentInGroup(student.student_id) && addStudentToGroup(student)">
+              <div>
+                <div class="fw-medium">{{ student.name }}</div>
+                <small class="text-muted">{{ student.email }}</small>
+              </div>
+              <span *ngIf="isStudentInGroup(student.student_id)" class="badge-sharp badge-inactive">
+                Already Added
+              </span>
+              <span *ngIf="!isStudentInGroup(student.student_id)" class="badge-sharp badge-active">
+                Add
+              </span>
             </div>
           </div>
+
+          <div class="mt-3 text-muted">
+            <small>Showing {{activeStudents.length}} active students</small>
+          </div>
         </div>
-        <div class="modal-footer">
-          <button type="button" class="btn-glass" (click)="modalService.closeModal('addStudentModal')"
-            [disabled]="addingStudent">Cancel</button>
-          <button type="button" class="btn-glass primary" [disabled]="true">
-            Select a student above
-          </button>
-        </div>
+      </div>
+      <div class="modal-footer-sharp">
+        <button type="button" class="btn-glass" (click)="closeAddStudentModal()">Cancel</button>
+        <button type="button" class="btn-glass primary" disabled>Select a student above</button>
       </div>
     </div>
   </div>

@@ -37,8 +37,8 @@ export class InstructorDashboardComponent implements OnInit, OnDestroy {
   upcomingClasses: number = 0;
   totalStudents: number = 0;
   attendanceRate: number = 0;
-  
-academicYearRange = { start: '', end: '' };
+
+  academicYearRange = { start: '', end: '' };
 
   // Attendance form
   attendanceForm: FormGroup = new FormGroup({});
@@ -51,6 +51,12 @@ academicYearRange = { start: '', end: '' };
   classPage: number = 1;
   classPageSize: number = 6;
   private subscriptions: Subscription[] = [];
+
+  // Monthly report
+  selectedReportMonth: string = '';
+  sendingReport: boolean = false;
+  reportMessage: string = '';
+  reportError: boolean = false;
 
   tagStatusMap: { [classId: number]: { tagged_in: boolean, tagged_out: boolean } } = {};
 
@@ -70,8 +76,10 @@ academicYearRange = { start: '', end: '' };
   }
 
   ngOnInit() {
-    this.loadDashboardData();
-  }
+  const today = new Date();
+  this.selectedReportMonth = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`;
+  this.loadDashboardData();
+}
 
   ngOnDestroy() {
     this.subscriptions.forEach(sub => sub.unsubscribe());
@@ -124,16 +132,16 @@ academicYearRange = { start: '', end: '' };
   }
 
   registerForAnnouncement(id: number) {
-  // For now, free registration – pass empty payment data
-  this.announcementService.register(id, {}).subscribe({
-    next: () => {
-      alert('Registered successfully!');
-      this.loadAnnouncementsAndPosts();
-      this.loadMyRegisteredEvents();
-    },
-    error: (err) => alert('Error: ' + err.error?.error)
-  });
-}
+    // For now, free registration – pass empty payment data
+    this.announcementService.register(id, {}).subscribe({
+      next: () => {
+        alert('Registered successfully!');
+        this.loadAnnouncementsAndPosts();
+        this.loadMyRegisteredEvents();
+      },
+      error: (err) => alert('Error: ' + err.error?.error)
+    });
+  }
 
   sanitizeUrl(url: string): SafeResourceUrl {
     let embedUrl = url;
@@ -182,49 +190,49 @@ academicYearRange = { start: '', end: '' };
     this.classPage = 1;
   }
   loadAcademicYearRange() {
-  this.apiService.getSettings().subscribe((range: any) => {
-    this.academicYearRange = range;
-  });
-}
+    this.apiService.getSettings().subscribe((range: any) => {
+      this.academicYearRange = range;
+    });
+  }
 
 
   // ---------- Classes ----------
-loadClasses() {
-  this.loading = true;
-  const sub = this.apiService.getClasses().subscribe({
-    next: (data: any) => {
-      // Parse the response as before
-      let parsed: any[] = [];
-      if (Array.isArray(data)) parsed = data;
-      else if (data?.rows) parsed = data.rows;
-      else if (data?.data) parsed = data.data;
-      else parsed = [];
+  loadClasses() {
+    this.loading = true;
+    const sub = this.apiService.getClasses().subscribe({
+      next: (data: any) => {
+        // Parse the response as before
+        let parsed: any[] = [];
+        if (Array.isArray(data)) parsed = data;
+        else if (data?.rows) parsed = data.rows;
+        else if (data?.data) parsed = data.data;
+        else parsed = [];
 
-      // Filter by academic year if we have dates
-      if (this.academicYearRange.start && this.academicYearRange.end) {
-        const start = new Date(this.academicYearRange.start);
-        const end = new Date(this.academicYearRange.end);
-        parsed = parsed.filter(c => {
-          const d = new Date(c.class_date);
-          return d >= start && d <= end;
-        });
+        // Filter by academic year if we have dates
+        if (this.academicYearRange.start && this.academicYearRange.end) {
+          const start = new Date(this.academicYearRange.start);
+          const end = new Date(this.academicYearRange.end);
+          parsed = parsed.filter(c => {
+            const d = new Date(c.class_date);
+            return d >= start && d <= end;
+          });
+        }
+
+        this.classes = parsed;
+        this.filteredClasses = [...this.classes];
+        this.classes.forEach(cls => this.loadTagStatus(cls.id));
+        this.calculateStatistics();
+        this.loading = false;
+      },
+      error: (error) => {
+        console.error('Error loading classes:', error);
+        this.classes = [];
+        this.filteredClasses = [];
+        this.loading = false;
       }
-
-      this.classes = parsed;
-      this.filteredClasses = [...this.classes];
-      this.classes.forEach(cls => this.loadTagStatus(cls.id));
-      this.calculateStatistics();
-      this.loading = false;
-    },
-    error: (error) => {
-      console.error('Error loading classes:', error);
-      this.classes = [];
-      this.filteredClasses = [];
-      this.loading = false;
-    }
-  });
-  this.subscriptions.push(sub);
-}
+    });
+    this.subscriptions.push(sub);
+  }
 
   calculateStatistics() {
     this.totalClasses = this.classes.length;
@@ -553,6 +561,43 @@ loadClasses() {
       this.classPage--;
     }
   }
+
+  sendMonthlyReport() {
+  if (!this.selectedReportMonth) {
+    this.reportMessage = 'Please select a month.';
+    this.reportError = true;
+    setTimeout(() => this.reportMessage = '', 3000);
+    return;
+  }
+
+  this.sendingReport = true;
+  this.reportMessage = '';
+  this.reportError = false;
+
+  const instructorId = this.currentUser?.instructor_id;
+  if (!instructorId) {
+    this.reportMessage = 'Instructor ID not found.';
+    this.reportError = true;
+    this.sendingReport = false;
+    setTimeout(() => this.reportMessage = '', 3000);
+    return;
+  }
+
+  this.apiService.sendMonthlyReport(this.selectedReportMonth, instructorId).subscribe({
+    next: (res: any) => {
+      this.reportMessage = res.message;
+      this.sendingReport = false;
+      setTimeout(() => this.reportMessage = '', 5000);
+    },
+    error: (err) => {
+      console.error('Report error:', err);
+      this.reportMessage = err.error?.error || 'Failed to send report.';
+      this.reportError = true;
+      this.sendingReport = false;
+      setTimeout(() => this.reportMessage = '', 5000);
+    }
+  });
+}
 
   // Reset page when filters change
 

@@ -9,8 +9,8 @@ import { AuthService } from './auth.service';
 })
 export class ApiService {
   // ------ CONFIGURATION ------
-  private apiUrl = 'https://dbds-backend.onrender.com/api';
-  // private apiUrl = 'http://localhost:5010/api';   // local development
+  // private apiUrl = 'https://dbds-backend.onrender.com/api';
+  private apiUrl = 'http://localhost:5010/api';   
 
   constructor(private http: HttpClient, private authService: AuthService) {}
 
@@ -371,4 +371,12 @@ export class ApiService {
     return this.http.get(`${this.apiUrl}/health`)
       .pipe(catchError(this.handleHttpError.bind(this)));
   }
+
+  // REPORTS
+  sendMonthlyReport(month: string, instructorId?: number): Observable<any> {
+  let url = `${this.apiUrl}/eachreports/instructor-monthly?month=${month}`;
+  if (instructorId) url += `&instructor_id=${instructorId}`;
+  return this.http.get(url, { headers: this.getHeaders() })
+    .pipe(catchError(this.handleHttpError.bind(this)));
+}
 }

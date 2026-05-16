@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { LoginComponent } from './components/login/login.component';
+import { LoginComponent } from './components/Helpers/login/login.component';
 import { RegisterComponent } from './components/register/register.component';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { AdminDashboardComponent } from './components/admin-dashboard/admin-dashboard.component';
@@ -11,10 +11,11 @@ import { RoleGuard } from './guards/role.guard';
 import { GroupsManagementComponent } from './components/groups-management/groups-management.component';
 import { ProfileComponent } from './components/profile/profile.component';
 import { ForgorPasswordComponent } from './components/forgor-password/forgor-password.component';
-import { ResetPasswordComponent } from './components/reset-password/reset-password.component';
+import { ResetPasswordComponent } from './components/Helpers/reset-password/reset-password.component';
+import { HomeComponen } from './components/home/home.component';
 
 const routes: Routes = [
-  { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
+  { path: '', redirectTo: '/home', pathMatch: 'full' },   // ← home is now the default
 
   // Auth (public)
   { path: 'login', component: LoginComponent },
@@ -22,7 +23,10 @@ const routes: Routes = [
   { path: 'forgot-password', component: ForgorPasswordComponent },
   { path: 'reset-password', component: ResetPasswordComponent },
 
-  // Dashboard (public + private)
+  // Home page
+  { path: 'home', component: HomeComponen },
+
+  // Dashboard (still available at /dashboard)
   { path: 'dashboard', component: DashboardComponent },
 
   // Profile (requires auth)
@@ -54,8 +58,8 @@ const routes: Routes = [
     data: { role: 'STUDENT' }
   },
 
-  // Wildcard – ALWAYS last
-  { path: '**', redirectTo: '/dashboard' }
+  // Wildcard – redirect to home
+  { path: '**', redirectTo: '/home' }
 ];
 
 @NgModule({

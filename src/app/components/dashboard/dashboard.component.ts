@@ -69,6 +69,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
     payment_time: '',
     payment_type: ''
   };
+  // Carousel 3D
+  currentCarouselIndex = 0;
+  visibleCarouselItems: any[] = []; // max 5 items
+  carouselPositions = ['lefter', 'left', 'center', 'right', 'righter'];
 
   private destroy$ = new Subject<void>();
 
@@ -87,44 +91,43 @@ export class DashboardComponent implements OnInit, OnDestroy {
       phone: [''],
       address: [''],
       currentPassword: [''],
-    newPassword: [''],
-    confirmPassword: ['']
+      newPassword: [''],
+      confirmPassword: ['']
     });
   }
 
   ngOnInit() {
-  this.authService.isInitialized$
-    .pipe(
-      filter(initialized => initialized === true),
-      take(1),
-      switchMap(() => this.authService.currentUser$),
-      take(1)
-    )
-    .subscribe(user => {
-      if (user) {
-        this.user = user;
-        this.isPublic = false;
-      } else {
-        this.user = null;
-        this.isPublic = true;
-      }
+    this.authService.isInitialized$
+      .pipe(
+        filter(initialized => initialized === true),
+        take(1),
+        switchMap(() => this.authService.currentUser$),
+        take(1)
+      )
+      .subscribe(user => {
+        if (user) {
+          this.user = user;
+          this.isPublic = false;
+        } else {
+          this.user = null;
+          this.isPublic = true;
+        }
 
-      // Now it's safe to load content – even if guest
-      this.loadAnnouncements();
-      this.loadPosts();
-      this.loadingInitial = false;    // hide global loading overlay
-    });
-}
+        // Now it's safe to load content – even if guest
+        this.loadAnnouncements();
+        this.loadPosts();
+        this.loadingInitial = false;    // hide global loading overlay
+      });
+  }
 
   loadAnnouncements() {
-    this.announcementService.getAll().subscribe((data: any[]) => {
+    this.announcementService.getAll().subscribe(data => {
       this.announcements = data.map(ann => ({
         ...ann,
         fullImageUrl: this.getFullImageUrl(ann.image_storage || ann.media_url),
-        safeVideoUrl: ann.media_type === 'VIDEO'
-          ? this.sanitizeUrl(ann.media_url)
-          : null,
+        safeVideoUrl: ann.media_type === 'VIDEO' ? this.sanitizeUrl(ann.media_url) : null,
       }));
+
       this.filterAnnouncements(this.selectedCategory);
     });
   }
@@ -132,17 +135,60 @@ export class DashboardComponent implements OnInit, OnDestroy {
   filterAnnouncements(category: string) {
     this.selectedCategory = category;
     this.filteredAnnouncements = this.announcements.filter(a => a.category === category);
+    this.currentCarouselIndex = 0;
+    this.updateVisibleCarouselItems();
   }
-  togglePasswordChange() {
-  this.showPasswordFields = !this.showPasswordFields;
-  if (!this.showPasswordFields) {
-    this.profileForm.patchValue({
-      currentPassword: '',
-      newPassword: '',
-      confirmPassword: ''
-    });
+  updateVisibleCarouselItems() {
+    const total = this.filteredAnnouncements.length;
+    if (total === 0) {
+      this.visibleCarouselItems = [];
+      return;
+    }
+    // Build array of 5 items centered at currentCarouselIndex
+    const items: any[] = [];
+    for (let i = -2; i <= 2; i++) {
+      let idx = this.currentCarouselIndex + i;
+      if (idx < 0) idx = total + idx;
+      if (idx >= total) idx = idx - total;
+      items.push(this.filteredAnnouncements[idx]);
+    }
+    this.visibleCarouselItems = items;
   }
+  nextCarousel() {
+    if (this.filteredAnnouncements.length === 0) return;
+    this.currentCarouselIndex = (this.currentCarouselIndex + 1) % this.filteredAnnouncements.length;
+    this.updateVisibleCarouselItems();
+  }
+
+  prevCarousel() {
+    if (this.filteredAnnouncements.length === 0) return;
+    this.currentCarouselIndex = (this.currentCarouselIndex - 1 + this.filteredAnnouncements.length) % this.filteredAnnouncements.length;
+    this.updateVisibleCarouselItems();
+  }
+  isEventCompleted(announcement: any): boolean {
+  if (!announcement.event_date) return false;
+  const eventDate = new Date(announcement.event_date);
+  // If event has time, combine with event_start_time (if exists)
+  if (announcement.event_start_time) {
+    const [hours, minutes] = announcement.event_start_time.split(':');
+    eventDate.setHours(parseInt(hours), parseInt(minutes));
+  } else {
+    eventDate.setHours(0, 0, 0, 0);
+  }
+  const now = new Date();
+  return eventDate < now;
 }
+
+  togglePasswordChange() {
+    this.showPasswordFields = !this.showPasswordFields;
+    if (!this.showPasswordFields) {
+      this.profileForm.patchValue({
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: ''
+      });
+    }
+  }
 
   loadPosts() {
     this.postService.getAll().subscribe((data: any[]) => {
@@ -310,25 +356,25 @@ export class DashboardComponent implements OnInit, OnDestroy {
       const profileData = this.profileForm.value;
       await firstValueFrom(this.apiService.updateUserProfile(profileData));
       if (this.showPasswordFields) {
-      const currentPassword = this.profileForm.get('currentPassword')?.value;
-      const newPassword = this.profileForm.get('newPassword')?.value;
-      const confirmPassword = this.profileForm.get('confirmPassword')?.value;
+        const currentPassword = this.profileForm.get('currentPassword')?.value;
+        const newPassword = this.profileForm.get('newPassword')?.value;
+        const confirmPassword = this.profileForm.get('confirmPassword')?.value;
 
-      if (currentPassword && newPassword && confirmPassword) {
-        if (newPassword !== confirmPassword) {
-          alert('New passwords do not match');
-          this.isSubmitting = false;
-          return;
+        if (currentPassword && newPassword && confirmPassword) {
+          if (newPassword !== confirmPassword) {
+            alert('New passwords do not match');
+            this.isSubmitting = false;
+            return;
+          }
+          await firstValueFrom(this.apiService.changePassword({
+            currentPassword,
+            newPassword,
+            confirmPassword
+          }));
+          alert('Password updated successfully');
+          this.showPasswordFields = false;
         }
-        await firstValueFrom(this.apiService.changePassword({
-          currentPassword,
-          newPassword,
-          confirmPassword
-        }));
-        alert('Password updated successfully');
-        this.showPasswordFields = false;
       }
-    }
 
       const refreshedUser = await firstValueFrom(this.authService.refreshUserData());
       this.user = refreshedUser;

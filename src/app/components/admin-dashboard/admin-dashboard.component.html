@@ -1,4 +1,5 @@
-<div class="dashboard-admin container-fluid">
+<app-loader *ngIf="loadingdata"></app-loader>
+<div class="dashboard-admin container-fluid" *ngIf="!loadingdata">
   <!-- Quick Stats Bar -->
   <div class="row mb-4 g-3">
     <div class="col-md-3 col-sm-6">
@@ -56,9 +57,6 @@
       <div class="d-flex justify-content-between align-items-center">
         <h3 class="page-title">Admin Dashboard</h3>
         <div class="btn-group">
-          <!-- <button class="btn-glass btn-sm" (click)="loadAllData()">
-            <i class="bi bi-arrow-clockwise"></i> Refresh
-          </button> -->
           <button class="btn-glass btn-sm" routerLink="/admin/groups">
             <i class="bi bi-people"></i> Manage Groups
           </button>
@@ -89,7 +87,6 @@
     </div>
   </div>
 
-  <!-- Class Management Section -->
   <!-- ==================== CLASS MANAGEMENT ==================== -->
   <div class="glass-panel" style="margin-bottom: 1.5rem;">
     <div class="panel-header">
@@ -102,7 +99,7 @@
     </div>
 
     <div class="panel-body">
-      <!-- Filter Bar (unchanged) -->
+      <!-- Filter Bar -->
       <div class="filter-bar">
         <div class="filter-field">
           <label class="filter-label"><i class="bi bi-person-badge me-1"></i> Instructor</label>
@@ -130,9 +127,8 @@
         <p class="mt-2 text-muted">Loading classes...</p>
       </div>
 
-      <!-- Content (after loading) -->
+      <!-- Content after loading -->
       <div *ngIf="!loadingClasses">
-        <!-- Empty state -->
         <div *ngIf="filteredClasses.length === 0" class="empty-state">
           <i class="bi bi-calendar-x empty-icon"></i>
           <h5>No Classes Found</h5>
@@ -143,7 +139,7 @@
           </button>
         </div>
 
-        <!-- ========== DESKTOP TABLE (shown on ≥768px) ========== -->
+        <!-- DESKTOP TABLE -->
         <div class="table-responsive d-none d-md-block" *ngIf="filteredClasses.length > 0">
           <table class="glass-table">
             <thead>
@@ -200,7 +196,7 @@
           </div>
         </div>
 
-        <!-- ========== MOBILE CARDS (shown on <768px) ========== -->
+        <!-- MOBILE CARDS -->
         <div class="d-md-none mobile-class-cards" *ngIf="filteredClasses.length > 0" style="margin-bottom: 1.5rem;">
           <div *ngFor="let classItem of paginatedClasses" class="class-mobile-card glass-card">
             <div class="class-mobile-header">
@@ -236,6 +232,7 @@
       </div>
     </div>
   </div>
+
   <!-- User Management & Payments Section -->
   <div class="row mb-4">
     <!-- User Management -->
@@ -246,12 +243,11 @@
         </div>
         <div class="panel-body">
           <div class="search-box mb-3">
-            <!-- <span class="search-icon"><i class="bi bi-search"></i></span> -->
             <input type="text" class="sharp-input" placeholder="Search users..." [(ngModel)]="userSearchTerm"
               (input)="filterUsers()">
           </div>
 
-          <!-- ========== DESKTOP TABLE ========== -->
+          <!-- DESKTOP TABLE -->
           <div class="table-responsive d-none d-md-block" *ngIf="paginatedUsers.length > 0">
             <table class="glass-table compact">
               <thead>
@@ -267,10 +263,10 @@
                   <td>
                     <div class="user-avatar-cell">
                       <div class="avatar-sm" [ngClass]="{
-                    'avatar-admin': user.role === 'ADMIN',
-                    'avatar-inst': user.role === 'INSTRUCTOR',
-                    'avatar-stud': user.role === 'STUDENT'
-                  }">{{user.name?.charAt(0) || 'U'}}</div>
+                        'avatar-admin': user.role === 'ADMIN',
+                        'avatar-inst': user.role === 'INSTRUCTOR',
+                        'avatar-stud': user.role === 'STUDENT'
+                      }">{{user.name?.charAt(0) || 'U'}}</div>
                       <div>
                         <div class="fw-medium">{{user.name}}</div>
                         <small class="text-muted">{{user.email}}</small>
@@ -278,10 +274,10 @@
                     </div>
                   </td>
                   <td><span class="badge" [ngClass]="{
-                'badge-admin': user.role === 'ADMIN',
-                'badge-inst': user.role === 'INSTRUCTOR',
-                'badge-stud': user.role === 'STUDENT'
-              }">{{user.role}}</span></td>
+                        'badge-admin': user.role === 'ADMIN',
+                        'badge-inst': user.role === 'INSTRUCTOR',
+                        'badge-stud': user.role === 'STUDENT'
+                      }">{{user.role}}</span></td>
                   <td>
                     <span [class]="user.is_active ? 'badge badge-active' : 'badge badge-inactive'">
                       <i class="bi" [ngClass]="user.is_active ? 'bi-check-circle' : 'bi-x-circle'"></i>
@@ -310,7 +306,7 @@
                 </tr>
               </tbody>
             </table>
-            <!-- Desktop Pagination -->
+
             <div class="pagination-bar" *ngIf="totalUserPages > 1">
               <button class="btn-glass btn-sm" (click)="prevUserPage()" [disabled]="userPage === 1">← Prev</button>
               <span class="page-info">{{userPage}} / {{totalUserPages}}</span>
@@ -319,16 +315,16 @@
             </div>
           </div>
 
-          <!-- ========== MOBILE CARDS ========== -->
+          <!-- MOBILE CARDS -->
           <div class="d-md-none mobile-class-cards" *ngIf="paginatedUsers.length > 0">
             <div *ngFor="let user of paginatedUsers" class="class-mobile-card">
               <div class="class-mobile-header">
                 <div class="d-flex align-items-center gap-2">
                   <div class="avatar-sm" [ngClass]="{
-                'avatar-admin': user.role === 'ADMIN',
-                'avatar-inst': user.role === 'INSTRUCTOR',
-                'avatar-stud': user.role === 'STUDENT'
-              }">{{user.name?.charAt(0) || 'U'}}</div>
+                        'avatar-admin': user.role === 'ADMIN',
+                        'avatar-inst': user.role === 'INSTRUCTOR',
+                        'avatar-stud': user.role === 'STUDENT'
+                      }">{{user.name?.charAt(0) || 'U'}}</div>
                   <div>
                     <div class="fw-bold">{{user.name}}</div>
                     <small class="text-muted">{{user.email}}</small>
@@ -340,10 +336,10 @@
               </div>
               <div class="class-mobile-body">
                 <span class="badge" [ngClass]="{
-              'badge-admin': user.role === 'ADMIN',
-              'badge-inst': user.role === 'INSTRUCTOR',
-              'badge-stud': user.role === 'STUDENT'
-            }">{{user.role}}</span>
+                      'badge-admin': user.role === 'ADMIN',
+                      'badge-inst': user.role === 'INSTRUCTOR',
+                      'badge-stud': user.role === 'STUDENT'
+                    }">{{user.role}}</span>
               </div>
               <div class="class-mobile-actions mt-2">
                 <button class="btn-glass btn-sm" (click)="toggleUserStatus(user.id)" [disabled]="user.role === 'ADMIN'">
@@ -359,7 +355,7 @@
                 </button>
               </div>
             </div>
-            <!-- Mobile Pagination -->
+
             <div class="pagination-bar" *ngIf="totalUserPages > 1">
               <button class="btn-glass btn-sm" (click)="prevUserPage()" [disabled]="userPage === 1">←</button>
               <span class="page-info">{{userPage}} / {{totalUserPages}}</span>
@@ -386,7 +382,6 @@
           <div class="mb-3">
             <label class="form-label">Select Month & Year:</label>
             <div class="search-box">
-              <!-- <span class="search-icon"><i class="bi bi-calendar"></i></span> -->
               <input type="month" class="sharp-input" [(ngModel)]="selectedMonth" (change)="loadPayments()">
             </div>
           </div>
@@ -411,7 +406,7 @@
               <p>Select a month and calculate payments</p>
             </div>
 
-            <!-- ========== DESKTOP TABLE ========== -->
+            <!-- DESKTOP TABLE -->
             <div class="table-responsive d-none d-md-block" *ngIf="payments.length > 0">
               <table class="glass-table compact">
                 <thead>
@@ -453,6 +448,7 @@
                   </tr>
                 </tfoot>
               </table>
+
               <div class="pagination-bar" *ngIf="totalPaymentPages > 1">
                 <button class="btn-glass btn-sm" (click)="prevPaymentPage()" [disabled]="paymentPage === 1">←
                   Prev</button>
@@ -462,7 +458,7 @@
               </div>
             </div>
 
-            <!-- ========== MOBILE CARDS ========== -->
+            <!-- MOBILE CARDS -->
             <div class="d-md-none mobile-class-cards" *ngIf="payments.length > 0">
               <div *ngFor="let payment of paginatedPayments" class="class-mobile-card">
                 <div class="class-mobile-header">
@@ -480,6 +476,7 @@
                     (click)="markAsPaid(payment.id)">Mark Paid</button>
                 </div>
               </div>
+
               <div class="pagination-bar" *ngIf="totalPaymentPages > 1">
                 <button class="btn-glass btn-sm" (click)="prevPaymentPage()" [disabled]="paymentPage === 1">←</button>
                 <span class="page-info">{{paymentPage}} / {{totalPaymentPages}}</span>
@@ -507,7 +504,7 @@
               (input)="filterStudents()">
           </div>
 
-          <!-- Desktop Table -->
+          <!-- DESKTOP TABLE -->
           <div class="table-responsive d-none d-md-block" *ngIf="paginatedStudentStats.length > 0">
             <table class="glass-table">
               <thead>
@@ -532,10 +529,10 @@
                   <td>
                     <div class="progress-bar-wrap">
                       <div class="progress" [ngClass]="{
-                      'progress-high': getAttendancePercentage(stat) >= 80,
-                      'progress-mid': getAttendancePercentage(stat) >= 50 && getAttendancePercentage(stat) < 80,
-                      'progress-low': getAttendancePercentage(stat) < 50
-                    }" [style.width]="getAttendancePercentage(stat) + '%'"></div>
+                          'progress-high': getAttendancePercentage(stat) >= 80,
+                          'progress-mid': getAttendancePercentage(stat) >= 50 && getAttendancePercentage(stat) < 80,
+                          'progress-low': getAttendancePercentage(stat) < 50
+                        }" [style.width]="getAttendancePercentage(stat) + '%'"></div>
                       <span class="progress-text">{{getAttendancePercentage(stat)}}%</span>
                     </div>
                   </td>
@@ -557,6 +554,7 @@
                 </tr>
               </tfoot>
             </table>
+
             <div class="pagination-bar" *ngIf="totalStudentPages > 1">
               <button class="btn-glass btn-sm" (click)="prevStudentPage()" [disabled]="studentPage === 1">←
                 Prev</button>
@@ -566,7 +564,7 @@
             </div>
           </div>
 
-          <!-- Mobile Cards -->
+          <!-- MOBILE CARDS -->
           <div class="d-md-none mobile-class-cards" *ngIf="paginatedStudentStats.length > 0">
             <div *ngFor="let stat of paginatedStudentStats" class="class-mobile-card">
               <div class="class-mobile-header">
@@ -581,14 +579,15 @@
                 </div>
                 <div class="progress-bar-wrap mt-1">
                   <div class="progress" [ngClass]="{
-                  'progress-high': getAttendancePercentage(stat) >= 80,
-                  'progress-mid': getAttendancePercentage(stat) >= 50 && getAttendancePercentage(stat) < 80,
-                  'progress-low': getAttendancePercentage(stat) < 50
-                }" [style.width]="getAttendancePercentage(stat) + '%'"></div>
+                          'progress-high': getAttendancePercentage(stat) >= 80,
+                          'progress-mid': getAttendancePercentage(stat) >= 50 && getAttendancePercentage(stat) < 80,
+                          'progress-low': getAttendancePercentage(stat) < 50
+                        }" [style.width]="getAttendancePercentage(stat) + '%'"></div>
                   <span class="progress-text">{{getAttendancePercentage(stat)}}%</span>
                 </div>
               </div>
             </div>
+
             <div class="pagination-bar" *ngIf="totalStudentPages > 1">
               <button class="btn-glass btn-sm" (click)="prevStudentPage()" [disabled]="studentPage === 1">←</button>
               <span class="page-info">{{studentPage}} / {{totalStudentPages}}</span>
@@ -613,7 +612,7 @@
           <h5 class="panel-title"><i class="bi bi-person-badge accent me-2"></i>Instructor Statistics</h5>
         </div>
         <div class="panel-body">
-          <!-- Desktop Table -->
+          <!-- DESKTOP TABLE -->
           <div class="table-responsive d-none d-md-block" *ngIf="paginatedInstructorStats.length > 0">
             <table class="glass-table compact">
               <thead>
@@ -653,6 +652,7 @@
                 </tr>
               </tbody>
             </table>
+
             <div class="pagination-bar" *ngIf="totalInstructorPages > 1">
               <button class="btn-glass btn-sm" (click)="prevInstructorPage()" [disabled]="instructorPage === 1">←
                 Prev</button>
@@ -662,8 +662,9 @@
             </div>
           </div>
 
-          <!-- Mobile Cards -->
-          <div class="d-md-none mobile-class-cards" *ngIf="paginatedInstructorStats.length > 0" style="margin-bottom: 1.5rem;">
+          <!-- MOBILE CARDS -->
+          <div class="d-md-none mobile-class-cards" *ngIf="paginatedInstructorStats.length > 0"
+            style="margin-bottom: 1.5rem;">
             <div *ngFor="let instructor of paginatedInstructorStats" class="class-mobile-card">
               <div class="class-mobile-header">
                 <strong>{{instructor.instructor_name}}</strong>
@@ -681,6 +682,7 @@
                 <div class="fw-bold text-success">${{instructor.potential_earnings || 0}}</div>
               </div>
             </div>
+
             <div class="pagination-bar" *ngIf="totalInstructorPages > 1">
               <button class="btn-glass btn-sm" (click)="prevInstructorPage()"
                 [disabled]="instructorPage === 1">←</button>
@@ -706,8 +708,7 @@
         Create</button>
     </div>
     <div class="panel-body">
-
-      <!-- ========== DESKTOP TABLE (≥768px) ========== -->
+      <!-- DESKTOP TABLE -->
       <div class="table-responsive d-none d-md-block" *ngIf="paginatedAnnouncements.length > 0">
         <table class="glass-table compact">
           <thead>
@@ -741,7 +742,6 @@
           </tbody>
         </table>
 
-        <!-- Desktop Pagination -->
         <div class="pagination-bar" *ngIf="totalAnnouncementPages > 1">
           <button class="btn-glass btn-sm" (click)="prevAnnouncementPage()" [disabled]="announcementPage === 1">←
             Prev</button>
@@ -751,8 +751,9 @@
         </div>
       </div>
 
-      <!-- ========== MOBILE CARDS (hidden on desktop) ========== -->
-      <div class="d-md-none mobile-class-cards" *ngIf="paginatedAnnouncements.length > 0" style="margin-bottom: 1.5rem;">
+      <!-- MOBILE CARDS -->
+      <div class="d-md-none mobile-class-cards" *ngIf="paginatedAnnouncements.length > 0"
+        style="margin-bottom: 1.5rem;">
         <div *ngFor="let ann of paginatedAnnouncements" class="class-mobile-card announcement-mobile-card">
           <div class="class-mobile-header">
             <strong>{{ann.title}}</strong>
@@ -774,7 +775,6 @@
           </div>
         </div>
 
-        <!-- Mobile Pagination -->
         <div class="pagination-bar" *ngIf="totalAnnouncementPages > 1">
           <button class="btn-glass btn-sm" (click)="prevAnnouncementPage()"
             [disabled]="announcementPage === 1">←</button>
@@ -784,7 +784,6 @@
         </div>
       </div>
 
-      <!-- Empty state -->
       <div *ngIf="announcements.length === 0" class="empty-state">
         <i class="bi bi-megaphone empty-icon"></i>
         <h5>No announcements yet</h5>
@@ -793,7 +792,7 @@
     </div>
   </div>
 
-  <!-- View Registrations Modal -->
+  <!-- View Registrations Modal (no pagination needed inside modal) -->
   <div class="modal fade" id="registrationsModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
       <div class="modal-content sharp-modal-content">
@@ -802,10 +801,8 @@
           <button type="button" class="btn-close-custom" (click)="closeRegistrationsModal()">×</button>
         </div>
         <div class="modal-body">
-          <!-- Empty state -->
           <div *ngIf="registrations.length === 0" class="empty-state">No registrations yet.</div>
-
-          <!-- ========== DESKTOP TABLE (≥768px) ========== -->
+          <!-- DESKTOP TABLE -->
           <div class="table-responsive d-none d-md-block" *ngIf="registrations.length > 0">
             <table class="glass-table compact">
               <thead>
@@ -844,8 +841,7 @@
               </tbody>
             </table>
           </div>
-
-          <!-- ========== MOBILE CARDS (hidden on desktop) ========== -->
+          <!-- MOBILE CARDS -->
           <div class="d-md-none mobile-class-cards" *ngIf="registrations.length > 0">
             <div *ngFor="let reg of registrations" class="class-mobile-card">
               <div class="class-mobile-header">
@@ -879,7 +875,8 @@
       </div>
     </div>
   </div>
-  <!-- ==================== POSTS MANAGEMENT ==================== -->
+
+  <!-- ==================== POSTS MANAGEMENT (WITH PAGINATION) ==================== -->
   <div class="row mb-4">
     <div class="col-12">
       <div class="glass-panel">
@@ -888,23 +885,56 @@
           <button class="btn-glass btn-sm" (click)="openPostModal()"><i class="bi bi-plus-circle"></i> Add Post</button>
         </div>
         <div class="panel-body">
-          <div class="row g-3">
-            <div class="col-md-4 col-sm-6" *ngFor="let post of posts">
-              <div class="glass-card p-0 video-card">
-                <div class="video-thumb">
-                  <iframe [src]="post.safeVideoUrl" frameborder="0" allowfullscreen loading="lazy"></iframe>
-                </div>
-                <div class="p-3">
-                  <h6 class="mb-1">{{post.title || 'Untitled'}}</h6>
-                  <p class="small text-muted mb-2">{{post.description | slice:0:80}}...</p>
-                  <div class="d-flex gap-2">
-                    <button class="btn-glass btn-sm" (click)="openPostModal(post)">Edit</button>
-                    <button class="btn-glass btn-sm danger" (click)="deletePost(post.id)">Delete</button>
+          <!-- DESKTOP GRID (columns) -->
+          <div class="row g-3 d-none d-md-block">
+            <div class="row">
+              <div class="col-md-4 col-sm-6" *ngFor="let post of paginatedPosts">
+                <div class="glass-card p-0 video-card">
+                  <div class="video-thumb">
+                    <iframe [src]="post.safeVideoUrl" frameborder="0" allowfullscreen loading="lazy"></iframe>
+                  </div>
+                  <div class="p-3">
+                    <h6 class="mb-1">{{post.title || 'Untitled'}}</h6>
+                    <p class="small text-muted mb-2">{{post.description | slice:0:80}}...</p>
+                    <div class="d-flex gap-2">
+                      <button class="btn-glass btn-sm" (click)="openPostModal(post)">Edit</button>
+                      <button class="btn-glass btn-sm danger" (click)="deletePost(post.id)">Delete</button>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-            <div *ngIf="posts.length === 0" class="col-12 empty-state">No posts yet.</div>
+          </div>
+
+          <!-- MOBILE GRID (single column) -->
+          <div class="d-md-none mobile-class-cards" *ngIf="paginatedPosts.length > 0">
+            <div *ngFor="let post of paginatedPosts" class="class-mobile-card">
+              <div class="video-thumb mb-2">
+                <iframe [src]="post.safeVideoUrl" frameborder="0" allowfullscreen loading="lazy"></iframe>
+              </div>
+              <div class="class-mobile-body">
+                <h6 class="mb-1">{{post.title || 'Untitled'}}</h6>
+                <p class="small text-muted mb-2">{{post.description | slice:0:80}}...</p>
+                <div class="d-flex gap-2">
+                  <button class="btn-glass btn-sm" (click)="openPostModal(post)">Edit</button>
+                  <button class="btn-glass btn-sm danger" (click)="deletePost(post.id)">Delete</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pagination for Posts (desktop & mobile) -->
+          <div class="pagination-bar" *ngIf="totalPostPages > 1">
+            <button class="btn-glass btn-sm" (click)="prevPostPage()" [disabled]="postPage === 1">← Prev</button>
+            <span class="page-info">{{postPage}} / {{totalPostPages}}</span>
+            <button class="btn-glass btn-sm" (click)="nextPostPage()" [disabled]="postPage === totalPostPages">Next
+              →</button>
+          </div>
+
+          <div *ngIf="posts.length === 0" class="empty-state">
+            <i class="bi bi-youtube empty-icon"></i>
+            <h5>No posts yet</h5>
+            <p>Create one to share dance videos</p>
           </div>
         </div>
       </div>
@@ -937,7 +967,7 @@
       </small>
     </div>
   </div>
-
+  <app-footer></app-footer>
   <!-- ==================== MODALS ==================== -->
   <!-- Create Class Modal -->
   <div class="modal fade" id="createClassModal" tabindex="-1" aria-hidden="true">
@@ -1086,14 +1116,10 @@
                 </select></div>
             </div>
             <div class="row mb-3">
-              <div class="col-md-6">
-                <label>Event Date</label>
-                <input type="date" class="sharp-input w-100" formControlName="event_date" [min]="today">
-              </div>
-              <div class="col-md-6">
-                <label>Start Time</label>
-                <input type="time" class="sharp-input w-100" formControlName="event_start_time">
-              </div>
+              <div class="col-md-6"><label>Event Date</label><input type="date" class="sharp-input w-100"
+                  formControlName="event_date" [min]="today"></div>
+              <div class="col-md-6"><label>Start Time</label><input type="time" class="sharp-input w-100"
+                  formControlName="event_start_time"></div>
             </div>
             <div class="mb-3"><label>Media URL</label><input type="text" class="sharp-input w-100"
                 formControlName="media_url"></div>
@@ -1148,5 +1174,4 @@
       </div>
     </div>
   </div>
-
 </div>

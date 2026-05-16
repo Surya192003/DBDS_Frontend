@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../../services/api.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ModalService } from '../../services/modal.service';
 
 @Component({
   selector: 'app-groups-management',
@@ -13,17 +12,21 @@ export class GroupsManagementComponent implements OnInit {
   activeStudents: any[] = [];
   selectedGroup: any = null;
   groupStudents: any[] = [];
-  
+
   loading: boolean = false;
   creatingGroup: boolean = false;
   addingStudent: boolean = false;
-  
+
+  // Modal visibility flags (replaces ModalService)
+  showCreateModal = false;
+  showDetailsModal = false;
+  showAddStudentModal = false;
+
   groupForm: FormGroup;
-  
+
   constructor(
     private apiService: ApiService,
-    private fb: FormBuilder,
-    public modalService: ModalService
+    private fb: FormBuilder
   ) {
     this.groupForm = this.fb.group({
       group_name: ['', Validators.required],
@@ -36,6 +39,9 @@ export class GroupsManagementComponent implements OnInit {
     this.loadActiveStudents();
   }
 
+  // ------------------------------
+  // Data loading
+  // ------------------------------
   loadGroups() {
     this.loading = true;
     this.apiService.getGroups().subscribe({
@@ -73,24 +79,60 @@ export class GroupsManagementComponent implements OnInit {
     });
   }
 
+  // ------------------------------
+  // Modal control (replaces ModalService)
+  // ------------------------------
   openCreateGroupModal() {
     this.groupForm.reset();
-    this.modalService.openModal('createGroupModal');
+    this.showCreateModal = true;
+  }
+
+  closeCreateGroupModal() {
+    this.showCreateModal = false;
   }
 
   openGroupDetailsModal(group: any) {
     this.selectedGroup = group;
     this.loadGroupDetails(group.id);
-    this.modalService.openModal('groupDetailsModal');
+    this.showDetailsModal = true;
   }
 
+  closeGroupDetailsModal() {
+    this.showDetailsModal = false;
+    this.selectedGroup = null;
+    this.groupStudents = [];
+  }
+
+  openAddStudentModal() {
+    // Refresh active students list before opening
+    this.loadActiveStudents();
+    this.showAddStudentModal = true;
+  }
+
+  closeAddStudentModal() {
+    this.showAddStudentModal = false;
+  }
+
+  // Close modal when clicking on the overlay background
+  closeModalOnOverlay(event: MouseEvent) {
+    const target = event.target as HTMLElement;
+    if (target.classList.contains('modal-overlay')) {
+      this.closeCreateGroupModal();
+      this.closeGroupDetailsModal();
+      this.closeAddStudentModal();
+    }
+  }
+
+  // ------------------------------
+  // Business logic
+  // ------------------------------
   createGroup() {
     if (this.groupForm.valid) {
       this.creatingGroup = true;
       this.apiService.createGroup(this.groupForm.value).subscribe({
         next: () => {
           this.creatingGroup = false;
-          this.modalService.closeModal('createGroupModal');
+          this.closeCreateGroupModal();
           this.loadGroups();
           alert('Group created successfully!');
         },
@@ -104,24 +146,24 @@ export class GroupsManagementComponent implements OnInit {
   }
 
   addStudentToGroup(student: any) {
-    if (this.selectedGroup) {
-      this.addingStudent = true;
-      this.apiService.addStudentToGroup(this.selectedGroup.id, student.student_id).subscribe({
-        next: () => {
-          this.addingStudent = false;
-          this.loadGroupDetails(this.selectedGroup.id);
-          alert('Student added to group!');
-        },
-        error: (error) => {
-          this.addingStudent = false;
-          console.error('Error adding student:', error);
-          alert('Failed to add student: ' + error.message);
-        }
-      });
-    }
+    if (!this.selectedGroup) return;
+    this.addingStudent = true;
+    this.apiService.addStudentToGroup(this.selectedGroup.id, student.student_id).subscribe({
+      next: () => {
+        this.addingStudent = false;
+        this.loadGroupDetails(this.selectedGroup.id);
+        alert('Student added to group!');
+      },
+      error: (error) => {
+        this.addingStudent = false;
+        console.error('Error adding student:', error);
+        alert('Failed to add student: ' + error.message);
+      }
+    });
   }
 
   removeStudentFromGroup(studentId: number) {
+    if (!this.selectedGroup) return;
     if (confirm('Remove this student from the group?')) {
       this.apiService.removeStudentFromGroup(this.selectedGroup.id, studentId).subscribe({
         next: () => {
@@ -141,7 +183,7 @@ export class GroupsManagementComponent implements OnInit {
       this.apiService.deleteGroup(groupId).subscribe({
         next: () => {
           this.loadGroups();
-          this.modalService.closeModal('groupDetailsModal');
+          this.closeGroupDetailsModal();
           alert('Group deleted!');
         },
         error: (error) => {
@@ -152,15 +194,7 @@ export class GroupsManagementComponent implements OnInit {
     }
   }
 
-  closeGroupDetailsModal() {
-    this.modalService.closeModal('groupDetailsModal');
-  }
-
-  closeCreateGroupModal() {
-    this.modalService.closeModal('createGroupModal');
-  }
   isStudentInGroup(studentId: number): boolean {
-  return this.groupStudents.some(s => s.student_id === studentId);
-}
-
+    return this.groupStudents.some(s => s.student_id === studentId);
+  }
 }

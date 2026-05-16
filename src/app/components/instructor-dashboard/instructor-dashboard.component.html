@@ -1,4 +1,4 @@
-<div class="instructor-wrapper" [@fadeStagger]>
+<div class="instructor-wrapper">
 
   <!-- ========== HEADER ========== -->
   <header class="dash-header">
@@ -6,7 +6,7 @@
       <h1 class="title-text">INSTRUCTOR_PORTAL</h1>
       <p class="tagline">DBDS_IRELAND // ACCESS_LEVEL: {{currentUser?.role}}</p>
     </div>
-    <button class="btn-sharp-outline" (click)="loadDashboardData()">
+    <button class="btn-glass" (click)="loadDashboardData()">
       <span class="d-none d-md-inline">REFRESH_SYSTEM</span> 🔄
     </button>
   </header>
@@ -247,65 +247,92 @@
   </section>
 
   <!-- ========== MONTHLY PERFORMANCE ========== -->
-  <section>
-    <label class="section-label">MONTHLY_PERFORMANCE_METRICS</label>
-    <div class="sharp-card">
-      <!-- DESKTOP TABLE -->
-      <div class="table-container d-none d-md-block" *ngIf="monthlyPerformance.length">
-        <table class="sharp-table">
-          <thead>
-            <tr>
-              <th>MONTH</th>
-              <th class="text-center">CLASSES</th>
-              <th class="text-center">STUDENTS</th>
-              <th class="text-end">EARNINGS</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let perf of monthlyPerformance">
-              <td class="fw-bold">{{perf.month_year}}</td>
-              <td class="text-center">{{perf.total_classes}}</td>
-              <td class="text-center">{{perf.total_students}}</td>
-              <td class="text-end fw-bold text-success">€{{perf.earnings}}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+<section>
+  <label class="section-label">MONTHLY_PERFORMANCE_METRICS</label>
+  <div class="sharp-card">
+    <!-- DESKTOP TABLE -->
+    <div class="table-container d-none d-md-block" *ngIf="monthlyPerformance.length">
+      <table class="sharp-table">
+        <thead>
+          <tr>
+            <th>MONTH</th>
+            <th class="text-center">CLASSES</th>
+            <th class="text-center">STUDENTS</th>
+            <th class="text-end">EARNINGS</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let perf of monthlyPerformance">
+            <td class="fw-bold">{{perf.month_year}}</td>
+            <td class="text-center">{{perf.total_classes}}</td>
+            <td class="text-center">{{perf.total_students}}</td>
+            <td class="text-end fw-bold text-success">€{{perf.earnings}}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
-      <!-- MOBILE CARDS -->
-      <div class="d-md-none mobile-class-cards" *ngIf="monthlyPerformance.length">
-        <div *ngFor="let perf of monthlyPerformance" class="class-mobile-card performance-mobile-card">
-          <div class="class-mobile-header">
-            <strong>{{perf.month_year}}</strong>
-            <span class="fw-bold text-success">€{{perf.earnings}}</span>
-          </div>
-          <div class="class-mobile-body">
-            <div class="d-flex gap-3">
-              <div>
-                <small class="text-muted d-block">Classes</small>
-                <span class="fw-bold">{{perf.total_classes}}</span>
-              </div>
-              <div>
-                <small class="text-muted d-block">Students</small>
-                <span class="fw-bold">{{perf.total_students}}</span>
-              </div>
+    <!-- MOBILE CARDS -->
+    <div class="d-md-none mobile-class-cards" *ngIf="monthlyPerformance.length">
+      <div *ngFor="let perf of monthlyPerformance" class="class-mobile-card performance-mobile-card">
+        <div class="class-mobile-header">
+          <strong>{{perf.month_year}}</strong>
+          <span class="fw-bold text-success">€{{perf.earnings}}</span>
+        </div>
+        <div class="class-mobile-body">
+          <div class="d-flex gap-3">
+            <div>
+              <small class="text-muted d-block">Classes</small>
+              <span class="fw-bold">{{perf.total_classes}}</span>
+            </div>
+            <div>
+              <small class="text-muted d-block">Students</small>
+              <span class="fw-bold">{{perf.total_students}}</span>
             </div>
           </div>
         </div>
       </div>
+    </div>
 
-      <div *ngIf="!monthlyPerformance.length" class="text-center py-4">
-        <p>No performance data available.</p>
+    <div *ngIf="!monthlyPerformance.length" class="text-center py-4">
+      <p>No performance data available.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ========== MONTHLY REPORT (EMAIL) ========== -->
+<section class="mt-4">
+  <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+    <label class="section-label">📧 EMAIL MONTHLY REPORT</label>
+    <span class="text-muted small">Classes, tag times, song links & student attendance</span>
+  </div>
+
+  <div class="sharp-card p-3">
+    <div class="row g-3 align-items-end">
+      <div class="col-md-4">
+        <label class="form-label fw-bold">Select Month</label>
+        <input type="month" class="form-control sharp-input" [(ngModel)]="selectedReportMonth" />
+      </div>
+      <div class="col-md-3">
+        <button class="btn-sharp w-100" (click)="sendMonthlyReport()" [disabled]="sendingReport">
+          <span *ngIf="sendingReport"><i class="bi bi-hourglass-split"></i> SENDING...</span>
+          <span *ngIf="!sendingReport"><i class="bi bi-envelope-paper"></i> SEND REPORT</span>
+        </button>
       </div>
     </div>
-  </section>
+    <div *ngIf="reportMessage" class="mt-3 alert" [class.alert-danger]="reportError" [class.alert-success]="!reportError">
+      {{ reportMessage }}
+    </div>
+  </div>
+</section>
+<app-footer></app-footer>
   <!-- SONG LINK MODAL -->
   <div class="modal fade" id="songModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content sharp-card p-0">
         <div class="modal-header border-bottom-0 p-4 pb-0">
           <h5 class="modal-title fw-bold">UPDATE_SONG_LINK</h5>
-          <button type="button" class="btn-close" aria-label="Close" (click)="closeAttendanceModal()"></button>
+          <button type="button" class="btn-close" aria-label="Close" (click)="closeSongModal()"></button>
         </div>
         <div class="modal-body p-4">
           <div class="mb-3">
@@ -316,7 +343,7 @@
           </div>
         </div>
         <div class="modal-footer border-0 p-4 pt-0">
-          <button type="button" class="btn-close" (click)="closeSongModal()"></button>
+          <!-- <button type="button" class="btn-close" aria-label="Close" (click)="closeSongModal()"></button> -->
           <button type="button" class="btn-sharp-sm" [disabled]="loading" (click)="updateSongLink()">
             <span *ngIf="loading">UPDATING...</span>
             <span *ngIf="!loading">UPDATE_SONG</span>
@@ -382,7 +409,7 @@
           </div>
         </div>
         <div class="modal-footer border-0 p-4 pt-0">
-          <button type="button" class="btn-close" (click)="closeAttendanceModal()"></button>
+          <!-- <button type="button" class="btn-close" (click)="closeAttendanceModal()"></button> -->
           <button type="button" class="btn-sharp-sm"
             [disabled]="markingAttendance || loadingStudents || classStudents.length === 0"
             (click)="submitAttendance()">
