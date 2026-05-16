@@ -9,8 +9,8 @@ import { AuthService } from './auth.service';
 })
 export class ApiService {
   // ------ CONFIGURATION ------
-  // private apiUrl = 'https://dbds-backend.onrender.com/api';
-  private apiUrl = 'http://localhost:5010/api';
+  private apiUrl = 'https://dbds-backend.onrender.com/api';
+  // private apiUrl = 'http://localhost:5010/api';
 
   constructor(private http: HttpClient, private authService: AuthService) { }
 
